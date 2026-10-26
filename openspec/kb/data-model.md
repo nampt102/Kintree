@@ -1,6 +1,6 @@
 # Data model
 
-Nguồn: `supabase/migrations/20261026000000_init.sql`. Test: `supabase/tests/integrity.test.sql`. Lý do thiết kế: `openspec/changes/bootstrap-core/design.md` (D4, D5) và ADR 0002, 0003.
+Nguồn: `supabase/migrations/20261026000000_init.sql`. Test: `supabase/tests/integrity.test.sql`. Lý do thiết kế: `openspec/changes/archive/2026-10-26-bootstrap-core/design.md` (D4, D5) và ADR 0002, 0003.
 
 ## Bảng
 

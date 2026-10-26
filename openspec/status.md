@@ -8,22 +8,20 @@
 Phase 1 — MVP: dựng được khung gia phả từ ghi âm/ảnh qua AI đề xuất + hàng chờ duyệt (xem `docs/PRD.md`). Phase 0 (kiểm chứng AI bằng tư liệu thật) tạm bỏ qua theo quyết định của chủ dự án.
 
 ## Bước đang làm
-Change `bootstrap-core` đã làm xong 15/15 task (đã duyệt 2026-10-26): monorepo, lịch âm + Can Chi, ngày giỗ, kiểm toàn vẹn cây ở `packages/core` (251 test) và schema Postgres (19 test pgTAP). Chưa archive.
+Không có change đang mở. `bootstrap-core` đã xong và archive (`changes/archive/2026-10-26-bootstrap-core/`); spec chính ở `openspec/specs/` (`lunar-calendar`, `death-anniversary`, `family-tree-integrity`).
 
 ## Bước tiếp theo
-1. Chủ dự án xem lại `bootstrap-core`, rồi `/opsx:archive` để đưa 3 spec vào `openspec/specs/`.
-2. Chốt ADR 0004 (bộ skill), cài hallmark nếu đồng ý.
-3. `/opsx:propose` change `tree-editing` (E2 trong `docs/user-stories.md`).
+1. Chốt ADR 0004 (bộ skill), cài hallmark nếu đồng ý.
+2. `/opsx:propose` change `tree-editing` (E2 trong `docs/user-stories.md`).
 
 ## Việc bị chặn / chờ quyết định
-- Archive `bootstrap-core` — chờ chủ dự án.
 - ADR 0004 (skill) — chờ chốt.
 
 ## Bảng tiến độ
 
 | # | Bước | Trạng thái | Change / PR | Ghi chú |
 |---|---|---|---|---|
-| 1 | Nền tảng: monorepo, lịch âm, ngày giỗ, schema (E1) | done | `bootstrap-core` | 15/15 task, chưa archive |
+| 1 | Nền tảng: monorepo, lịch âm, ngày giỗ, schema (E1) | done | `bootstrap-core` | archive 2026-10-26 |
 | 2 | Dựng cây (E2, F1–F4) | todo | `tree-editing` | |
 | 3 | Đăng nhập, mời, phân quyền + RLS (E3, F10) | todo | `auth-invite-roles` | |
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | todo | `ai-sources-proposals` | điểm khác biệt |
@@ -51,6 +49,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-10-26: Archive `bootstrap-core`, sync 3 spec vào `openspec/specs/`.
 - 2026-10-26: Làm xong `bootstrap-core`; thêm KB `tech-stack.md`, `data-model.md`; push lên github.com/nampt102/Kintree.
 - 2026-10-26: ADR 0005 — AI nhiều nhà cung cấp (OpenAI, Claude, Gemini).
 - 2026-10-26: Cài project-kit/OpenSpec; ghi ADR 0001–0003; viết `docs/user-stories.md`; tạo change `bootstrap-core`.
