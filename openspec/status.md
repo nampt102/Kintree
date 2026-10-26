@@ -11,11 +11,9 @@ Phase 1 — MVP: dựng được khung gia phả từ ghi âm/ảnh qua AI đề
 Không có change đang mở. `bootstrap-core` đã xong và archive (`changes/archive/2026-10-26-bootstrap-core/`); spec chính ở `openspec/specs/` (`lunar-calendar`, `death-anniversary`, `family-tree-integrity`).
 
 ## Bước tiếp theo
-1. Chốt ADR 0004 (bộ skill), cài hallmark nếu đồng ý.
-2. `/opsx:propose` change `tree-editing` (E2 trong `docs/user-stories.md`).
+1. `/opsx:propose` change `tree-editing` (E2 trong `docs/user-stories.md`).
 
 ## Việc bị chặn / chờ quyết định
-- ADR 0004 (skill) — chờ chốt.
 
 ## Bảng tiến độ
 
@@ -37,7 +35,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - `0001-stack-web-mobile` — Vite + React + TS, bọc Capacitor; landing bằng Astro.
 - `0002-postgres-khong-graph-db` — Postgres (Supabase), không dùng FalkorDB.
 - `0003-ai-chi-de-xuat-co-nguon` — AI chỉ tạo đề xuất; mỗi trường gắn nguồn.
-- `0004-skills-cho-ai-agent` — (đề xuất) skill chính cho từng loại việc; hallmark cho landing/audit, ui-ux-pro-max cho app.
+- `0004-skills-cho-ai-agent` — skill chính cho từng loại việc; hallmark cho landing/audit, ui-ux-pro-max cho app.
 - `0005-ai-nhieu-nha-cung-cap` — gọi được OpenAI, Claude, Gemini qua Vercel AI SDK; chọn model bằng cấu hình.
 
 ## Rủi ro mở
@@ -49,6 +47,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-10-26: Chốt ADR 0004; cài hallmark vào `.claude/skills/hallmark`.
 - 2026-10-26: Archive `bootstrap-core`, sync 3 spec vào `openspec/specs/`.
 - 2026-10-26: Làm xong `bootstrap-core`; thêm KB `tech-stack.md`, `data-model.md`; push lên github.com/nampt102/Kintree.
 - 2026-10-26: ADR 0005 — AI nhiều nhà cung cấp (OpenAI, Claude, Gemini).
