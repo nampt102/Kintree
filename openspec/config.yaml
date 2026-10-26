@@ -4,6 +4,7 @@ context: |
   Bộ nhớ dự án nằm trong repo: đọc openspec/status.md đầu tiên, rồi openspec/kb/ và openspec/decisions/. Quy trình bắt đầu/kết thúc phiên ở AGENTS.md.
   Dự án: Kintree — web + mobile app cây gia phả cho dòng họ Việt. Điểm khác biệt: AI chép phả (ghi âm lời kể, ảnh phả cũ/bia mộ → đề xuất → hàng chờ duyệt, mỗi trường gắn nguồn chứng cứ). PRD: docs/PRD.md.
   Stack: pnpm monorepo. apps/app = Vite + React + TypeScript, bọc iOS/Android bằng Capacitor. packages/core = TypeScript thuần (lịch âm, ngày giỗ, xưng hô, xếp cây, GEDCOM, ràng buộc), test bằng Vitest. Backend Supabase (Postgres + RLS, Auth, Storage, Edge Functions, pg_cron). AI: nhiều nhà cung cấp (OpenAI, Claude, Gemini) qua Vercel AI SDK trong Edge Function, chọn model bằng biến môi trường (ADR 0005). Không dùng graph DB.
+  Thiết kế UI/UX: dùng đúng skill đã chốt ở ADR 0004 — ui-ux-pro-max cho màn hình và thành phần trong app, hallmark chỉ cho landing page và audit; chỗ nào bỏ khuyến nghị của skill phải ghi lý do vào design.md. Ưu tiên điện thoại, kể cả iPhone gập của Apple (chủ dự án gọi là "iPhone Duo", thông số chưa xác nhận).
   Quy ước: lịch âm theo múi giờ UTC+7; ngày tháng lưu dạng không đầy đủ (year/month/day nullable + is_lunar). AI không bao giờ ghi thẳng vào cây, chỉ tạo proposal. Ưu tiên giải pháp đơn giản nhất chạy được.
   Language: vi
   All artifacts must be written in vi.

@@ -1,6 +1,6 @@
 # Module: cây gia phả (`packages/core/src/tree/`)
 
-Hiện trạng sau change `tree-editing`. Hành vi quy định ở `openspec/specs/` (sau khi archive; trước đó ở `openspec/changes/tree-editing/specs/`); lý do thiết kế ở `design.md` của change. Test: `packages/core/test/tree/`.
+Hiện trạng sau change `tree-editing`. Hành vi quy định ở `openspec/specs/family-tree-editing` và `family-tree-viewing`; lý do thiết kế ở `openspec/changes/archive/2026-10-26-tree-editing/design.md`. Test: `packages/core/test/tree/`.
 
 ## Mô hình (`model.ts`)
 - `TreeDoc` = `{ version: 1, meta, persons, parents, marriages }`. `meta` = `{ id, name, description?, region }` (`region`: `north`/`central`/`south`).
