@@ -71,3 +71,14 @@ test('đổi xuôi rồi ngược khớp mọi ngày 1900–2100', () => {
   }
   expect(bad).toEqual([]);
 }, 120_000);
+
+// Điểm sóc sát nửa đêm (giờ Việt Nam): giờ sóc lấy từ PyEphem (thư viện thiên văn độ chính xác cao),
+// kiểm ngày 2026-10-26. Đây là những chỗ thuật toán độ chính xác thấp hay đặt sai ngày mùng 1.
+test.each([
+  [{ year: 1944, month: 6, day: 20 }, { year: 1944, month: 5, day: 1, leap: false }], // sóc 23:59:32
+  [{ year: 2072, month: 12, day: 9 }, { year: 2072, month: 11, day: 1, leap: false }], // sóc 23:58:28
+  [{ year: 2077, month: 11, day: 15 }, { year: 2077, month: 10, day: 1, leap: false }], // sóc 23:59:34
+  [{ year: 2175, month: 1, day: 22 }, { year: 2175, month: 1, day: 1, leap: false }], // sóc 23:59:36
+])('sóc sát nửa đêm: %o là mùng 1', (solar, lunar) => {
+  expect(solarToLunar(solar)).toEqual(lunar);
+});

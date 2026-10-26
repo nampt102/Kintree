@@ -8,7 +8,7 @@
 Phase 1 — MVP: dựng được khung gia phả từ ghi âm/ảnh qua AI đề xuất + hàng chờ duyệt (xem `docs/PRD.md`). Phase 0 (kiểm chứng AI bằng tư liệu thật) tạm bỏ qua theo quyết định của chủ dự án.
 
 ## Bước đang làm
-Change `bootstrap-core` đã làm xong 15/15 task (đã duyệt 2026-10-26): monorepo, lịch âm + Can Chi, ngày giỗ, kiểm toàn vẹn cây ở `packages/core` (247 test) và schema Postgres (19 test pgTAP). Chưa archive.
+Change `bootstrap-core` đã làm xong 15/15 task (đã duyệt 2026-10-26): monorepo, lịch âm + Can Chi, ngày giỗ, kiểm toàn vẹn cây ở `packages/core` (251 test) và schema Postgres (19 test pgTAP). Chưa archive.
 
 ## Bước tiếp theo
 1. Chủ dự án xem lại `bootstrap-core`, rồi `/opsx:archive` để đưa 3 spec vào `openspec/specs/`.
@@ -45,6 +45,7 @@ User stories chi tiết: `docs/user-stories.md`.
 ## Rủi ro mở
 - AI đọc sai phả Hán Nôm / giọng các cụ (Phase 0 bị bỏ qua) — đo độ chính xác ngay khi làm change `ai-sources-proposals`.
 - Lịch âm trước 1968 (ít nhất miền Nam) theo UTC+8, code dùng UTC+7 — ngày giỗ người mất trước 1968 có thể lệch 1 ngày; xem `kb/tech-stack.md`.
+- Lịch âm sai tháng 7/1967 (điểm sóc 00:00:03, sát nửa đêm) theo PyEphem; ca biên vài giây cần lịch chính thức — xem `kb/tech-stack.md`.
 - Bảng Tết test lấy từ 2 gói phần mềm có thể cùng gốc Hồ Ngọc Đức, chưa đối chiếu lịch giấy — xem `packages/core/test/fixtures/tet.json`.
 - Apple Guideline 4.2 với app Capacitor — có camera, ghi âm, push, offline.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.

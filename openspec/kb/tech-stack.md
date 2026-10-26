@@ -40,6 +40,7 @@ Hiện trạng sau change `bootstrap-core`. Lý do chọn: `openspec/decisions/0
 - Viết độc lập từ công thức Meeus (*Astronomical Algorithms*) và ΔT của Espenak & Meeus; nguồn ghi ở đầu `src/lunar.ts`.
 - Không dùng mã amlich của Hồ Ngọc Đức: file nguồn ghi rõ chỉ cho phép dùng cá nhân, phi thương mại (đã kiểm trên gói npm `amlich`, 2026-10-26).
 - Kiểm: Tết 1900–2100 khớp bảng đối chiếu; đổi xuôi rồi ngược khớp mọi ngày 1900–2100.
+- Đối chiếu từng ngày 1800–2199 với gói `amlich` (2026-10-26, script ngoài repo): 274 ngày lệch ở 14 năm. Ca lệch một ngày (1877, 1885, 2054, 2062) là `amlich` trả "ngày 0". Ca lệch cả tháng đều do điểm sóc rơi trong ±2 phút quanh nửa đêm; theo PyEphem, Kintree đúng 8/9 ca, sai ca tháng 7/1967 (sóc 00:00:03 ngày 8/7, Kintree đặt mùng 1 vào 7/7). Muốn sửa cần công thức kinh độ mặt trời/điểm sóc chính xác hơn; ở biên vài giây thì cần đối chiếu lịch chính thức.
 - **Rủi ro chưa xử lý:** trước năm 1968 lịch âm Việt Nam (ít nhất ở miền Nam) tính theo UTC+8; code dùng UTC+7 cho mọi năm. Ví dụ Tết Mậu Thân 1968: lịch UTC+7 là 29/01, miền Nam ăn Tết 30/01. Ngày giỗ của người mất trước 1968 có thể lệch một ngày ở vài tháng.
 
 ## Lưu ý khi viết migration

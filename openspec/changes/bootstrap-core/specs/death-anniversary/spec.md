@@ -56,3 +56,7 @@ Hệ thống SHALL gọi tên kỳ giỗ theo số năm âm lịch kể từ nă
 #### Scenario: Giỗ thường
 - **WHEN** người mất năm âm lịch 2020 và cần ngày giỗ năm âm lịch 2026
 - **THEN** kỳ giỗ là “Giỗ thường”
+
+#### Scenario: Chưa tới giỗ đầu
+- **WHEN** người mất năm âm lịch 2026 và cần ngày giỗ năm âm lịch 2026 hoặc sớm hơn
+- **THEN** hệ thống không trả ngày giỗ và báo “chưa tới giỗ đầu”
