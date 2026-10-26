@@ -1,0 +1,11 @@
+{
+  "name": "kintree",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "engines": { "node": ">=20.19" },
+  "scripts": {
+    "dev": "pnpm --filter app dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test"
+  }
+}
