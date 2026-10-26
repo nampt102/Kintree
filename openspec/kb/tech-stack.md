@@ -27,6 +27,21 @@ Hiện trạng sau change `bootstrap-core`. Lý do chọn: `openspec/decisions/0
 | `pnpm db:test` | chạy test pgTAP trong `supabase/tests/` |
 | `pnpm db:stop` | dừng container |
 
+## `apps/app` (sau `tree-editing`)
+| Đường dẫn | Nội dung |
+|---|---|
+| `src/App.tsx` | khung: danh sách cuốn hoặc một cuốn đang mở |
+| `src/lib/store.ts` | `TreeStore` + bản `localStorage` (`kintree:index`, `kintree:doc:<id>`); `downloadBackup`, `downloadRaw` |
+| `src/lib/messages.ts` | bảng dịch mọi mã lỗi sang tiếng Việt (kiểu `Record` buộc đủ mã) |
+| `src/lib/actions.ts` | nút nào hiện cho một người (luật thật vẫn ở `core`) |
+| `src/state/useTreeDoc.ts` | giữ `TreeDoc` trong bộ nhớ, `edit(op)` chạy thao tác của `core` rồi lưu |
+| `src/components/TreeScreen.tsx` | màn hình một cuốn: thanh công cụ, tìm, thu gọn, xem riêng nhánh, hộp thoại |
+| `src/components/TreeDiagram.tsx` | React Flow: vẽ theo `computeLayout`; nút quanh khung chỉ hiện khi trỏ chuột (thiết bị có hover) |
+| `src/components/PersonPanel.tsx` | bảng thông tin: cạnh phải (desktop) / tấm trượt dưới (< 768 px) |
+| `src/components/ActionDialogs.tsx`, `DateInput.tsx` | hộp thoại thêm con/vợ chồng/cha mẹ, gỡ, sắp thứ tự, hồ sơ; ô ngày ba ô có quy đổi âm/dương |
+
+Lưu ý khi sửa giao diện sơ đồ: React Flow bật sẵn phóng to khi bấm đúp và nuốt sự kiện `dblclick` của khung; đã tắt bằng `zoomOnDoubleClick={false}` để bấm đúp mở được hồ sơ. Đừng refit sơ đồ khi mở bảng thông tin: khung dịch chuyển giữa hai lần bấm làm bấm đúp trượt.
+
 ## `packages/core`
 | File | Nội dung |
 |---|---|
@@ -34,6 +49,7 @@ Hiện trạng sau change `bootstrap-core`. Lý do chọn: `openspec/decisions/0
 | `src/canchi.ts` | Can Chi năm, tháng, ngày |
 | `src/dates.ts` | `PartialDate`, `isValidPartialDate`, `deathAnniversary` (tháng nhuận → tháng thường, ngày 30 → 29 khi tháng thiếu, tên kỳ giỗ) |
 | `src/integrity.ts` | `checkParentLink`, `checkMarriage` — cùng luật với trigger trong migration |
+| `src/tree/` | mô hình, thao tác sửa cây, tìm kiếm, lưu trữ, bố cục — xem `openspec/kb/modules/tree.md` |
 | `test/fixtures/tet.json` | ngày Tết 1900–2100, nguồn ghi trong file |
 
 ## Lịch âm

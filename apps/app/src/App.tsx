@@ -1,22 +1,25 @@
-import { canChiDay, canChiYear, solarToLunar } from '@kintree/core'
-
-// Ngày hôm nay theo giờ Việt Nam, bất kể máy đặt múi giờ nào.
-const [year, month, day] = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' })
-  .format(new Date())
-  .split('-')
-  .map(Number) as [number, number, number]
+import { useMemo, useState } from 'react'
+import { TreeList } from './components/TreeList.tsx'
+import { TreeScreen } from './components/TreeScreen.tsx'
+import { localStorageStore } from './lib/store.ts'
 
 function App() {
-  const today = { year, month, day }
-  const lunar = solarToLunar(today)
+  const store = useMemo(() => localStorageStore(), [])
+  const [openId, setOpenId] = useState<string | null>(null)
+
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Kintree</h1>
-      <p>
-        Hôm nay {day}/{month}/{year} là ngày {lunar.day}/{lunar.month}
-        {lunar.leap ? ' (nhuận)' : ''} năm {canChiYear(lunar.year)} âm lịch, ngày {canChiDay(today)}.
-      </p>
-    </main>
+    <div className="min-h-screen">
+      <header className="border-b border-line bg-white px-4 py-3">
+        <h1 className="text-2xl font-semibold text-seal">Kintree</h1>
+      </header>
+      <main>
+        {openId ? (
+          <TreeScreen store={store} treeId={openId} onBack={() => setOpenId(null)} />
+        ) : (
+          <TreeList store={store} onOpen={setOpenId} />
+        )}
+      </main>
+    </div>
   )
 }
 
