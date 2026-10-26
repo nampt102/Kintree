@@ -8,7 +8,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "vitest run",
+    "test": "tsc --noEmit && vitest run",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

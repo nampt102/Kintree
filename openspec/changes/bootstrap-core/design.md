@@ -50,7 +50,7 @@ supabase/               # supabase init; migrations/
 - Trong Postgres: 5 cột trên mỗi loại ngày (`birth_year`, `birth_month`, `birth_day`, `birth_lunar`, `birth_leap`; tương tự `death_*`) cộng `CHECK` (có ngày thì có tháng, có tháng thì có năm, khoảng giá trị). Ngày dương có tồn tại hay không kiểm ở cả DB (hàm SQL dùng `make_date`) và `core`; ngày âm chỉ kiểm ở `core` vì cần lịch âm.
 - Thay vì cột `date`: `date` bắt đủ ngày, ép người nhập đoán ngày (đúng điều PRD muốn tránh). Thay vì `jsonb`: khó đặt `CHECK` và khó truy vấn theo tháng cho lịch giỗ.
 
-### D5. Schema chính (`supabase/migrations/0001_init.sql`)
+### D5. Schema chính (`supabase/migrations/20261026000000_init.sql` — Supabase CLI bắt tên có mốc thời gian)
 
 | Bảng | Cột chính |
 |---|---|
@@ -76,7 +76,7 @@ supabase/               # supabase init; migrations/
 - **R3.** Trigger kiểm vòng chạy `WITH RECURSIVE` mỗi lần ghi quan hệ. → Cây ≤ 1.000 người nên chi phí nhỏ; đo lại nếu nhập GEDCOM lớn chậm.
 - **R4.** Supabase CLI cần Docker để chạy Postgres local. → Ghi yêu cầu trong `openspec/kb/tech-stack.md`; test SQL chạy được khi có Docker, test `core` không cần Docker.
 
-- **R5.** Giấy phép mã amlich của Hồ Ngọc Đức (chưa xác nhận, không mở được trang gốc khi viết) có thể cấm dùng thương mại. → Không chép mã; viết lại từ công thức thiên văn đã công bố; ghi nguồn công thức trong file.
+- **R5.** Giấy phép mã amlich của Hồ Ngọc Đức chỉ cho phép dùng cá nhân, phi thương mại (đã xác nhận 2026-10-26 qua chú thích trong gói npm `amlich`). → Không chép mã; viết lại từ công thức thiên văn đã công bố; ghi nguồn công thức trong file.
 
 ## Open Questions
 
