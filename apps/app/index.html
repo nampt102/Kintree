@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover: vẽ tới mép màn hình (tai thỏ, Dynamic Island), vùng an toàn xử lý bằng env(safe-area-inset-*).
+         interactive-widget=resizes-content: bàn phím ảo thu nhỏ vùng nhìn (Chrome Android) để nút chính không bị che. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#FAFAF7" />
     <title>Kintree</title>
   </head>
   <body>

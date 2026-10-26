@@ -2,24 +2,24 @@ import { useMemo, useState } from 'react'
 import { TreeList } from './components/TreeList.tsx'
 import { TreeScreen } from './components/TreeScreen.tsx'
 import { localStorageStore } from './lib/store.ts'
+import { ToastProvider, useBackToClose } from './ui/index.ts'
 
 function App() {
   const store = useMemo(() => localStorageStore(), [])
   const [openId, setOpenId] = useState<string | null>(null)
+  // Back của trình duyệt / Android, vuốt quay lại trên iOS: từ một cuốn về danh sách cuốn.
+  useBackToClose(openId !== null, () => setOpenId(null))
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-line bg-white px-4 py-3">
-        <h1 className="text-2xl font-semibold text-seal">Kintree</h1>
-      </header>
-      <main>
+    <ToastProvider>
+      <div className="min-h-dvh bg-canvas">
         {openId ? (
-          <TreeScreen store={store} treeId={openId} onBack={() => setOpenId(null)} />
+          <TreeScreen key={openId} store={store} treeId={openId} onBack={() => setOpenId(null)} />
         ) : (
           <TreeList store={store} onOpen={setOpenId} />
         )}
-      </main>
-    </div>
+      </div>
+    </ToastProvider>
   )
 }
 

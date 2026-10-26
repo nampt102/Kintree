@@ -5,5 +5,6 @@ import { defineConfig } from 'vitest/config'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  test: { environment: 'node' },
+  // Chỉ test đơn vị trong src/; e2e/ do Playwright chạy (pnpm --filter app e2e).
+  test: { environment: 'node', include: ['src/**/*.test.{ts,tsx}'] },
 })

@@ -11,35 +11,67 @@ import {
   spouseIdsOf,
   type Gender,
   type TreeDoc,
+  type TreePerson,
 } from '@kintree/core'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, Download, List, MoreVertical, Network, Search, UserRound, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { bloodParentOf, buildActions } from '../lib/actions.ts'
 import { messageFor } from '../lib/messages.ts'
 import { downloadBackup, downloadRaw, type TreeStore } from '../lib/store.ts'
 import { useTreeDoc } from '../state/useTreeDoc.ts'
+import {
+  Button,
+  Dialog,
+  EmptyState,
+  ErrorText,
+  IconButton,
+  OverflowMenu,
+  Segmented,
+  SelectField,
+  Sheet,
+  Skeleton,
+  TextField,
+  TopBar,
+  useToast,
+  useViewportSegments,
+  useWindowClass,
+} from '../ui/index.ts'
 import { AddChildDialog, AddParentDialog, AddSpouseDialog, ProfileDialog, RemoveDialog, ReorderDialog, type EditFn } from './ActionDialogs.tsx'
+import { PersonDetails, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
 import { PersonList } from './PersonList.tsx'
-import { PersonPanel, type PanelAction } from './PersonPanel.tsx'
-import { TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
-import { Button, ErrorNote, Field, Select, TextInput } from './ui.tsx'
+import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
 
-type DialogState =
-  | { kind: 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'; personId: string }
-  | null
+type DialogKind = 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'
+type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | null
 
 export function TreeScreen({ store, treeId, onBack }: { store: TreeStore; treeId: string; onBack: () => void }) {
   const { state, edit, saveError } = useTreeDoc(store, treeId)
 
-  if (state.status === 'loading') return <p className="p-4">Đang tải…</p>
+  const back = <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
+  if (state.status === 'loading') {
+    return (
+      <>
+        <TopBar>{back}</TopBar>
+        <Skeleton lines={4} />
+      </>
+    )
+  }
   if (state.status === 'error') {
     return (
-      <div className="mx-auto max-w-2xl space-y-3 p-4">
-        <ErrorNote>{messageFor(state.error)}</ErrorNote>
-        <div className="flex gap-2">
-          {state.error === 'CORRUPT' && <Button onClick={() => downloadRaw(treeId)}>Tải bản sao dữ liệu lỗi</Button>}
-          <Button onClick={onBack}>Quay lại</Button>
+      <>
+        <TopBar>{back}</TopBar>
+        <div className="mx-auto max-w-2xl space-y-3 p-4">
+          <ErrorText>{messageFor(state.error)}</ErrorText>
+          <div className="flex flex-wrap gap-2">
+            {state.error === 'CORRUPT' && (
+              <Button icon={Download} onClick={() => downloadRaw(treeId)}>
+                Tải bản sao dữ liệu lỗi
+              </Button>
+            )}
+            <Button onClick={onBack}>Quay lại</Button>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
   return <Loaded doc={state.doc} edit={edit} saveError={saveError} onBack={onBack} />
@@ -47,15 +79,20 @@ export function TreeScreen({ store, treeId, onBack }: { store: TreeStore; treeId
 
 function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; saveError: string | null; onBack: () => void }) {
   const view = useMemo(() => activeView(doc), [doc])
+  const windowClass = useWindowClass()
+  const segments = useViewportSegments()
+  const compact = windowClass === 'compact'
   const [mode, setMode] = useState<'tree' | 'list'>('tree')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [highlightId, setHighlightId] = useState<string | null>(null)
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set())
   const [focusId, setFocusId] = useState<string | null>(null)
   const [dialog, setDialog] = useState<DialogState>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
 
-  const layout = useMemo(() => computeLayout(doc, { collapsed, focusId }), [doc, collapsed, focusId])
+  const layout = useMemo(() => computeLayout(doc, { collapsed, focusId, cardWidth: CARD.width, cardHeight: CARD.height }), [doc, collapsed, focusId])
+  const actions = useMemo(() => buildActions(doc), [doc])
   const empty = view.persons.length === 0
   const selected = selectedId ? findPerson(doc, selectedId) : undefined
   const focusPerson = focusId ? findPerson(doc, focusId) : undefined
@@ -72,8 +109,6 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
     return () => clearTimeout(t)
   }, [highlightId])
 
-  const actions = useMemo(() => buildActions(doc), [doc])
-
   const toggleCollapse = useCallback((id: string) => {
     setCollapsed((prev) => {
       const next = new Set(prev)
@@ -83,7 +118,7 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
     })
   }, [])
 
-  /** Chọn một người, mở các nhánh đang che họ, và cuộn tới. */
+  /** Chọn một người, mở các nhánh đang che họ, và đưa sơ đồ tới đó. */
   const goTo = useCallback(
     (id: string) => {
       const open = revealPerson(doc, collapsed, id)
@@ -99,7 +134,7 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
   const onNodeAction = useCallback(
     (id: string, action: NodeAction) => {
       if (action === 'toggleCollapse') return toggleCollapse(id)
-      setDialog({ kind: action === 'addParent' ? 'addParent' : action === 'addChild' ? 'addChild' : action === 'addSpouse' ? 'addSpouse' : 'remove', personId: id })
+      setDialog({ kind: action === 'remove' ? 'remove' : action, personId: id })
     },
     [toggleCollapse],
   )
@@ -116,100 +151,176 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
     if (newId) goTo(newId)
   }
 
-  const results = query.trim() ? searchPersons(doc, query).slice(0, 8) : []
-  const dialogPerson = dialog ? findPerson(doc, dialog.personId) : undefined
+  const pickResult = (id: string) => {
+    goTo(id)
+    setQuery('')
+    setSearchOpen(false)
+  }
+
+  const detailsProps = selected ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), onAction: onPanelAction } : null
+  const paneWidth = windowClass === 'expanded' ? 360 : 320
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] flex-col">
-      <header className="flex flex-wrap items-center gap-2 border-b border-line bg-white p-2">
-        <Button variant="ghost" onClick={onBack}>
-          ← Các cuốn
-        </Button>
-        <h2 className="mr-auto min-w-0 truncate text-xl font-semibold">{doc.meta.name}</h2>
-        <div className="relative w-full sm:w-64">
-          <TextInput aria-label="Tìm người" placeholder="Tìm người…" value={query} onChange={(e) => setQuery(e.target.value)} />
-          {results.length > 0 && (
-            <ul className="absolute left-0 right-0 top-full z-30 mt-1 max-h-72 overflow-y-auto rounded-md border border-line bg-white shadow-lg">
-              {results.map((p) => (
-                <li key={p.id}>
-                  <button
-                    type="button"
-                    className="min-h-11 w-full px-3 py-2 text-left hover:bg-[#f1ead9]"
-                    onClick={() => {
-                      goTo(p.id)
-                      setQuery('')
-                    }}
-                  >
-                    {p.fullName}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div role="group" aria-label="Chế độ xem" className="flex gap-1">
-          <Button variant={mode === 'tree' ? 'primary' : 'secondary'} aria-pressed={mode === 'tree'} onClick={() => setMode('tree')}>
-            Cây
-          </Button>
-          <Button variant={mode === 'list' ? 'primary' : 'secondary'} aria-pressed={mode === 'list'} onClick={() => setMode('list')}>
-            Danh sách
-          </Button>
-        </div>
-        <Button onClick={() => downloadBackup(doc)}>Tải bản sao</Button>
-      </header>
+    <div className="flex h-dvh flex-col">
+      <TopBar>
+        <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
+        <h1 className="min-w-0 flex-1 truncate px-1 text-lg font-semibold">{doc.meta.name}</h1>
+        {!empty && (compact ? <IconButton icon={Search} label="Tìm người" onClick={() => setSearchOpen(true)} /> : <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} />)}
+        {!empty &&
+          (compact ? (
+            // Cỡ gọn: một nút đổi qua lại để nhường chỗ cho tên cuốn.
+            <IconButton icon={mode === 'tree' ? List : Network} label={mode === 'tree' ? 'Xem dạng danh sách' : 'Xem dạng cây'} onClick={() => setMode(mode === 'tree' ? 'list' : 'tree')} />
+          ) : (
+            <Segmented
+              label="Chế độ xem"
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: 'tree', label: 'Cây', icon: Network },
+                { value: 'list', label: 'Danh sách', icon: List },
+              ]}
+            />
+          ))}
+        <OverflowMenu trigger={(p) => <IconButton icon={MoreVertical} label="Thêm" {...p} />} items={[{ label: 'Tải bản sao', icon: Download, onSelect: () => downloadBackup(doc) }]} />
+      </TopBar>
 
-      {saveError && <ErrorNote>{saveError}</ErrorNote>}
-      {focusPerson && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-line bg-[#f1ead9] px-3 py-2">
-          <span>Đang xem riêng nhánh của {focusPerson.fullName}.</span>
-          <Button onClick={() => setFocusId(null)}>Xem toàn bộ cây</Button>
+      {compact && searchOpen && (
+        <div className="absolute inset-x-0 top-0 z-[40] border-b border-line bg-surface p-2 shadow-sheet" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}>
+          <div className="flex items-start gap-1">
+            <div className="min-w-0 flex-1">
+              <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} autoFocus onEscape={() => setSearchOpen(false)} />
+            </div>
+            <IconButton icon={X} label="Đóng tìm kiếm" onClick={() => setSearchOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="px-4 py-2">
+          <ErrorText>{saveError}</ErrorText>
+        </div>
+      )}
+      {focusPerson && mode === 'tree' && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-line bg-accent-soft px-4 py-1">
+          <span className="min-w-0 flex-1">Đang xem riêng nhánh của {focusPerson.fullName}.</span>
+          <Button variant="ghost" onClick={() => setFocusId(null)}>
+            Xem toàn bộ cây
+          </Button>
         </div>
       )}
 
       {empty ? (
-        <div className="p-4">
-          <AddRootForm edit={edit} />
-        </div>
+        <EmptyState
+          icon={UserRound}
+          title="Cuốn này chưa có ai"
+          text="Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên."
+          action={
+            <Button variant="primary" onClick={() => setDialog({ kind: 'addRoot' })}>
+              Thêm thuỷ tổ
+            </Button>
+          }
+        />
       ) : mode === 'list' ? (
         <div className="min-h-0 flex-1 overflow-y-auto">
           <PersonList doc={doc} onOpen={(id) => setDialog({ kind: 'profile', personId: id })} />
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1">
-          <div className="min-w-0 flex-1" data-testid="diagram">
+        <div className="relative flex min-h-0 flex-1" data-testid="tree-area">
+          <div className="min-w-0 flex-1" data-testid="diagram" style={segments ? { flex: `0 0 ${segments[0]!.width}px` } : undefined}>
             <TreeDiagram
               doc={view}
               layout={layout}
               selectedId={selectedId}
               highlightId={highlightId}
               focusKey={`${doc.meta.id}|${focusId}|${[...collapsed].sort().join(',')}`}
+              showMiniMap={windowClass === 'expanded' && !segments}
+              compact={compact}
               actionsFor={actions}
               onSelect={setSelectedId}
               onOpenProfile={(id) => setDialog({ kind: 'profile', personId: id })}
               onAction={onNodeAction}
             />
           </div>
-          {selected && (
-            <PersonPanel
-              doc={doc}
-              person={selected}
-              actions={actions(selected)}
-              collapsed={collapsed.has(selected.id)}
-              onAction={onPanelAction}
-              onClose={() => setSelectedId(null)}
-            />
+          {segments ? (
+            <>
+              {/* Khe nếp gập: không đặt nội dung. */}
+              <div aria-hidden data-testid="hinge" style={{ flex: `0 0 ${Math.max(0, segments[1]!.left - segments[0]!.left - segments[0]!.width)}px` }} />
+              {detailsProps ? (
+                <PersonSidePane {...detailsProps} width={segments[1]!.width} onClose={() => setSelectedId(null)} />
+              ) : (
+                <div className="flex shrink-0 items-center justify-center bg-surface p-6 text-center text-ink-muted" style={{ width: segments[1]!.width }}>
+                  Chọn một người trên sơ đồ để xem thông tin.
+                </div>
+              )}
+            </>
+          ) : (
+            detailsProps &&
+            (compact ? (
+              <Sheet title={`Thông tin ${detailsProps.person.fullName}`} onClose={() => setSelectedId(null)}>
+                <PersonDetails {...detailsProps} />
+              </Sheet>
+            ) : (
+              <PersonSidePane {...detailsProps} width={paneWidth} onClose={() => setSelectedId(null)} />
+            ))
           )}
         </div>
       )}
 
-      {dialog && dialogPerson && <DialogHost key={`${dialog.kind}:${dialog.personId}`} dialog={dialog} doc={doc} edit={edit} person={dialogPerson} onClose={closeDialog} />}
+      {dialog?.kind === 'addRoot' && <AddRootDialog edit={edit} onClose={closeDialog} />}
+      {dialog && dialog.kind !== 'addRoot' && <DialogHost key={`${dialog.kind}:${dialog.personId}`} kind={dialog.kind} personId={dialog.personId} doc={doc} edit={edit} onClose={closeDialog} />}
     </div>
   )
 }
 
-function DialogHost({ dialog, doc, edit, person, onClose }: { dialog: NonNullable<DialogState>; doc: TreeDoc; edit: EditFn; person: NonNullable<ReturnType<typeof findPerson>>; onClose: (newId?: string) => void }) {
+function SearchBox({
+  doc,
+  query,
+  setQuery,
+  onPick,
+  autoFocus,
+  onEscape,
+}: {
+  doc: TreeDoc
+  query: string
+  setQuery: (q: string) => void
+  onPick: (id: string) => void
+  autoFocus?: boolean
+  onEscape?: () => void
+}) {
+  const results = query.trim() ? searchPersons(doc, query).slice(0, 8) : []
+  return (
+    <div className="relative w-full md:w-64">
+      <input
+        type="search"
+        aria-label="Tìm người"
+        placeholder="Tìm người (gõ không dấu được)"
+        value={query}
+        autoFocus={autoFocus}
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => e.key === 'Escape' && onEscape?.()}
+        className="min-h-11 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink placeholder:text-ink-muted"
+      />
+      {results.length > 0 && (
+        <ul className="absolute left-0 right-0 top-full z-[40] mt-1 max-h-72 overflow-y-auto rounded-md border border-line bg-surface shadow-sheet">
+          {results.map((p) => (
+            <li key={p.id}>
+              <button type="button" className="min-h-11 w-full cursor-pointer px-3 py-2 text-left hover:bg-surface-muted" onClick={() => onPick(p.id)}>
+                {p.fullName}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {query.trim() !== '' && results.length === 0 && <p className="mt-1 text-sm text-ink-muted">Không tìm thấy ai.</p>}
+    </div>
+  )
+}
+
+function DialogHost({ kind, personId, doc, edit, onClose }: { kind: DialogKind; personId: string; doc: TreeDoc; edit: EditFn; onClose: (newId?: string) => void }) {
+  const person = findPerson(doc, personId) as TreePerson | undefined
+  if (!person) return null
   const common = { doc, edit, person, onClose }
-  switch (dialog.kind) {
+  switch (kind) {
     case 'addChild':
       return <AddChildDialog {...common} />
     case 'addSpouse':
@@ -238,35 +349,49 @@ function DialogHost({ dialog, doc, edit, person, onClose }: { dialog: NonNullabl
   }
 }
 
-function AddRootForm({ edit }: { edit: EditFn }) {
+function AddRootDialog({ edit, onClose }: { edit: EditFn; onClose: (newId?: string) => void }) {
   const [name, setName] = useState('')
   const [gender, setGender] = useState<Gender | ''>('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<{ field: 'name' | 'gender'; text: string } | null>(null)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const genderRef = useRef<HTMLSelectElement>(null)
+  const toast = useToast()
 
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault()
     const r = edit((d) => addRoot(d, { fullName: name, ...(gender ? { gender } : {}) }, () => crypto.randomUUID()))
-    setError(r.ok ? null : messageFor(r.error))
+    if (!r.ok) {
+      const field = r.error === 'MISSING_GENDER' ? 'gender' : 'name'
+      setError({ field, text: messageFor(r.error) })
+      ;(field === 'gender' ? genderRef : nameRef).current?.focus()
+      return
+    }
+    toast(`Đã thêm ${name.trim()}`)
+    onClose(r.id)
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-md space-y-3 rounded-md border border-line bg-white p-4">
-      <h3 className="text-lg font-semibold">Cuốn này chưa có ai</h3>
-      <p>Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên.</p>
-      <Field label="Họ tên thuỷ tổ">
-        <TextInput value={name} onChange={(e) => setName(e.target.value)} />
-      </Field>
-      <Field label="Giới tính">
-        <Select value={gender} onChange={(e) => setGender(e.target.value as Gender | '')}>
+    <Dialog
+      title="Thêm thuỷ tổ"
+      onClose={() => onClose()}
+      dirty={name.trim() !== ''}
+      footer={
+        <>
+          <Button onClick={() => onClose()}>Huỷ</Button>
+          <Button type="submit" form="add-root" variant="primary">
+            Thêm thuỷ tổ
+          </Button>
+        </>
+      }
+    >
+      <form id="add-root" onSubmit={submit} className="space-y-4" noValidate>
+        <TextField ref={nameRef} label="Họ tên thuỷ tổ" value={name} onChange={(e) => setName(e.target.value)} error={error?.field === 'name' ? error.text : null} autoFocus autoComplete="off" />
+        <SelectField ref={genderRef} label="Giới tính" value={gender} onChange={(e) => setGender(e.target.value as Gender | '')} error={error?.field === 'gender' ? error.text : null}>
           <option value="">— Chọn —</option>
           <option value="male">Nam</option>
           <option value="female">Nữ</option>
-        </Select>
-      </Field>
-      {error && <ErrorNote>{error}</ErrorNote>}
-      <Button type="submit" variant="primary">
-        Thêm thuỷ tổ
-      </Button>
-    </form>
+        </SelectField>
+      </form>
+    </Dialog>
   )
 }

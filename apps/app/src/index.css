@@ -1,20 +1,143 @@
 @import "tailwindcss";
+@import "@fontsource/be-vietnam-pro/latin-400.css";
+@import "@fontsource/be-vietnam-pro/latin-500.css";
+@import "@fontsource/be-vietnam-pro/latin-600.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-400.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-500.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-600.css";
 
+/* Token của hệ thống thiết kế (openspec/kb/design-system.md). Màn hình chỉ dùng tên token, không dùng mã hex.
+   Tương phản được kiểm ở src/ui/contrast.test.ts. */
 @theme {
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --color-paper: #faf7f0;
-  --color-ink: #2a2118;
-  --color-seal: #9b2c1f;
-  --color-line: #cdbfa6;
+  --font-sans: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-canvas: #fafaf7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f2f1ed;
+  --color-line: #e3e0d8;
+  --color-line-strong: #857f73;
+  --color-ink: #1c1b19;
+  --color-ink-muted: #5c5850;
+  --color-accent: #a3302a;
+  --color-accent-hover: #8a2822;
+  --color-accent-soft: #f6e8e6;
+  --color-focus: #1d4ed8;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+  --color-scrim: rgb(28 27 25 / 0.45);
+
+  /* Thang chữ (rem theo cỡ gốc 112.5% = 18 px nhưng vẫn phóng theo cài đặt của người dùng). */
+  --text-xs: 0.7778rem; /* 14 px */
+  --text-sm: 0.8889rem; /* 16 px */
+  --text-base: 1rem; /* 18 px */
+  --text-lg: 1.1111rem; /* 20 px */
+  --text-xl: 1.3333rem; /* 24 px */
+  --text-2xl: 1.6667rem; /* 30 px */
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Cỡ cửa sổ: gọn < 600, vừa 600–839, rộng ≥ 840 (design D3). */
+  --breakpoint-sm: initial;
+  --breakpoint-md: 600px;
+  --breakpoint-lg: 840px;
+  --breakpoint-xl: initial;
+  --breakpoint-2xl: initial;
+
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.3, 0, 1, 1);
+  --duration-enter: 250ms;
+  --duration-exit: 160ms;
+
+  --shadow-sheet: 0 -4px 24px rgb(28 27 25 / 0.12);
+  --shadow-card: 0 1px 2px rgb(28 27 25 / 0.08);
 }
 
+/* Thang z-index cố định (design D1). */
 :root {
-  font-size: 18px;
+  --z-diagram: 0;
+  --z-bar: 10;
+  --z-sheet: 20;
+  --z-search: 40;
+  --z-dialog: 100;
+  --z-toast: 1000;
+  --icon-sm: 20px;
+  --icon-md: 24px;
+}
+
+html {
+  font-size: 112.5%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--color-paper);
+  background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role='button'],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+/* Vòng focus 3 px luôn nhìn thấy, khác màu nhấn. */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.kt-node-btn {
+  width: calc(44px / var(--kt-zoom, 1)) !important;
+  height: calc(44px / var(--kt-zoom, 1)) !important;
+}
+.kt-zoomed-out .kt-node-btn {
+  display: none !important;
+}
+.kt-zoomed-out .kt-zoomed-out-only {
+  display: block;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Làm nổi người tìm thấy: 2 nhịp rồi dừng ở viền tĩnh. */
+@keyframes kt-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgb(163 48 42 / 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgb(163 48 42 / 0.25);
+  }
+}
+.kt-glow {
+  box-shadow: 0 0 0 4px rgb(163 48 42 / 0.15);
+  animation: kt-glow 700ms var(--ease-out) 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
