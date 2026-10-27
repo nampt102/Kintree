@@ -32,11 +32,13 @@ type Props = {
   person: TreePerson
   actions: PersonActions
   collapsed: boolean
+  /** Người xem: hồ sơ chỉ đọc, không có nút sửa. */
+  readOnly?: boolean
   onAction: (a: PanelAction) => void
 }
 
 /** Nội dung bảng thông tin một người: dùng chung cho tấm trượt (cỡ gọn) và ngăn bên (cỡ vừa/rộng). */
-export function PersonDetails({ doc, person, actions, collapsed, onAction }: Props) {
+export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction }: Props) {
   const spouses = spouseIdsOf(doc, person.id)
     .map((id) => findPerson(doc, id)?.fullName)
     .filter(Boolean)
@@ -65,10 +67,11 @@ export function PersonDetails({ doc, person, actions, collapsed, onAction }: Pro
         <Row label="Nơi sinh" value={person.birthPlace} />
         <Row label="Nơi an táng" value={person.burialPlace} />
         <Row label="Vợ/chồng" value={spouses.join(', ')} />
+        {readOnly && <Row label="Tiểu sử" value={person.biography} />}
       </dl>
 
       <div className="grid gap-2">
-        {btn('Sửa hồ sơ', 'edit', Pencil)}
+        {!readOnly && btn('Sửa hồ sơ', 'edit', Pencil)}
         {actions.canAddChild && btn('Thêm con', 'addChild', UserPlus)}
         {actions.canAddSpouse && btn('Thêm vợ/chồng', 'addSpouse', Heart)}
         {actions.canAddParent && btn('Thêm cha/mẹ còn thiếu', 'addParent', ArrowUp)}

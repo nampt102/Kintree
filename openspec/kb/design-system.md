@@ -1,6 +1,6 @@
 # Hệ thống thiết kế
 
-Hiện trạng sau change `ui-design-system`. Lý do chọn: `openspec/changes/ui-design-system/design.md`. Kiểm bằng `apps/app/e2e/` (Playwright) và `apps/app/src/ui/contrast.test.ts`.
+Hiện trạng sau change `ui-design-system`. Lý do chọn: `openspec/changes/archive/2026-10-26-ui-design-system/design.md`; hành vi bắt buộc ở `openspec/specs/app-ui-foundation` và `responsive-layout`. Kiểm bằng `apps/app/e2e/` (Playwright) và `apps/app/src/ui/contrast.test.ts`.
 
 Quy tắc: màn hình chỉ dùng token và thành phần dưới đây, không tự đặt mã màu hex hay cỡ riêng. Thiết kế UI theo skill đã chốt ở ADR 0004 (`ui-ux-pro-max`).
 

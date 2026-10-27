@@ -1,9 +1,8 @@
-import { expect, test } from '@playwright/test'
-import { seed } from './fixtures.ts'
+import { expect, login, test } from './fixtures.ts'
 
-test('mở trang danh sách cuốn', async ({ page }) => {
-  await seed(page)
+test('đăng nhập rồi thấy danh sách dòng họ', async ({ page, world }) => {
+  await login(page, world.admin)
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Kintree' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /Chi trưởng họ Nguyễn/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: new RegExp(world.clanName) })).toBeVisible()
 })

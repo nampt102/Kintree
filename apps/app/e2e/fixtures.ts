@@ -1,15 +1,15 @@
-import { addChild, addRoot, addSpouse, createTree, serialize, updatePerson, type Result, type TreeDoc } from '@kintree/core'
-import { expect, type Page } from '@playwright/test'
+import { addChild, addRoot, addSpouse, createTree, updatePerson, type Result, type TreeDoc } from '@kintree/core'
+import { test as base, expect, type Page } from '@playwright/test'
+import { makeWorld, sessionKey, signIn, type TestUser, type World } from './backend.ts'
 
 const ok = <T extends object>(r: Result<T>) => {
   if (!r.ok) throw new Error(r.error)
   return r
 }
 
-/** Cuốn mẫu 3 đời: Cả + Bình; con An (vợ Dâu, con Cháu), Hoa, Nuôi (con nuôi, tên dài). */
+/** Cuốn mẫu 3 đời: Cả + Bình; con An (vợ Dâu, con Cháu), Hoa, Nuôi (con nuôi, tên dài). Mã là UUID mới mỗi lần gọi. */
 export function sampleDoc(): TreeDoc {
-  let n = 0
-  const id = () => `p${++n}`
+  const id = () => crypto.randomUUID()
   let doc = ok(createTree({ name: 'Chi trưởng họ Nguyễn', region: 'north' }, id)).doc
   const root = ok(addRoot(doc, { fullName: 'Nguyễn Văn Cả', gender: 'male' }, id))
   doc = ok(updatePerson(root.doc, root.id, { birth: { year: 1890, lunar: false }, death: { year: 1968, month: 3, day: 5, lunar: true } })).doc
@@ -23,26 +23,50 @@ export function sampleDoc(): TreeDoc {
   return doc
 }
 
-/** Ghi các cuốn vào localStorage trước khi trang chạy (chỉ lần đầu trong mỗi trang, để tải lại không xoá thay đổi). */
-export async function seed(page: Page, docs: TreeDoc[] = [sampleDoc()]) {
-  const entries = docs.map((d) => [`kintree:doc:${d.meta.id}`, serialize(d)] as const)
-  const index = JSON.stringify(docs.map((d) => ({ id: d.meta.id, name: d.meta.name, region: d.meta.region, updatedAt: '2026-10-26T00:00:00.000Z' })))
+type Worlds = { create: (doc: TreeDoc | null) => Promise<World> }
+
+/** `world`: dòng họ riêng của test với cuốn mẫu, một quản trị, một người xem. `worlds`: tạo thêm dòng họ (vd. không có cuốn). */
+export const test = base.extend<{ world: World; worlds: Worlds }>({
+  worlds: async ({}, use) => {
+    const made: World[] = []
+    await use({
+      create: async (doc) => {
+        const w = await makeWorld(doc)
+        made.push(w)
+        return w
+      },
+    })
+    await Promise.all(made.map((w) => w.dispose()))
+  },
+  world: async ({ worlds }, use) => {
+    await use(await worlds.create(sampleDoc()))
+  },
+})
+export { expect }
+
+/** Đưa một phiên đăng nhập mới vào trình duyệt trước khi trang chạy (chỉ lần đầu mỗi thẻ, để tải lại không dùng lại token đã xoay vòng). */
+export async function login(page: Page, user: TestUser) {
+  const session = await signIn(user)
   await page.addInitScript(
-    ({ entries, index }) => {
-      if (sessionStorage.getItem('kt-seeded')) return
-      localStorage.clear()
-      for (const [k, v] of entries) localStorage.setItem(k, v)
-      localStorage.setItem('kintree:index', index)
-      sessionStorage.setItem('kt-seeded', '1')
+    ({ key, value }) => {
+      if (sessionStorage.getItem('kt-session')) return
+      localStorage.setItem(key, value)
+      sessionStorage.setItem('kt-session', '1')
     },
-    { entries, index },
+    { key: sessionKey(), value: JSON.stringify(session) },
   )
 }
 
-export async function openSampleTree(page: Page) {
-  await seed(page)
+/** Đăng nhập rồi vào dòng họ của test (màn các cuốn). */
+export async function openClan(page: Page, world: World, user: TestUser = world.admin) {
+  await login(page, user)
   await page.goto('/')
-  await page.getByRole('button', { name: /Chi trưởng họ Nguyễn/ }).click()
+  await page.getByRole('button', { name: new RegExp(world.clanName) }).click()
+}
+
+export async function openSampleTree(page: Page, world: World, user: TestUser = world.admin) {
+  await openClan(page, world, user)
+  await page.getByRole('button', { name: /Chi trưởng họ Nguyễn/ }).first().click()
   await expect(page.locator('[data-person-id]').first()).toBeVisible()
   await diagramSettled(page)
 }

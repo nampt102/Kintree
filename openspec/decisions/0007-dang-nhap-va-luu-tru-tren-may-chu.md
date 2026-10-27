@@ -1,7 +1,7 @@
 # 0007. Đăng nhập Google + email OTP; dữ liệu cây chỉ lưu trên máy chủ
 
 - **Ngày:** 2026-10-26
-- **Trạng thái:** đã chốt (áp dụng ở change `auth-invite-roles`, chưa làm)
+- **Trạng thái:** đã chốt; làm ở change `cloud-auth-storage` (email OTP + lưu trên máy chủ xong 2026-10-27; Google đã thử đăng nhập thật 2026-10-27). Mô hình quyền: xem `0008`
 - **Người quyết định:** jamesphan
 - **Thay thế một phần:** `0006` (phần "dữ liệu cây lưu cục bộ trước")
 

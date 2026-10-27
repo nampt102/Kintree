@@ -13,11 +13,12 @@ import {
   type TreeDoc,
   type TreePerson,
 } from '@kintree/core'
-import { ArrowLeft, Download, List, MoreVertical, Network, Search, UserRound, X } from 'lucide-react'
+import { ArrowLeft, Download, List, MoreVertical, Network, Pencil, Search, Trash2, UserRound, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { bloodParentOf, buildActions } from '../lib/actions.ts'
 import { messageFor } from '../lib/messages.ts'
-import { downloadBackup, downloadRaw, type TreeStore } from '../lib/store.ts'
+import type { CloudStore, Role } from '../lib/cloudStore.ts'
+import { downloadBackup } from '../lib/store.ts'
 import { useTreeDoc } from '../state/useTreeDoc.ts'
 import {
   Button,
@@ -39,13 +40,14 @@ import {
 import { AddChildDialog, AddParentDialog, AddSpouseDialog, ProfileDialog, RemoveDialog, ReorderDialog, type EditFn } from './ActionDialogs.tsx'
 import { PersonDetails, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
 import { PersonList } from './PersonList.tsx'
+import { DeleteTreeDialog, EditTreeInfoDialog } from './TreeManage.tsx'
 import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
 
 type DialogKind = 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'
-type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | null
+type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | { kind: 'editTree' } | { kind: 'deleteTree' } | null
 
-export function TreeScreen({ store, treeId, onBack }: { store: TreeStore; treeId: string; onBack: () => void }) {
-  const { state, edit, saveError } = useTreeDoc(store, treeId)
+export function TreeScreen({ cloud, treeId, onBack }: { cloud: CloudStore; treeId: string; onBack: () => void }) {
+  const { state, edit, saveError, reload } = useTreeDoc(cloud, treeId)
 
   const back = <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
   if (state.status === 'loading') {
@@ -63,21 +65,21 @@ export function TreeScreen({ store, treeId, onBack }: { store: TreeStore; treeId
         <div className="mx-auto max-w-2xl space-y-3 p-4">
           <ErrorText>{messageFor(state.error)}</ErrorText>
           <div className="flex flex-wrap gap-2">
-            {state.error === 'CORRUPT' && (
-              <Button icon={Download} onClick={() => downloadRaw(treeId)}>
-                Tải bản sao dữ liệu lỗi
-              </Button>
-            )}
+            {state.error !== 'TREE_NOT_FOUND' && <Button onClick={reload}>Thử lại</Button>}
             <Button onClick={onBack}>Quay lại</Button>
           </div>
         </div>
       </>
     )
   }
-  return <Loaded doc={state.doc} edit={edit} saveError={saveError} onBack={onBack} />
+  return <Loaded doc={state.doc} role={state.role} cloud={cloud} edit={edit} saveError={saveError} onBack={onBack} reload={reload} />
 }
 
-function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; saveError: string | null; onBack: () => void }) {
+/** Người xem: chỉ giữ thao tác không ghi (thu gọn nhánh, xem riêng nhánh); quyền thật do RLS cưỡng chế. */
+const READ_ONLY_FLAGS = { canAddChild: false, canAddSpouse: false, canAddParent: false, canRemove: false, canRemoveBranch: false, canReorderChildren: false, canReorderSpouses: false, canReorderSiblings: false }
+
+function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: TreeDoc; role: Role; cloud: CloudStore; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void }) {
+  const readOnly = role !== 'admin'
   const view = useMemo(() => activeView(doc), [doc])
   const windowClass = useWindowClass()
   const segments = useViewportSegments()
@@ -92,7 +94,10 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
   const [query, setQuery] = useState('')
 
   const layout = useMemo(() => computeLayout(doc, { collapsed, focusId, cardWidth: CARD.width, cardHeight: CARD.height }), [doc, collapsed, focusId])
-  const actions = useMemo(() => buildActions(doc), [doc])
+  const actions = useMemo(() => {
+    const build = buildActions(doc)
+    return readOnly ? (p: TreePerson) => ({ ...build(p), ...READ_ONLY_FLAGS }) : build
+  }, [doc, readOnly])
   const empty = view.persons.length === 0
   const selected = selectedId ? findPerson(doc, selectedId) : undefined
   const focusPerson = focusId ? findPerson(doc, focusId) : undefined
@@ -157,7 +162,7 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
     setSearchOpen(false)
   }
 
-  const detailsProps = selected ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), onAction: onPanelAction } : null
+  const detailsProps = selected ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), readOnly, onAction: onPanelAction } : null
   const paneWidth = windowClass === 'expanded' ? 360 : 320
 
   return (
@@ -181,7 +186,16 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
               ]}
             />
           ))}
-        <OverflowMenu trigger={(p) => <IconButton icon={MoreVertical} label="Thêm" {...p} />} items={[{ label: 'Tải bản sao', icon: Download, onSelect: () => downloadBackup(doc) }]} />
+        <OverflowMenu trigger={(p) => <IconButton icon={MoreVertical} label="Thêm" {...p} />} items={[
+            { label: 'Tải bản sao', icon: Download, onSelect: () => downloadBackup(doc) },
+            ...(readOnly
+              ? []
+              : [
+                  { label: 'Sửa thông tin cuốn', icon: Pencil, onSelect: () => setDialog({ kind: 'editTree' }) },
+                  { label: 'Xoá cuốn', icon: Trash2, onSelect: () => setDialog({ kind: 'deleteTree' }) },
+                ]),
+          ]}
+        />
       </TopBar>
 
       {compact && searchOpen && (
@@ -213,16 +227,18 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
         <EmptyState
           icon={UserRound}
           title="Cuốn này chưa có ai"
-          text="Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên."
+          text={readOnly ? 'Người quản trị chưa thêm ai vào cuốn này.' : 'Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên.'}
           action={
-            <Button variant="primary" onClick={() => setDialog({ kind: 'addRoot' })}>
-              Thêm thuỷ tổ
-            </Button>
+            readOnly ? undefined : (
+              <Button variant="primary" onClick={() => setDialog({ kind: 'addRoot' })}>
+                Thêm thuỷ tổ
+              </Button>
+            )
           }
         />
       ) : mode === 'list' ? (
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <PersonList doc={doc} onOpen={(id) => setDialog({ kind: 'profile', personId: id })} />
+          <PersonList doc={doc} onOpen={(id) => (readOnly ? goTo(id) : setDialog({ kind: 'profile', personId: id }))} />
         </div>
       ) : (
         <div className="relative flex min-h-0 flex-1" data-testid="tree-area">
@@ -237,7 +253,7 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
               compact={compact}
               actionsFor={actions}
               onSelect={setSelectedId}
-              onOpenProfile={(id) => setDialog({ kind: 'profile', personId: id })}
+              onOpenProfile={(id) => (readOnly ? setSelectedId(id) : setDialog({ kind: 'profile', personId: id }))}
               onAction={onNodeAction}
             />
           </div>
@@ -267,7 +283,19 @@ function Loaded({ doc, edit, saveError, onBack }: { doc: TreeDoc; edit: EditFn; 
       )}
 
       {dialog?.kind === 'addRoot' && <AddRootDialog edit={edit} onClose={closeDialog} />}
-      {dialog && dialog.kind !== 'addRoot' && <DialogHost key={`${dialog.kind}:${dialog.personId}`} kind={dialog.kind} personId={dialog.personId} doc={doc} edit={edit} onClose={closeDialog} />}
+      {dialog?.kind === 'editTree' && (
+        <EditTreeInfoDialog
+          cloud={cloud}
+          tree={{ id: doc.meta.id, name: doc.meta.name, region: doc.meta.region, description: doc.meta.description }}
+          onClose={() => setDialog(null)}
+          onSaved={() => {
+            setDialog(null)
+            reload()
+          }}
+        />
+      )}
+      {dialog?.kind === 'deleteTree' && <DeleteTreeDialog cloud={cloud} tree={{ id: doc.meta.id, name: doc.meta.name }} onClose={() => setDialog(null)} onDeleted={onBack} />}
+      {dialog && dialog.kind !== 'addRoot' && dialog.kind !== 'editTree' && dialog.kind !== 'deleteTree' && <DialogHost key={`${dialog.kind}:${dialog.personId}`} kind={dialog.kind} personId={dialog.personId} doc={doc} edit={edit} onClose={closeDialog} />}
     </div>
   )
 }

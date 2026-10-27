@@ -1,10 +1,9 @@
-import { expect, test } from '@playwright/test'
-import { card, openSampleTree, seed } from './fixtures.ts'
+import { card, expect, openClan, openSampleTree, test } from './fixtures.ts'
 
 test.use({ viewport: { width: 1280, height: 800 } })
 
-test('Mở rồi đóng hộp thoại bằng bàn phím: con trỏ trở về nút đã mở', async ({ page }) => {
-  await openSampleTree(page)
+test('Mở rồi đóng hộp thoại bằng bàn phím: con trỏ trở về nút đã mở', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   const opener = page.getByRole('button', { name: 'Thêm con', exact: true })
   await opener.focus()
@@ -15,8 +14,8 @@ test('Mở rồi đóng hộp thoại bằng bàn phím: con trỏ trở về n�
   await expect(opener).toBeFocused()
 })
 
-test('Đóng khi đã nhập tên: hỏi trước; chỉ đóng khi xác nhận', async ({ page }) => {
-  await openSampleTree(page)
+test('Đóng khi đã nhập tên: hỏi trước; chỉ đóng khi xác nhận', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   await page.getByLabel('Họ tên').fill('Nguyễn Văn Bình')
@@ -33,8 +32,8 @@ test('Đóng khi đã nhập tên: hỏi trước; chỉ đóng khi xác nhận'
   await expect(page.getByRole('dialog', { name: /Thêm con/ })).toBeHidden()
 })
 
-test('Đóng khi chưa nhập gì: đóng ngay, không hỏi', async ({ page }) => {
-  await openSampleTree(page)
+test('Đóng khi chưa nhập gì: đóng ngay, không hỏi', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   let asked = false
@@ -47,8 +46,8 @@ test('Đóng khi chưa nhập gì: đóng ngay, không hỏi', async ({ page }) 
   expect(asked).toBe(false)
 })
 
-test('Thêm con thành công: thông báo rồi tự ẩn, khung mới được làm nổi', async ({ page }) => {
-  await openSampleTree(page)
+test('Thêm con thành công: thông báo rồi tự ẩn, khung mới được làm nổi', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   await page.getByLabel('Họ tên').fill('Nguyễn Văn Bình')
@@ -60,8 +59,8 @@ test('Thêm con thành công: thông báo rồi tự ẩn, khung mới được 
   await expect(toast).toBeHidden({ timeout: 6000 })
 })
 
-test('Thêm bị từ chối: lỗi dưới ô giới tính, con trỏ tới đó, giữ họ tên', async ({ page }) => {
-  await openSampleTree(page)
+test('Thêm bị từ chối: lỗi dưới ô giới tính, con trỏ tới đó, giữ họ tên', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   await page.getByLabel('Họ tên').fill('Nguyễn Văn Bình')
@@ -73,8 +72,8 @@ test('Thêm bị từ chối: lỗi dưới ô giới tính, con trỏ tới đ�
   await expect(page.getByLabel('Họ tên')).toHaveValue('Nguyễn Văn Bình')
 })
 
-test('Gỡ người: thông báo và người biến khỏi sơ đồ', async ({ page }) => {
-  await openSampleTree(page)
+test('Gỡ người: thông báo và người biến khỏi sơ đồ', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Thị Hoa').click()
   await page.getByRole('button', { name: 'Gỡ người này' }).click()
   await page.getByRole('button', { name: 'Gỡ', exact: true }).click()
@@ -82,25 +81,25 @@ test('Gỡ người: thông báo và người biến khỏi sơ đồ', async ({
   await expect(card(page, 'Nguyễn Thị Hoa')).toHaveCount(0)
 })
 
-test('Trình đọc màn hình: nút quanh khung đọc ra việc và tên người', async ({ page }) => {
-  await openSampleTree(page)
+test('Trình đọc màn hình: nút quanh khung đọc ra việc và tên người', async ({ page, world }) => {
+  await openSampleTree(page, world)
   for (const name of ['Thêm con cho Nguyễn Văn An', 'Thêm vợ/chồng cho Nguyễn Văn An', 'Thu gọn nhánh của Nguyễn Văn An']) {
     await expect(page.getByRole('button', { name })).toHaveCount(1)
   }
 })
 
 test.describe('giảm chuyển động', () => {
-  test('Làm nổi khi chưa bật giảm chuyển động: chạy 2 nhịp rồi dừng', async ({ page }) => {
-    await openSampleTree(page)
+  test('Làm nổi khi chưa bật giảm chuyển động: chạy 2 nhịp rồi dừng', async ({ page, world }) => {
+    await openSampleTree(page, world)
     await page.getByLabel('Tìm người').fill('chau')
     await page.getByRole('button', { name: 'Nguyễn Văn Cháu', exact: true }).click()
     const anim = await card(page, 'Nguyễn Văn Cháu').evaluate((el) => getComputedStyle(el).animationIterationCount)
     expect(anim).toBe('2')
   })
 
-  test('Tìm một người khi bật giảm chuyển động: nhảy thẳng, viền tĩnh', async ({ page }) => {
+  test('Tìm một người khi bật giảm chuyển động: nhảy thẳng, viền tĩnh', async ({ page, world }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
-    await openSampleTree(page)
+    await openSampleTree(page, world)
     await page.getByLabel('Tìm người').fill('chau')
     await page.getByRole('button', { name: 'Nguyễn Văn Cháu', exact: true }).click()
     const style = await card(page, 'Nguyễn Văn Cháu').evaluate((el) => {
@@ -112,9 +111,9 @@ test.describe('giảm chuyển động', () => {
   })
 })
 
-test('Cuốn chưa có ai: một câu và một nút "Thêm thuỷ tổ"', async ({ page }) => {
-  await seed(page, [])
-  await page.goto('/')
+test('Cuốn chưa có ai: một câu và một nút "Thêm thuỷ tổ"', async ({ page, worlds }) => {
+  const world = await worlds.create(null)
+  await openClan(page, world)
   await expect(page.getByText('Chưa có cuốn gia phả nào')).toBeVisible()
   await page.getByRole('button', { name: 'Tạo cuốn gia phả' }).click()
   await page.getByLabel('Tên cuốn').fill('Chi hai')
@@ -123,16 +122,16 @@ test('Cuốn chưa có ai: một câu và một nút "Thêm thuỷ tổ"', async
   await expect(page.getByRole('button', { name: 'Thêm thuỷ tổ' })).toHaveCount(1)
 })
 
-test('Chế độ danh sách: lọc "Đã mất"', async ({ page }) => {
-  await openSampleTree(page)
+test('Chế độ danh sách: lọc "Đã mất"', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await page.getByRole('button', { name: 'Danh sách', exact: true }).click()
   await page.getByRole('button', { name: 'Đã mất' }).click()
   await expect(page.getByText('1 người')).toBeVisible()
   await expect(page.getByRole('button', { name: /Nguyễn Văn Cả/ })).toBeVisible()
 })
 
-test('Back của trình duyệt đóng tấm trượt / hộp thoại rồi về danh sách cuốn', async ({ page }) => {
-  await openSampleTree(page)
+test('Back của trình duyệt đóng tấm trượt / hộp thoại rồi về danh sách cuốn', async ({ page, world }) => {
+  await openSampleTree(page, world)
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Sửa hồ sơ' }).click()
   await expect(page.getByRole('dialog', { name: /Hồ sơ/ })).toBeVisible()
@@ -140,5 +139,5 @@ test('Back của trình duyệt đóng tấm trượt / hộp thoại rồi về
   await expect(page.getByRole('dialog', { name: /Hồ sơ/ })).toBeHidden()
   await expect(page.getByRole('complementary', { name: /Thông tin Nguyễn Văn An/ })).toBeVisible()
   await page.goBack()
-  await expect(page.getByRole('button', { name: /Chi trưởng họ Nguyễn/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Chi trưởng họ Nguyễn/ }).first()).toBeVisible()
 })

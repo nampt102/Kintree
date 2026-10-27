@@ -1,6 +1,6 @@
 import type { EditError } from '@kintree/core'
 
-export type StoreError = 'CORRUPT' | 'UNSUPPORTED_VERSION' | 'STORAGE_FULL'
+export type StoreError = 'NOT_SIGNED_IN' | 'FORBIDDEN' | 'OFFLINE' | 'LOAD_FAILED' | 'SAVE_FAILED' | 'TREE_NOT_FOUND'
 export type AppError = EditError | StoreError
 
 /** Bảng dịch mã lỗi duy nhất của giao diện; kiểu `Record` buộc phải có câu cho mọi mã. */
@@ -29,9 +29,12 @@ export const MESSAGES: Record<AppError, string> = {
   GENDER_UNKNOWN: 'Hãy ghi giới tính của người này trước khi thêm vợ/chồng.',
   INVALID_DATE: 'Ngày tháng không hợp lệ.',
   INVALID_ORDER: 'Thứ tự không khớp với danh sách người hiện có.',
-  CORRUPT: 'Dữ liệu lưu trên máy không đọc được. Dữ liệu cũ vẫn được giữ nguyên; hãy tải bản sao.',
-  UNSUPPORTED_VERSION: 'Dữ liệu được lưu bởi một phiên bản mới hơn của ứng dụng.',
-  STORAGE_FULL: 'Bộ nhớ của trình duyệt đã đầy, chưa lưu được. Hãy tải bản sao rồi xoá bớt dữ liệu.',
+  NOT_SIGNED_IN: 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.',
+  FORBIDDEN: 'Bạn không có quyền thực hiện thao tác này.',
+  OFFLINE: 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.',
+  LOAD_FAILED: 'Không tải được dữ liệu. Hãy thử lại.',
+  SAVE_FAILED: 'Không lưu được. Thay đổi vừa rồi đã được hoàn lại; hãy thử lại.',
+  TREE_NOT_FOUND: 'Không tìm thấy cuốn gia phả này (có thể đã bị xoá).',
 }
 
 export const messageFor = (error: AppError): string => MESSAGES[error]
