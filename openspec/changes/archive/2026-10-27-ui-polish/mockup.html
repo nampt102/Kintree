@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+        colors: {
+          canvas: '#FAF8F5', surface: '#FFFFFF', muted: '#F3EFEA', line: '#ECE7E1', input: '#8F877C', connector: '#BDB4AA',
+          ink: '#1F1A17', sub: '#6B635A',
+          accent: { DEFAULT: '#9F2B25', hover: '#86231E', soft: '#F8ECEA' },
+          male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' },
+          danger: { DEFAULT: '#B42318', soft: '#FBEDEB' },
+        },
+        boxShadow: {
+          1: '0 1px 2px rgb(31 26 23 / .05), 0 1px 3px rgb(31 26 23 / .07)',
+          2: '0 2px 4px rgb(31 26 23 / .05), 0 8px 20px rgb(31 26 23 / .09)',
+          3: '0 12px 32px rgb(31 26 23 / .14), 0 2px 6px rgb(31 26 23 / .06)',
+          btn: 'inset 0 1px 0 rgb(255 255 255 / .14), 0 1px 2px rgb(31 26 23 / .18)',
+        },
+      },
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0 / .25); flex-shrink: 0; }
+  .desk { width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 1px #d8d0c4, 0 30px 60px rgb(0 0 0 / .16); flex-shrink: 0; }
+  .status { height: 47px; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; font-size: 15px; font-weight: 600; }
+  .dots { background-image: radial-gradient(#e5dfd7 1px, transparent 1px); background-size: 22px 22px; }
+  [data-lucide] { width: 20px; height: 20px; stroke-width: 1.75; }
+  .i14 { width: 14px !important; height: 14px !important; }
+  .i16 { width: 16px !important; height: 16px !important; }
+  .i18 { width: 18px !important; height: 18px !important; }
+  .i22 { width: 22px !important; height: 22px !important; }
+  /* Nút chính: đỏ son phẳng, viền sáng mảnh phía trên cho cảm giác "bấm được" mà không bóng loáng. */
+  .btn-primary { background: #9F2B25; color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 0 1px 2px rgb(31 26 23 / .18); }
+  .btn-secondary { background: #fff; color: #1F1A17; box-shadow: 0 0 0 1px #E4DED6, 0 1px 2px rgb(31 26 23 / .05); }
+  /* Nút nhanh: ô tròn nền nhạt + nhãn dưới (kiểu danh bạ iOS). */
+  .quick { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: #1F1A17; }
+  .quick > span:first-child { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 9999px; background: #F3EFEA; color: #1F1A17; }
+  .quick.primary > span:first-child { background: #9F2B25; color: #fff; box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 0 1px 2px rgb(31 26 23 / .18); }
+  /* Dòng thao tác phụ: biểu tượng mảnh màu phụ, chữ, mũi tên; không ô màu. */
+  .row { display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 14px; }
+  .row + .row { box-shadow: inset 0 1px 0 #ECE7E1; }
+  .row > i:first-child { color: #6B635A; }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1400px] px-8 py-10 space-y-14">
+
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · change ui-polish · bản mẫu lần 2</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Đỏ trầm, nền trung tính</h1>
+    <p class="max-w-3xl text-sub">Bỏ vàng đồng: chỉ còn đỏ son làm màu chính trên nền trắng ấm và xám trung tính. Nút thao tác làm lại: thao tác hay dùng thành hàng nút tròn có nhãn; thao tác khác là danh sách gọn (biểu tượng mảnh, mũi tên), không ô màu; "Gỡ" là chữ đỏ ở cuối. Dữ liệu là dữ liệu mẫu.</p>
+  </header>
+
+  <!-- Bảng màu -->
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">1. Màu, độ sâu, nút</h2>
+    <div class="flex flex-wrap gap-3">
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="h-12 rounded-lg bg-canvas ring-1 ring-line"></div><p class="mt-2 text-sm font-medium">Nền trang</p><p class="text-xs text-sub">#FAF8F5</p></div>
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="h-12 rounded-lg bg-muted"></div><p class="mt-2 text-sm font-medium">Xám ấm</p><p class="text-xs text-sub">#F3EFEA</p></div>
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="h-12 rounded-lg bg-accent"></div><p class="mt-2 text-sm font-medium">Đỏ son (chính)</p><p class="text-xs text-sub">#9F2B25 · 7,4:1</p></div>
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="h-12 rounded-lg bg-accent-soft"></div><p class="mt-2 text-sm font-medium">Đỏ nhạt</p><p class="text-xs text-sub">#F8ECEA</p></div>
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="flex h-12 gap-1"><div class="flex-1 rounded-lg bg-male"></div><div class="flex-1 rounded-lg bg-female"></div></div><p class="mt-2 text-sm font-medium">Nam / Nữ</p><p class="text-xs text-sub">chỉ ở khung người</p></div>
+      <div class="w-40 rounded-xl bg-surface p-3 shadow-1"><div class="h-12 rounded-lg bg-ink"></div><p class="mt-2 text-sm font-medium">Chữ</p><p class="text-xs text-sub">#1F1A17 · phụ #6B635A</p></div>
+    </div>
+    <div class="grid grid-cols-[auto_1fr] gap-x-10 gap-y-6 rounded-2xl bg-canvas p-6">
+      <p class="pt-3 text-sm font-medium text-sub">Nút</p>
+      <div class="flex flex-wrap items-center gap-3">
+        <button class="btn-primary flex h-11 items-center gap-2 rounded-xl px-5 text-[15px] font-semibold"><i data-lucide="plus" class="i18"></i>Tạo cuốn gia phả</button>
+        <button class="btn-secondary flex h-11 items-center gap-2 rounded-xl px-5 text-[15px] font-medium"><i data-lucide="download" class="i18 text-sub"></i>Tải bản sao</button>
+        <button class="flex h-11 items-center rounded-xl px-4 text-[15px] font-medium text-accent hover:bg-accent-soft">Huỷ</button>
+        <button class="flex h-11 items-center gap-2 rounded-xl px-4 text-[15px] font-medium text-danger"><i data-lucide="trash-2" class="i18"></i>Gỡ người này</button>
+        <span class="text-xs text-sub">Chính · Phụ · Chữ · Nguy hiểm</span>
+      </div>
+      <p class="pt-4 text-sm font-medium text-sub">Nút nhanh</p>
+      <div class="flex gap-6">
+        <div class="quick primary"><span><i data-lucide="pencil" class="i18"></i></span>Sửa</div>
+        <div class="quick"><span><i data-lucide="user-plus" class="i18"></i></span>Thêm con</div>
+        <div class="quick"><span><i data-lucide="heart" class="i18"></i></span>Vợ/chồng</div>
+        <div class="quick"><span><i data-lucide="crosshair" class="i18"></i></span>Xem nhánh</div>
+      </div>
+      <p class="pt-3 text-sm font-medium text-sub">Danh sách</p>
+      <div class="w-96 overflow-hidden rounded-2xl bg-surface shadow-1">
+        <div class="row"><i data-lucide="arrow-up" class="i18"></i><span class="flex-1 font-medium">Thêm cha/mẹ còn thiếu</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+        <div class="row"><i data-lucide="arrow-up-down" class="i18"></i><span class="flex-1 font-medium">Sắp thứ tự anh chị em</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+      </div>
+      <p class="pt-3 text-sm font-medium text-sub">Độ sâu</p>
+      <div class="flex gap-6">
+        <div class="grid h-16 w-32 place-items-center rounded-xl bg-surface text-sm text-sub shadow-1">Thẻ</div>
+        <div class="grid h-16 w-32 place-items-center rounded-xl bg-surface text-sm text-sub shadow-2">Menu</div>
+        <div class="grid h-16 w-32 place-items-center rounded-2xl bg-surface text-sm text-sub shadow-3">Hộp thoại</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Điện thoại -->
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">2. Điện thoại (390 × 844)</h2>
+    <div class="flex flex-wrap gap-12">
+
+      <div class="space-y-3">
+        <p class="text-sm font-medium text-sub">Đăng nhập</p>
+        <div class="phone">
+          <div class="status"><span>9:41</span><span>●●●</span></div>
+          <svg class="absolute inset-x-0 top-0 h-[360px] w-full" viewBox="0 0 390 360" fill="none" aria-hidden>
+            <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3ECE6"/><stop offset="1" stop-color="#FAF8F5"/></linearGradient></defs>
+            <rect width="390" height="360" fill="url(#g)"/>
+            <g stroke="#E0D3C9" stroke-width="1.2">
+              <path d="M195 300 V210 M195 210 C195 180 150 170 120 150 M195 210 C195 180 240 170 270 150 M120 150 C110 130 90 120 70 110 M120 150 C125 128 135 115 150 100 M270 150 C260 128 250 115 240 100 M270 150 C285 130 305 120 325 112"/>
+            </g>
+            <g fill="#E0D3C9"><circle cx="70" cy="110" r="5"/><circle cx="150" cy="100" r="5"/><circle cx="240" cy="100" r="5"/><circle cx="325" cy="112" r="5"/><circle cx="120" cy="150" r="5"/><circle cx="270" cy="150" r="5"/><circle cx="195" cy="210" r="6" fill="#9F2B25" opacity=".35"/></g>
+          </svg>
+          <div class="relative flex h-[797px] flex-col px-6 pt-36">
+            <div class="flex items-center gap-2.5">
+              <span class="btn-primary grid size-11 place-items-center rounded-xl"><i data-lucide="tree-deciduous" class="i22"></i></span>
+              <span class="text-[26px] font-semibold tracking-tight text-accent">Kintree</span>
+            </div>
+            <h1 class="mt-6 text-[28px] font-semibold leading-tight tracking-tight">Gia phả của dòng họ,<br/>gìn giữ cho đời sau</h1>
+            <p class="mt-2 text-sub">Đăng nhập để xem và cùng gìn giữ gia phả.</p>
+            <div class="mt-8 rounded-2xl bg-surface p-5 shadow-2">
+              <label class="text-sm font-medium">Email</label>
+              <div class="mt-1.5 flex h-12 items-center gap-2 rounded-xl border border-input bg-surface px-3 text-sub"><i data-lucide="mail" class="i18"></i>ten@gmail.com</div>
+              <button class="btn-primary mt-4 flex h-12 w-full items-center justify-center rounded-xl text-[15px] font-semibold">Gửi mã đăng nhập</button>
+              <div class="my-4 flex items-center gap-3 text-xs text-sub"><span class="h-px flex-1 bg-line"></span>hoặc<span class="h-px flex-1 bg-line"></span></div>
+              <button class="btn-secondary flex h-12 w-full items-center justify-center gap-2.5 rounded-xl text-[15px] font-medium">
+                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.7H9v3.3h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.5 1.3L15 2.4A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
+                Đăng nhập bằng Google
+              </button>
+            </div>
+            <p class="mt-auto pb-8 text-center text-xs text-sub">Dữ liệu gia phả chỉ người được dòng họ cấp quyền mới xem được.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-sm font-medium text-sub">Danh sách dòng họ</p>
+        <div class="phone">
+          <div class="status bg-surface"><span>9:41</span><span>●●●</span></div>
+          <div class="flex h-14 items-center gap-2 bg-surface px-4 shadow-[0_1px_0_#ECE7E1]">
+            <span class="btn-primary grid size-8 place-items-center rounded-lg"><i data-lucide="tree-deciduous" class="i18"></i></span>
+            <span class="flex-1 text-lg font-semibold text-accent">Kintree</span>
+            <span class="grid size-11 place-items-center"><span class="grid size-8 place-items-center rounded-full bg-muted text-sm font-semibold text-sub">J</span></span>
+          </div>
+          <div class="space-y-6 px-4 pt-6">
+            <div>
+              <h2 class="text-2xl font-semibold tracking-tight">Dòng họ của bạn</h2>
+              <p class="mt-1 text-sm text-sub">2 dòng họ</p>
+            </div>
+            <div class="space-y-3">
+              <button class="flex w-full items-center gap-3 rounded-2xl bg-surface p-4 text-left shadow-1">
+                <span class="grid size-12 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="landmark" class="i22"></i></span>
+                <span class="min-w-0 flex-1"><span class="block font-semibold">Họ Nguyễn Văn</span><span class="mt-0.5 block text-sm text-sub">3 cuốn · Quản trị</span></span>
+                <i data-lucide="chevron-right" class="i18 text-[#BDB4AA]"></i>
+              </button>
+              <button class="flex w-full items-center gap-3 rounded-2xl bg-surface p-4 text-left shadow-1">
+                <span class="grid size-12 place-items-center rounded-xl bg-muted text-sub"><i data-lucide="landmark" class="i22"></i></span>
+                <span class="min-w-0 flex-1"><span class="block font-semibold">Họ Trần (bên ngoại)</span><span class="mt-0.5 block text-sm text-sub">1 cuốn · Chỉ xem</span></span>
+                <i data-lucide="chevron-right" class="i18 text-[#BDB4AA]"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-sm font-medium text-sub">Cây gia phả + thông tin một người</p>
+        <div class="phone">
+          <div class="status bg-surface"><span>9:41</span><span>●●●</span></div>
+          <div class="flex h-14 items-center gap-1 bg-surface px-2 shadow-[0_1px_0_#ECE7E1]">
+            <span class="grid size-11 place-items-center"><i data-lucide="arrow-left"></i></span>
+            <span class="min-w-0 flex-1"><span class="block truncate font-semibold leading-tight">Chi trưởng họ Nguyễn</span><span class="block text-xs text-sub">8 người · 3 đời</span></span>
+            <span class="grid size-11 place-items-center"><i data-lucide="search"></i></span>
+            <span class="grid size-11 place-items-center"><i data-lucide="list"></i></span>
+            <span class="grid size-11 place-items-center"><i data-lucide="more-vertical"></i></span>
+          </div>
+          <div class="dots relative h-[743px] overflow-hidden">
+            <svg class="absolute inset-0" width="390" height="743" fill="none" aria-hidden>
+              <g stroke="#BDB4AA" stroke-width="1.5"><path d="M195 128 V150 H86 V172 M195 150 H300 V172"/><path d="M86 234 V284"/><path d="M194 56 H205" stroke="#9F2B25" stroke-opacity=".6"/></g>
+            </svg>
+            <span class="absolute left-3 top-[30px] rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-sub">Đời 1</span>
+            <div class="absolute left-[54px] top-[22px] w-[140px] rounded-xl border border-dashed border-input bg-muted/70 p-2.5">
+              <div class="flex items-center gap-2"><span class="grid size-7 shrink-0 place-items-center rounded-full bg-[#E7E1D9] text-xs font-semibold text-sub">C</span><div class="min-w-0"><p class="truncate text-[12.5px] font-semibold leading-tight">Nguyễn Văn Cả</p><p class="text-[11px] text-sub">1890 – 1968</p></div></div>
+              <span class="mt-1.5 inline-flex items-center gap-1 rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent"><i data-lucide="landmark" class="i14"></i>Thuỷ tổ</span>
+            </div>
+            <div class="absolute left-[205px] top-[28px] w-[150px] rounded-xl bg-surface p-2.5 shadow-1" style="border-left:3px solid #A23F6B">
+              <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-full bg-female-soft text-xs font-semibold text-female">B</span><div class="min-w-0"><p class="truncate text-[12.5px] font-semibold leading-tight">Trần Thị Bình</p><p class="flex items-center gap-1 text-[11px] text-sub"><i data-lucide="venus" class="i14 text-female"></i>Dâu</p></div></div>
+            </div>
+            <span class="absolute left-3 top-[180px] rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-sub">Đời 2</span>
+            <div class="absolute left-[54px] top-[172px] w-[140px] rounded-xl bg-surface p-2.5 shadow-2 ring-2 ring-accent" style="border-left:3px solid #2F5E8C">
+              <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-full bg-male-soft text-xs font-semibold text-male">A</span><div class="min-w-0"><p class="truncate text-[12.5px] font-semibold leading-tight">Nguyễn Văn An</p><p class="flex items-center gap-1 text-[11px] text-sub"><i data-lucide="mars" class="i14 text-male"></i>1920 –</p></div></div>
+            </div>
+            <div class="absolute left-[228px] top-[172px] w-[140px] rounded-xl bg-surface p-2.5 shadow-1" style="border-left:3px solid #A23F6B">
+              <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-full bg-female-soft text-xs font-semibold text-female">H</span><div class="min-w-0"><p class="truncate text-[12.5px] font-semibold leading-tight">Nguyễn Thị Hoa</p><p class="flex items-center gap-1 text-[11px] text-sub"><i data-lucide="venus" class="i14 text-female"></i>1924 –</p></div></div>
+            </div>
+            <span class="absolute left-3 top-[292px] rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-sub">Đời 3</span>
+            <div class="absolute left-[54px] top-[284px] w-[140px] rounded-xl bg-surface p-2.5 shadow-1" style="border-left:3px solid #2F5E8C">
+              <div class="flex items-center gap-2"><span class="grid size-7 place-items-center rounded-full bg-male-soft text-xs font-semibold text-male">C</span><div class="min-w-0"><p class="truncate text-[12.5px] font-semibold leading-tight">Nguyễn Văn Cháu</p><p class="flex items-center gap-1 text-[11px] text-sub"><i data-lucide="mars" class="i14 text-male"></i>1950 –</p></div></div>
+            </div>
+
+            <div class="absolute inset-x-0 bottom-0 h-[410px] rounded-t-[22px] bg-surface shadow-[0_-8px_30px_rgb(31_26_23/.14)]">
+              <div class="flex justify-center pt-2"><span class="h-1.5 w-10 rounded-full bg-[#DDD6CD]"></span></div>
+              <div class="flex items-center gap-3 px-5 pt-3">
+                <span class="grid size-14 place-items-center rounded-full bg-male-soft text-xl font-semibold text-male">A</span>
+                <div class="min-w-0 flex-1"><p class="text-xl font-semibold leading-tight">Nguyễn Văn An</p><p class="mt-0.5 flex items-center gap-1.5 text-sm text-sub"><i data-lucide="mars" class="i14 text-male"></i>Nam · sinh 1920 · Đời 2</p></div>
+                <span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="x" class="i18"></i></span>
+              </div>
+              <div class="mt-5 flex justify-around px-4">
+                <div class="quick primary"><span><i data-lucide="pencil" class="i18"></i></span>Sửa hồ sơ</div>
+                <div class="quick"><span><i data-lucide="user-plus" class="i18"></i></span>Thêm con</div>
+                <div class="quick"><span><i data-lucide="heart" class="i18"></i></span>Vợ/chồng</div>
+                <div class="quick"><span><i data-lucide="crosshair" class="i18"></i></span>Xem nhánh</div>
+              </div>
+              <div class="mx-4 mt-5 overflow-hidden rounded-2xl bg-canvas text-sm">
+                <div class="flex justify-between px-4 py-3"><span class="text-sub">Vợ</span><span class="font-medium">Lê Thị Dâu</span></div>
+                <div class="flex justify-between px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Con</span><span class="font-medium">Nguyễn Văn Cháu</span></div>
+              </div>
+              <div class="mx-4 mt-3 overflow-hidden rounded-2xl bg-surface shadow-1">
+                <div class="row"><i data-lucide="arrow-up-down" class="i18"></i><span class="flex-1 font-medium">Sắp thứ tự anh chị em</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+                <div class="row"><i data-lucide="chevrons-down-up" class="i18"></i><span class="flex-1 font-medium">Thu gọn nhánh con cháu</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">3. Máy tính (1280 × 800)</h2>
+
+    <p class="text-sm font-medium text-sub">Các cuốn của một dòng họ</p>
+    <div class="desk">
+      <div class="flex h-16 items-center gap-3 bg-surface px-6 shadow-[0_1px_0_#ECE7E1]">
+        <span class="grid size-11 place-items-center"><i data-lucide="arrow-left"></i></span>
+        <span class="btn-primary grid size-8 place-items-center rounded-lg"><i data-lucide="tree-deciduous" class="i18"></i></span>
+        <nav class="flex items-center gap-2 text-sm"><span class="text-sub">Dòng họ</span><i data-lucide="chevron-right" class="i14 text-sub"></i><span class="font-semibold">Họ Nguyễn Văn</span></nav>
+        <span class="flex-1"></span>
+        <span class="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 shadow-[0_0_0_1px_#E4DED6]"><span class="grid size-8 place-items-center rounded-full bg-muted text-sm font-semibold text-sub">J</span><span class="text-sm">jamesphan102@gmail.com</span></span>
+      </div>
+      <div class="mx-auto max-w-[1040px] px-6 pt-10">
+        <div class="flex items-end justify-between">
+          <div><h2 class="text-[28px] font-semibold tracking-tight">Các cuốn gia phả</h2><p class="mt-1 text-sub">Họ Nguyễn Văn · 3 cuốn</p></div>
+          <button class="btn-primary flex h-11 items-center gap-2 rounded-xl px-5 text-[15px] font-semibold"><i data-lucide="plus" class="i18"></i>Tạo cuốn gia phả</button>
+        </div>
+        <div class="mt-8 grid grid-cols-2 gap-4">
+          <div class="flex items-center gap-4 rounded-2xl bg-surface p-5 shadow-1">
+            <span class="grid size-14 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="tree-deciduous" class="i22"></i></span>
+            <div class="min-w-0 flex-1"><p class="text-lg font-semibold">Chi trưởng họ Nguyễn</p><p class="mt-0.5 text-sm text-sub">Miền Bắc · Quản trị</p></div>
+            <span class="grid size-11 place-items-center rounded-full text-sub"><i data-lucide="more-horizontal"></i></span>
+          </div>
+          <div class="flex items-center gap-4 rounded-2xl bg-surface p-5 shadow-2">
+            <span class="grid size-14 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="tree-deciduous" class="i22"></i></span>
+            <div class="min-w-0 flex-1"><p class="text-lg font-semibold">Chi thứ hai</p><p class="mt-0.5 text-sm text-sub">Miền Bắc · Quản trị</p></div>
+            <span class="grid size-11 place-items-center rounded-full bg-muted text-ink"><i data-lucide="more-horizontal"></i></span>
+          </div>
+          <div class="flex items-center gap-4 rounded-2xl bg-surface p-5 shadow-1">
+            <span class="grid size-14 place-items-center rounded-xl bg-muted text-sub"><i data-lucide="tree-deciduous" class="i22"></i></span>
+            <div class="min-w-0 flex-1"><p class="text-lg font-semibold">Chi út (Nam Định)</p><p class="mt-0.5 text-sm text-sub">Miền Bắc · Chỉ xem</p></div>
+          </div>
+        </div>
+        <div class="relative">
+          <div class="absolute left-[560px] -top-[160px] w-56 overflow-hidden rounded-xl bg-surface py-1.5 shadow-3">
+            <div class="flex h-11 items-center gap-3 px-4 text-[15px]"><i data-lucide="pencil" class="i18 text-sub"></i>Sửa thông tin cuốn</div>
+            <div class="mx-3 my-1 h-px bg-line"></div>
+            <div class="flex h-11 items-center gap-3 px-4 text-[15px] text-danger"><i data-lucide="trash-2" class="i18"></i>Xoá cuốn</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="pt-6 text-sm font-medium text-sub">Cây gia phả + ngăn thông tin</p>
+    <div class="desk">
+      <div class="flex h-16 items-center gap-3 bg-surface px-4 shadow-[0_1px_0_#ECE7E1]">
+        <span class="grid size-11 place-items-center"><i data-lucide="arrow-left"></i></span>
+        <div class="min-w-0"><p class="font-semibold leading-tight">Chi trưởng họ Nguyễn</p><p class="text-xs text-sub">Họ Nguyễn Văn · 8 người · 3 đời</p></div>
+        <span class="flex-1"></span>
+        <div class="flex h-11 w-72 items-center gap-2 rounded-xl bg-muted px-3 text-sub"><i data-lucide="search" class="i18"></i>Tìm người</div>
+        <div class="flex h-11 items-center rounded-xl bg-muted p-1 text-sm font-medium">
+          <span class="flex h-9 items-center gap-1.5 rounded-lg bg-surface px-3.5 shadow-1"><i data-lucide="network" class="i16"></i>Cây</span>
+          <span class="flex h-9 items-center gap-1.5 px-3.5 text-sub"><i data-lucide="list" class="i16"></i>Danh sách</span>
+        </div>
+        <span class="grid size-11 place-items-center rounded-xl"><i data-lucide="more-horizontal"></i></span>
+      </div>
+      <div class="flex h-[736px]">
+        <div class="dots relative flex-1 overflow-hidden">
+          <svg class="absolute inset-0" width="900" height="736" fill="none" aria-hidden>
+            <g stroke="#BDB4AA" stroke-width="1.5">
+              <path d="M440 168 V200 H240 V232 M440 200 V232 M440 200 H650 V232"/>
+              <path d="M240 296 V362"/>
+              <path d="M650 296 V362" stroke-dasharray="6 5"/>
+              <path d="M420 130 H460" stroke="#9F2B25" stroke-opacity=".6"/>
+              <path d="M330 264 H350" stroke="#9F2B25" stroke-opacity=".6"/>
+            </g>
+          </svg>
+          <span class="absolute left-6 top-[120px] rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-sub">Đời 1</span>
+          <span class="absolute left-6 top-[254px] rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-sub">Đời 2</span>
+          <span class="absolute left-6 top-[384px] rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-sub">Đời 3</span>
+
+          <div class="absolute left-[240px] top-[92px] w-[180px] rounded-xl border border-dashed border-input bg-muted/70 p-3">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-[#E7E1D9] font-semibold text-sub">C</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn Cả</p><p class="text-xs text-sub">1890 – 1968</p></div></div>
+            <span class="mt-2 inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent"><i data-lucide="landmark" class="i14"></i>Thuỷ tổ</span>
+          </div>
+          <div class="absolute left-[460px] top-[100px] w-[180px] rounded-xl bg-surface p-3 shadow-1" style="border-left:3px solid #A23F6B">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-female-soft font-semibold text-female">B</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Trần Thị Bình</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="venus" class="i14 text-female"></i>1895 – 1970 · Dâu</p></div></div>
+          </div>
+          <div class="absolute left-[150px] top-[232px] w-[180px] rounded-xl bg-surface p-3 shadow-2 ring-2 ring-accent" style="border-left:3px solid #2F5E8C">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-male-soft font-semibold text-male">A</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn An</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="mars" class="i14 text-male"></i>1920 –</p></div></div>
+          </div>
+          <div class="absolute left-[350px] top-[232px] w-[180px] rounded-xl bg-surface p-3 shadow-1" style="border-left:3px solid #A23F6B">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-female-soft font-semibold text-female">D</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Lê Thị Dâu</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="venus" class="i14 text-female"></i>1922 – · Dâu</p></div></div>
+          </div>
+          <div class="absolute left-[560px] top-[232px] w-[180px] rounded-xl bg-surface p-3 shadow-1" style="border-left:3px solid #A23F6B">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-female-soft font-semibold text-female">H</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Thị Hoa</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="venus" class="i14 text-female"></i>1924 –</p></div></div>
+          </div>
+          <div class="absolute left-[150px] top-[362px] w-[180px] rounded-xl bg-surface p-3 shadow-1" style="border-left:3px solid #2F5E8C">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-male-soft font-semibold text-male">C</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn Cháu</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="mars" class="i14 text-male"></i>1950 –</p></div></div>
+          </div>
+          <div class="absolute left-[560px] top-[362px] w-[180px] rounded-xl bg-surface p-3 shadow-1" style="border-left:3px solid #2F5E8C">
+            <div class="flex items-center gap-2.5"><span class="grid size-9 place-items-center rounded-full bg-male-soft font-semibold text-male">N</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn Nuôi</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="mars" class="i14 text-male"></i>1951 – · Con nuôi</p></div></div>
+          </div>
+
+          <div class="absolute bottom-6 left-6 flex flex-col overflow-hidden rounded-xl bg-surface shadow-2">
+            <span class="grid size-11 place-items-center"><i data-lucide="plus" class="i18"></i></span>
+            <span class="grid size-11 place-items-center shadow-[inset_0_1px_0_#ECE7E1]"><i data-lucide="minus" class="i18"></i></span>
+            <span class="grid size-11 place-items-center shadow-[inset_0_1px_0_#ECE7E1]"><i data-lucide="scan" class="i18"></i></span>
+          </div>
+          <div class="absolute bottom-6 right-6 h-[110px] w-[170px] rounded-xl bg-surface p-2 shadow-2">
+            <div class="relative h-full rounded-lg bg-canvas">
+              <span class="absolute left-[60px] top-3 h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span><span class="absolute left-[95px] top-3 h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span>
+              <span class="absolute left-[30px] top-9 h-2.5 w-8 rounded-sm bg-accent/70"></span><span class="absolute left-[66px] top-9 h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span><span class="absolute left-[105px] top-9 h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span>
+              <span class="absolute left-[28px] top-[60px] h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span><span class="absolute left-[105px] top-[60px] h-2.5 w-8 rounded-sm bg-[#D6CEC4]"></span>
+              <span class="absolute inset-x-4 inset-y-2 rounded-md ring-1 ring-[#8F877C]"></span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="w-[380px] shrink-0 overflow-hidden bg-surface shadow-[-1px_0_0_#ECE7E1]">
+          <div class="flex justify-end px-3 pt-3"><span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="x" class="i18"></i></span></div>
+          <div class="px-6">
+            <div class="flex flex-col items-center text-center">
+              <span class="grid size-20 place-items-center rounded-full bg-male-soft text-3xl font-semibold text-male">A</span>
+              <p class="mt-3 text-2xl font-semibold leading-tight tracking-tight">Nguyễn Văn An</p>
+              <p class="mt-1 flex items-center gap-1.5 text-sm text-sub"><i data-lucide="mars" class="i14 text-male"></i>Nam · sinh 1920 · Đời 2</p>
+            </div>
+            <div class="mt-6 flex justify-around">
+              <div class="quick primary"><span><i data-lucide="pencil" class="i18"></i></span>Sửa hồ sơ</div>
+              <div class="quick"><span><i data-lucide="user-plus" class="i18"></i></span>Thêm con</div>
+              <div class="quick"><span><i data-lucide="heart" class="i18"></i></span>Vợ/chồng</div>
+              <div class="quick"><span><i data-lucide="crosshair" class="i18"></i></span>Xem nhánh</div>
+            </div>
+            <div class="mt-6 overflow-hidden rounded-2xl bg-canvas text-sm">
+              <div class="flex justify-between px-4 py-3"><span class="text-sub">Ngày sinh</span><span class="font-medium tabular-nums">12/3/1920 (âm)</span></div>
+              <div class="flex justify-between px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Nơi sinh</span><span class="font-medium">Nam Định</span></div>
+              <div class="flex justify-between px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Vợ</span><span class="font-medium">Lê Thị Dâu</span></div>
+            </div>
+            <div class="mt-3 overflow-hidden rounded-2xl bg-surface shadow-1">
+              <div class="row"><i data-lucide="arrow-up-down" class="i18"></i><span class="flex-1 font-medium">Sắp thứ tự anh chị em</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+              <div class="row"><i data-lucide="chevrons-down-up" class="i18"></i><span class="flex-1 font-medium">Thu gọn nhánh con cháu</span><i data-lucide="chevron-right" class="i16 text-[#BDB4AA]"></i></div>
+            </div>
+            <button class="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl text-[15px] font-medium text-danger hover:bg-danger-soft"><i data-lucide="trash-2" class="i18"></i>Gỡ cả nhánh</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Thay đổi so với lần 1</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Bỏ vàng đồng: nhãn "Đời n" dùng xám ấm; huy hiệu "Thuỷ tổ" dùng đỏ nhạt; nền đăng nhập trung tính.</li>
+      <li>Nút thao tác: bỏ cột nút viền và các ô biểu tượng màu. Bốn việc hay dùng là hàng nút tròn có nhãn (nút "Sửa hồ sơ" là nút đỏ duy nhất); việc ít dùng là danh sách gọn; "Gỡ" là chữ đỏ ở cuối, không khung.</li>
+      <li>Nút chung: bo 12 px, nút chính đỏ phẳng có viền sáng mảnh, nút phụ trắng viền rất nhạt, nút huỷ chỉ là chữ.</li>
+      <li>Thẻ cuốn không còn số người/số đời (để gọn, không cần truy vấn thêm).</li>
+    </ul>
+  </section>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

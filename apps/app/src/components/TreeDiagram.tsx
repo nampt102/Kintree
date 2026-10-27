@@ -14,10 +14,10 @@ import {
   type NodeProps,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { ArrowUp, Heart, Maximize, Minus, Trash2, UserPlus, ZoomIn, ZoomOut, type LucideIcon } from 'lucide-react'
+import { ArrowUp, Heart, Landmark, Mars, Minus, Plus, Scan, Trash2, UserPlus, Venus, type LucideIcon } from 'lucide-react'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { lifespan } from '../lib/format.ts'
-import { IconButton, usePrefersReducedMotion } from '../ui/index.ts'
+import { Avatar, IconButton, usePrefersReducedMotion } from '../ui/index.ts'
 
 export type NodeAction = 'addParent' | 'addChild' | 'addSpouse' | 'remove' | 'toggleCollapse'
 
@@ -48,7 +48,7 @@ function HoverAction({ icon, label, onClick, className }: { icon: LucideIcon; la
     <IconButton
       icon={icon}
       label={label}
-      variant="secondary"
+      variant="raised"
       className={`kt-node-btn absolute opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:hidden ${className}`}
       onClick={(e) => {
         e.stopPropagation()
@@ -58,11 +58,14 @@ function HoverAction({ icon, label, onClick, className }: { icon: LucideIcon; la
   )
 }
 
+const GENDER_TEXT = { male: 'Nam', female: 'Nữ', unknown: 'Chưa rõ giới tính' } as const
+
 const PersonCard = memo(function PersonCard({ data }: NodeProps<PersonNode>) {
   const { person, hiddenCount, collapsed, selected, highlighted } = data
   const dead = person.death !== undefined
   const years = lifespan(person)
   const name = person.fullName
+  const GenderIcon = person.gender === 'male' ? Mars : person.gender === 'female' ? Venus : null
   return (
     <div className="group relative h-full w-full">
       <Handle id="t" type="target" position={Position.Top} className="!opacity-0" />
@@ -71,23 +74,32 @@ const PersonCard = memo(function PersonCard({ data }: NodeProps<PersonNode>) {
       <div
         data-person-id={person.id}
         className={[
-          'flex h-full w-full cursor-pointer flex-col justify-center rounded-md px-3 text-center',
-          dead ? 'border border-dashed border-line-strong bg-surface-muted' : 'border border-line-strong bg-surface shadow-card',
-          selected ? '!border-2 !border-solid !border-accent' : '',
+          'relative flex h-full w-full cursor-pointer items-center gap-2.5 rounded-xl pl-2.5 pr-2 text-left transition-shadow duration-150',
+          dead ? 'border border-dashed border-line-input bg-surface-muted' : 'bg-surface shadow-1 ring-1 ring-line/70',
+          !dead && person.gender === 'male' ? 'border-l-[3px] border-l-male' : '',
+          !dead && person.gender === 'female' ? 'border-l-[3px] border-l-female' : '',
+          selected ? '!shadow-2 ring-2 !ring-accent' : '',
           highlighted ? 'kt-glow' : '',
         ].join(' ')}
       >
-        <div className="line-clamp-2 text-sm font-semibold leading-tight text-ink" title={name}>
-          {name}
-        </div>
-        {(years || person.isOutsider) && (
-          <div className="mt-0.5 flex items-center justify-center gap-1.5 text-xs text-ink-muted">
-            {years && <span className="tabular">{years}</span>}
-            {person.isOutsider && (
-              <span className="rounded-full bg-surface-muted px-1.5 leading-5 text-ink-muted ring-1 ring-line">{person.gender === 'male' ? 'Rể' : 'Dâu'}</span>
-            )}
-          </div>
+        {person.isRoot && (
+          <span className="absolute -top-2.5 left-3 inline-flex items-center gap-1 rounded-full bg-accent-soft px-1.5 text-[11px] font-semibold leading-5 text-accent ring-1 ring-surface">
+            <Landmark aria-hidden size={12} strokeWidth={2.2} />
+            Thuỷ tổ
+          </span>
         )}
+        <Avatar name={name} gender={person.gender} muted={dead} size={34} />
+        <div className="min-w-0 flex-1">
+          <div className="line-clamp-2 text-[13.5px] font-semibold leading-tight text-ink" title={name}>
+            {name}
+          </div>
+          <div className="mt-0.5 flex items-center gap-1 text-xs text-ink-muted">
+            {GenderIcon && <GenderIcon aria-hidden size={12} strokeWidth={2.4} className={person.gender === 'male' ? 'shrink-0 text-male' : 'shrink-0 text-female'} />}
+            <span className="sr-only">{GENDER_TEXT[person.gender]}</span>
+            {years && <span className="tabular truncate">{years}</span>}
+            {person.isOutsider && <span className="shrink-0">{years ? '· ' : ''}{person.gender === 'male' ? 'Rể' : 'Dâu'}</span>}
+          </div>
+        </div>
       </div>
 
       {data.canAddParent && <HoverAction icon={ArrowUp} label={`Thêm cha/mẹ cho ${name}`} onClick={() => data.onAction(person.id, 'addParent')} className="bottom-full left-1/2 mb-1 -translate-x-1/2" />}
@@ -99,7 +111,7 @@ const PersonCard = memo(function PersonCard({ data }: NodeProps<PersonNode>) {
         <>
           {/* Nhãn số người đang ẩn vẫn hiện khi thu quá nhỏ (lúc đó nút bị ẩn). */}
           {collapsed && (
-            <span aria-hidden className="kt-zoomed-out-only absolute -bottom-3 left-1/2 hidden -translate-x-1/2 rounded-full border border-line-strong bg-surface px-1.5 text-xs font-semibold leading-6 text-ink">
+            <span aria-hidden className="kt-zoomed-out-only absolute -bottom-3 left-1/2 hidden -translate-x-1/2 rounded-full bg-surface px-1.5 text-xs font-semibold leading-6 text-ink shadow-1 ring-1 ring-line">
               +{hiddenCount}
             </span>
           )}
@@ -113,7 +125,7 @@ const PersonCard = memo(function PersonCard({ data }: NodeProps<PersonNode>) {
               data.onAction(person.id, 'toggleCollapse')
             }}
           >
-            <span className="flex h-6 min-w-6 items-center justify-center rounded-full border border-line-strong bg-surface px-1.5 text-xs font-semibold text-ink shadow-card">
+            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-surface px-1.5 text-xs font-semibold text-ink-muted shadow-1 ring-1 ring-line">
               {collapsed ? `+${hiddenCount}` : <Minus aria-hidden size={14} strokeWidth={2} />}
             </span>
           </button>
@@ -130,7 +142,7 @@ const Junction = () => (
 )
 
 const RowLabel = ({ data }: NodeProps<LabelNode>) => (
-  <div className="pointer-events-none whitespace-nowrap text-base font-semibold text-ink-muted">{data.text}</div>
+  <div className="pointer-events-none whitespace-nowrap rounded-full bg-surface-muted px-2.5 text-sm font-semibold leading-7 text-ink-muted">{data.text}</div>
 )
 
 const nodeTypes = { person: PersonCard, rowLabel: RowLabel, junction: Junction }
@@ -150,6 +162,8 @@ export type DiagramProps = {
   showMiniMap: boolean
   /** Cỡ gọn: không thu nhỏ quá mức đọc được. */
   compact: boolean
+  /** Chiều cao thanh nổi trên (px) để căn khung không bị che. */
+  topInset?: number
   actionsFor: (p: TreePerson) => Pick<PersonData, 'canAddParent' | 'canAddChild' | 'canAddSpouse' | 'canRemove' | 'hasChildren'>
   onSelect: (id: string | null) => void
   onOpenProfile: (id: string) => void
@@ -162,23 +176,24 @@ const MIN_ACTION_ZOOM = 0.5
 /** Mức phóng nhỏ nhất khi tự căn ở cỡ gọn: khung còn ~140 px, chữ tên ~13 px. */
 const COMPACT_MIN_ZOOM = 0.8
 
-/** Nút thu phóng 44 px (thay bộ nút 26 px mặc định của React Flow), nằm trên vùng an toàn. */
+/** Thanh nổi dưới (design D4): thu nhỏ, phóng to, vừa khung; mỗi nút 44 px; nằm trong vùng an toàn. */
 function ZoomControls({ onFit }: { onFit: () => void }) {
   const rf = useReactFlow()
   const reduced = usePrefersReducedMotion()
   const duration = reduced ? 0 : 200
   return (
     <Panel position="bottom-left" style={{ marginLeft: 'max(12px, env(safe-area-inset-left))', marginBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
-      <div className="flex flex-col gap-2">
-        <IconButton icon={ZoomIn} label="Phóng to" variant="secondary" onClick={() => void rf.zoomIn({ duration })} />
-        <IconButton icon={ZoomOut} label="Thu nhỏ" variant="secondary" onClick={() => void rf.zoomOut({ duration })} />
-        <IconButton icon={Maximize} label="Vừa khung" variant="secondary" onClick={onFit} />
+      <div className="kt-glass flex items-center gap-0.5 rounded-full p-1">
+        <IconButton icon={Minus} label="Thu nhỏ" onClick={() => void rf.zoomOut({ duration })} />
+        <IconButton icon={Plus} label="Phóng to" onClick={() => void rf.zoomIn({ duration })} />
+        <span aria-hidden className="mx-0.5 h-6 w-px bg-line" />
+        <IconButton icon={Scan} label="Vừa khung" onClick={onFit} />
       </div>
     </Panel>
   )
 }
 
-function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, compact, actionsFor, onSelect, onOpenProfile, onAction }: DiagramProps) {
+function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, compact, topInset = 0, actionsFor, onSelect, onOpenProfile, onAction }: DiagramProps) {
   const rf = useReactFlow()
   const reduced = usePrefersReducedMotion()
   // Nút trong sơ đồ giữ vùng chạm 44 px trên màn hình ở mọi mức phóng; thu dưới 50% thì ẩn (dùng bảng thông tin).
@@ -225,8 +240,8 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
     () =>
       layout.edges.map((e) =>
         e.type === 'marriage'
-          ? { id: e.id, source: e.from, sourceHandle: 'r', target: e.to, targetHandle: 'l', type: 'straight', style: { stroke: 'var(--color-accent)', strokeWidth: 2 } }
-          : { id: e.id, source: e.from, sourceHandle: 'b', target: e.to, targetHandle: 't', type: 'smoothstep', style: { stroke: 'var(--color-ink-muted)', strokeWidth: 2, ...edgeStyle[e.kind] } },
+          ? { id: e.id, source: e.from, sourceHandle: 'r', target: e.to, targetHandle: 'l', type: 'straight', style: { stroke: 'var(--color-accent)', strokeOpacity: 0.55, strokeWidth: 1.5 } }
+          : { id: e.id, source: e.from, sourceHandle: 'b', target: e.to, targetHandle: 't', type: 'smoothstep', style: { stroke: 'var(--color-connector)', strokeWidth: 1.5, ...edgeStyle[e.kind] } },
       ),
     [layout],
   )
@@ -236,8 +251,8 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
   // Cỡ gọn: cây quá rộng thì giữ mức phóng đọc được và đặt người đầu cây ở giữa phía trên, người dùng kéo để xem tiếp.
   const width = useStore((s) => s.width)
   const height = useStore((s) => s.height)
-  const latest = useRef({ width, height, layout, compact, reduced })
-  latest.current = { width, height, layout, compact, reduced }
+  const latest = useRef({ width, height, layout, compact, reduced, topInset })
+  latest.current = { width, height, layout, compact, reduced, topInset }
   const hasSize = width > 0 && height > 0
 
   const rfRef = useRef(rf)
@@ -247,7 +262,9 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
   const fitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const fit = useCallback(() => {
     const rf = rfRef.current
-    const { width, height, layout, compact, reduced } = latest.current
+    const { width, height: fullHeight, layout, compact, reduced, topInset } = latest.current
+    // Vùng nhìn thấy thật: trừ thanh nổi trên và thanh nổi dưới (~64 px).
+    const height = Math.max(fullHeight - topInset - 64, 1)
     if (!width || !height) return
     const duration = reduced ? 0 : 250
     setFitState('animating')
@@ -260,11 +277,11 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
     const first = layout.nodes[0]
     if (compact && first && fitZoom < COMPACT_MIN_ZOOM) {
       const zoom = COMPACT_MIN_ZOOM
-      void rf.setViewport({ x: width / 2 - (first.x + first.width / 2) * zoom, y: 32 - first.y * zoom, zoom }, { duration })
+      void rf.setViewport({ x: width / 2 - (first.x + first.width / 2) * zoom, y: topInset + 24 - first.y * zoom, zoom }, { duration })
       return
     }
     const zoom = Math.max(fitZoom, 0.05)
-    void rf.setViewport({ x: (width - boundsW * zoom) / 2 - minX * zoom, y: (height - boundsH * zoom) / 2, zoom }, { duration })
+    void rf.setViewport({ x: (width - boundsW * zoom) / 2 - minX * zoom, y: topInset + (height - boundsH * zoom) / 2, zoom }, { duration })
   }, [])
 
   // Căn lại khi đổi chế độ xem hoặc cỡ cửa sổ, không khi sửa cây hay khi mở/đóng ngăn thông tin
@@ -308,9 +325,21 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
       style={{ ['--kt-zoom' as string]: zoom }}
       data-fit={fitState}
     >
-      <Background color="var(--color-line)" gap={24} />
+      <Background color="#e2dbd2" gap={22} size={1.2} />
       <ZoomControls onFit={fit} />
-      {showMiniMap && <MiniMap pannable zoomable nodeColor={(n) => (n.type === 'person' ? 'var(--color-accent)' : 'transparent')} />}
+      {showMiniMap && (
+        <MiniMap
+          pannable
+          zoomable
+          className="!rounded-xl !bg-surface !shadow-2 ring-1 ring-line/60"
+          bgColor="#ffffff"
+          maskColor="rgb(250 248 245 / 0.75)"
+          maskStrokeColor="#8f877c"
+          maskStrokeWidth={1.5}
+          nodeBorderRadius={6}
+          nodeColor={(n) => (n.type !== 'person' ? 'transparent' : n.id === selectedId ? 'var(--color-accent)' : '#d6cec4')}
+        />
+      )}
     </ReactFlow>
   )
 }

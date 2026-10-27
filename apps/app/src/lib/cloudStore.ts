@@ -175,8 +175,9 @@ export function mapError(e: NonNullable<DbError>, fallback: StoreError): StoreEr
 
 // ---------- Phần gọi mạng ----------
 
-export type ClanInfo = { id: string; name: string; role: Role }
-export type TreeInfo = { id: string; clanId: string; name: string; region: Region; description?: string; role: Role }
+/** `memberCount` chỉ có khi người dùng là quản trị dòng họ (người xem chỉ đọc được vai trò của mình). */
+export type ClanInfo = { id: string; name: string; role: Role; memberCount?: number }
+export type TreeInfo = { id: string; clanId: string; name: string; region: Region; description?: string; role: Role; personCount: number }
 export type Directory = { clans: ClanInfo[]; trees: TreeInfo[] }
 
 export type LoadResult = { ok: true; doc: TreeDoc; role: Role } | { ok: false; error: StoreError }
@@ -226,17 +227,40 @@ export function cloudStore(client: SupabaseClient, userId: string) {
           if (m.clan_id) clanRole.set(m.clan_id, higher(clanRole.get(m.clan_id), m.role) as Role)
           if (m.tree_id) treeRole.set(m.tree_id, higher(treeRole.get(m.tree_id), m.role) as Role)
         }
+        // Đếm (không tải dòng): số người còn hiện mỗi cuốn; số thành viên mỗi dòng họ mình quản trị.
+        const countOf = async (q: PromiseLike<{ count: number | null; error: DbError }>) => {
+          const r = await q
+          if (r.error) throw Object.assign(new Error(r.error.message ?? 'count'), { db: r.error })
+          return r.count ?? 0
+        }
+        const treeRows = trees.data ?? []
+        const clanRows = clans.data ?? []
+        let personCounts: number[]
+        let memberCounts: (number | undefined)[]
+        try {
+          ;[personCounts, memberCounts] = await Promise.all([
+            Promise.all(treeRows.map((t) => countOf(client.from('persons').select('id', { count: 'exact', head: true }).eq('tree_id', t.id).is('removed_at', null)))),
+            Promise.all(
+              clanRows.map((c) =>
+                clanRole.get(c.id) === 'admin' ? countOf(client.from('memberships').select('id', { count: 'exact', head: true }).eq('clan_id', c.id)) : Promise.resolve(undefined),
+              ),
+            ),
+          ])
+        } catch (e) {
+          return fail((e as { db?: NonNullable<DbError> }).db ?? netError(e), 'LOAD_FAILED')
+        }
         return {
           ok: true,
           value: {
-            clans: (clans.data ?? []).map((c) => ({ id: c.id, name: c.name, role: clanRole.get(c.id) ?? 'viewer' })),
-            trees: (trees.data ?? []).map((t) => ({
+            clans: clanRows.map((c, i) => ({ id: c.id, name: c.name, role: clanRole.get(c.id) ?? 'viewer', ...(memberCounts[i] !== undefined ? { memberCount: memberCounts[i] } : {}) })),
+            trees: treeRows.map((t, i) => ({
               id: t.id,
               clanId: t.clan_id,
               name: t.name,
               region: t.region as Region,
               ...(t.description ? { description: t.description } : {}),
               role: higher(clanRole.get(t.clan_id), treeRole.get(t.id)) ?? 'viewer',
+              personCount: personCounts[i] ?? 0,
             })),
           },
         }

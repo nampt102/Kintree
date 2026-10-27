@@ -13,7 +13,7 @@ import {
   type TreeDoc,
   type TreePerson,
 } from '@kintree/core'
-import { ArrowLeft, Download, List, MoreVertical, Network, Pencil, Search, Trash2, UserRound, X } from 'lucide-react'
+import { ArrowLeft, Download, List, MoreHorizontal, Network, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { bloodParentOf, buildActions } from '../lib/actions.ts'
 import { messageFor } from '../lib/messages.ts'
@@ -33,12 +33,13 @@ import {
   Skeleton,
   TextField,
   TopBar,
+  Avatar,
   useToast,
   useViewportSegments,
   useWindowClass,
 } from '../ui/index.ts'
 import { AddChildDialog, AddParentDialog, AddSpouseDialog, ProfileDialog, RemoveDialog, ReorderDialog, type EditFn } from './ActionDialogs.tsx'
-import { PersonDetails, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
+import { PersonDetails, PersonPeek, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
 import { PersonList } from './PersonList.tsx'
 import { DeleteTreeDialog, EditTreeInfoDialog } from './TreeManage.tsx'
 import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
@@ -46,7 +47,7 @@ import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
 type DialogKind = 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'
 type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | { kind: 'editTree' } | { kind: 'deleteTree' } | null
 
-export function TreeScreen({ cloud, treeId, onBack }: { cloud: CloudStore; treeId: string; onBack: () => void }) {
+export function TreeScreen({ cloud, treeId, onBack, hideBack = false }: { cloud: CloudStore; treeId: string; onBack: () => void; hideBack?: boolean }) {
   const { state, edit, saveError, reload } = useTreeDoc(cloud, treeId)
 
   const back = <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
@@ -72,13 +73,13 @@ export function TreeScreen({ cloud, treeId, onBack }: { cloud: CloudStore; treeI
       </>
     )
   }
-  return <Loaded doc={state.doc} role={state.role} cloud={cloud} edit={edit} saveError={saveError} onBack={onBack} reload={reload} />
+  return <Loaded doc={state.doc} role={state.role} cloud={cloud} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} />
 }
 
 /** Người xem: chỉ giữ thao tác không ghi (thu gọn nhánh, xem riêng nhánh); quyền thật do RLS cưỡng chế. */
 const READ_ONLY_FLAGS = { canAddChild: false, canAddSpouse: false, canAddParent: false, canRemove: false, canRemoveBranch: false, canReorderChildren: false, canReorderSpouses: false, canReorderSiblings: false }
 
-function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: TreeDoc; role: Role; cloud: CloudStore; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void }) {
+function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }: { doc: TreeDoc; role: Role; cloud: CloudStore; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean }) {
   const readOnly = role !== 'admin'
   const view = useMemo(() => activeView(doc), [doc])
   const windowClass = useWindowClass()
@@ -90,7 +91,6 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set())
   const [focusId, setFocusId] = useState<string | null>(null)
   const [dialog, setDialog] = useState<DialogState>(null)
-  const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
 
   const layout = useMemo(() => computeLayout(doc, { collapsed, focusId, cardWidth: CARD.width, cardHeight: CARD.height }), [doc, collapsed, focusId])
@@ -159,34 +159,67 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
   const pickResult = (id: string) => {
     goTo(id)
     setQuery('')
-    setSearchOpen(false)
   }
 
   const detailsProps = selected ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), readOnly, onAction: onPanelAction } : null
-  const paneWidth = windowClass === 'expanded' ? 360 : 320
+  const paneWidth = windowClass === 'expanded' ? 384 : 340
+
+  const paneOpen = !!detailsProps && !compact && !segments && mode === 'tree'
+  const edge = 'max(12px, env(safe-area-inset-left))'
+  const edgeR = 'max(12px, env(safe-area-inset-right))'
+  const regionLabel = { north: 'Miền Bắc', central: 'Miền Trung', south: 'Miền Nam' }[doc.meta.region]
+  const banner = saveError ? (
+    <div className="kt-glass flex items-center gap-2 rounded-2xl px-4 py-2">
+      <ErrorText>{saveError}</ErrorText>
+    </div>
+  ) : focusPerson && mode === 'tree' ? (
+    <div className="kt-glass flex flex-wrap items-center gap-2 rounded-full py-1 pl-4 pr-1">
+      <span className="min-w-0 flex-1 text-sm">Đang xem riêng nhánh của {focusPerson.fullName}.</span>
+      <Button variant="ghost" onClick={() => setFocusId(null)}>
+        Xem toàn bộ cây
+      </Button>
+    </div>
+  ) : null
 
   return (
-    <div className="flex h-dvh flex-col">
-      <TopBar>
-        <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
-        <h1 className="min-w-0 flex-1 truncate px-1 text-lg font-semibold">{doc.meta.name}</h1>
-        {!empty && (compact ? <IconButton icon={Search} label="Tìm người" onClick={() => setSearchOpen(true)} /> : <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} />)}
-        {!empty &&
-          (compact ? (
-            // Cỡ gọn: một nút đổi qua lại để nhường chỗ cho tên cuốn.
-            <IconButton icon={mode === 'tree' ? List : Network} label={mode === 'tree' ? 'Xem dạng danh sách' : 'Xem dạng cây'} onClick={() => setMode(mode === 'tree' ? 'list' : 'tree')} />
-          ) : (
-            <Segmented
-              label="Chế độ xem"
-              value={mode}
-              onChange={setMode}
-              options={[
-                { value: 'tree', label: 'Cây', icon: Network },
-                { value: 'list', label: 'Danh sách', icon: List },
-              ]}
-            />
-          ))}
-        <OverflowMenu trigger={(p) => <IconButton icon={MoreVertical} label="Thêm" {...p} />} items={[
+    <div className="relative flex h-dvh flex-col overflow-hidden bg-canvas">
+      {/* Thanh nổi trên (design D4): một hàng, nền kính, không chiếm chỗ của sơ đồ. */}
+      <header
+        className="kt-glass absolute z-[10] flex h-14 items-center gap-1 rounded-full px-1.5"
+        style={{ top: 'max(12px, env(safe-area-inset-top))', left: edge, right: paneOpen ? `${paneWidth}px` : edgeR }}
+      >
+        {!hideBack && <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />}
+        <div className={compact ? 'sr-only' : `min-w-28 flex-1 ${hideBack ? 'pl-4' : 'pl-1'} pr-2`}>
+          <h1 className="truncate text-[15px] font-semibold leading-tight">{doc.meta.name}</h1>
+          <p className="truncate text-xs text-ink-muted">
+            {view.persons.length} người · {regionLabel}
+          </p>
+        </div>
+        {!empty && compact && (
+          <div className="min-w-0 flex-1">
+            <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} placeholder={`Tìm trong ${doc.meta.name}`} />
+          </div>
+        )}
+        {!empty && !compact && (
+            <>
+              <Segmented
+                label="Chế độ xem"
+                value={mode}
+                onChange={setMode}
+                options={[
+                  { value: 'tree', label: 'Cây', icon: Network },
+                  { value: 'list', label: 'Danh sách', icon: List },
+                ]}
+              />
+              <div className={`shrink-0 ${paneOpen ? 'w-40' : 'w-56 lg:w-64'}`}>
+                <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} placeholder="Tìm người" />
+              </div>
+            </>
+        )}
+        {compact && empty && <span className="flex-1" />}
+        <OverflowMenu
+          trigger={(p) => <IconButton icon={MoreHorizontal} label="Thêm" {...p} />}
+          items={[
             { label: 'Tải bản sao', icon: Download, onSelect: () => downloadBackup(doc) },
             ...(readOnly
               ? []
@@ -196,48 +229,38 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
                 ]),
           ]}
         />
-      </TopBar>
+      </header>
 
-      {compact && searchOpen && (
-        <div className="absolute inset-x-0 top-0 z-[40] border-b border-line bg-surface p-2 shadow-sheet" style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}>
-          <div className="flex items-start gap-1">
-            <div className="min-w-0 flex-1">
-              <SearchBox doc={doc} query={query} setQuery={setQuery} onPick={pickResult} autoFocus onEscape={() => setSearchOpen(false)} />
-            </div>
-            <IconButton icon={X} label="Đóng tìm kiếm" onClick={() => setSearchOpen(false)} />
-          </div>
+      {/* Cỡ gọn: nút đổi chế độ xem nổi ở góc dưới phải (thanh trên chỉ còn quay lại, tìm, menu). */}
+      {compact && !empty && (
+        <div className="absolute z-[10]" style={{ right: edgeR, bottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+          <IconButton icon={mode === 'tree' ? List : Network} label={mode === 'tree' ? 'Xem dạng danh sách' : 'Xem dạng cây'} variant="raised" onClick={() => setMode(mode === 'tree' ? 'list' : 'tree')} />
         </div>
       )}
 
-      {saveError && (
-        <div className="px-4 py-2">
-          <ErrorText>{saveError}</ErrorText>
-        </div>
-      )}
-      {focusPerson && mode === 'tree' && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-line bg-accent-soft px-4 py-1">
-          <span className="min-w-0 flex-1">Đang xem riêng nhánh của {focusPerson.fullName}.</span>
-          <Button variant="ghost" onClick={() => setFocusId(null)}>
-            Xem toàn bộ cây
-          </Button>
+      {banner && (
+        <div className="absolute z-[9] flex justify-center" style={{ top: 'calc(max(12px, env(safe-area-inset-top)) + 64px)', left: edge, right: paneOpen ? `${paneWidth}px` : edgeR }}>
+          {banner}
         </div>
       )}
 
       {empty ? (
-        <EmptyState
-          icon={UserRound}
-          title="Cuốn này chưa có ai"
-          text={readOnly ? 'Người quản trị chưa thêm ai vào cuốn này.' : 'Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên.'}
-          action={
-            readOnly ? undefined : (
-              <Button variant="primary" onClick={() => setDialog({ kind: 'addRoot' })}>
-                Thêm thuỷ tổ
-              </Button>
-            )
-          }
-        />
+        <div className="flex flex-1 items-center justify-center pt-20">
+          <EmptyState
+            icon={UserRound}
+            title="Cuốn này chưa có ai"
+            text={readOnly ? 'Người quản trị chưa thêm ai vào cuốn này.' : 'Hãy bắt đầu bằng thuỷ tổ: người xa nhất mà dòng họ còn biết tên.'}
+            action={
+              readOnly ? undefined : (
+                <Button variant="primary" icon={Plus} onClick={() => setDialog({ kind: 'addRoot' })}>
+                  Thêm thuỷ tổ
+                </Button>
+              )
+            }
+          />
+        </div>
       ) : mode === 'list' ? (
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1 overflow-y-auto pt-[calc(max(12px,env(safe-area-inset-top))+72px)]">
           <PersonList doc={doc} onOpen={(id) => (readOnly ? goTo(id) : setDialog({ kind: 'profile', personId: id }))} />
         </div>
       ) : (
@@ -251,6 +274,7 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
               focusKey={`${doc.meta.id}|${focusId}|${[...collapsed].sort().join(',')}`}
               showMiniMap={windowClass === 'expanded' && !segments}
               compact={compact}
+              topInset={72}
               actionsFor={actions}
               onSelect={setSelectedId}
               onOpenProfile={(id) => (readOnly ? setSelectedId(id) : setDialog({ kind: 'profile', personId: id }))}
@@ -264,7 +288,7 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
               {detailsProps ? (
                 <PersonSidePane {...detailsProps} width={segments[1]!.width} onClose={() => setSelectedId(null)} />
               ) : (
-                <div className="flex shrink-0 items-center justify-center bg-surface p-6 text-center text-ink-muted" style={{ width: segments[1]!.width }}>
+                <div className="flex shrink-0 items-center justify-center p-6 text-center text-ink-muted" style={{ width: segments[1]!.width }}>
                   Chọn một người trên sơ đồ để xem thông tin.
                 </div>
               )}
@@ -272,7 +296,7 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload }: { doc: Tr
           ) : (
             detailsProps &&
             (compact ? (
-              <Sheet title={`Thông tin ${detailsProps.person.fullName}`} onClose={() => setSelectedId(null)}>
+              <Sheet title={`Thông tin ${detailsProps.person.fullName}`} onClose={() => setSelectedId(null)} peek={<PersonPeek {...detailsProps} />}>
                 <PersonDetails {...detailsProps} />
               </Sheet>
             ) : (
@@ -305,41 +329,42 @@ function SearchBox({
   query,
   setQuery,
   onPick,
-  autoFocus,
-  onEscape,
+  placeholder,
 }: {
   doc: TreeDoc
   query: string
   setQuery: (q: string) => void
   onPick: (id: string) => void
-  autoFocus?: boolean
-  onEscape?: () => void
+  placeholder: string
 }) {
   const results = query.trim() ? searchPersons(doc, query).slice(0, 8) : []
   return (
-    <div className="relative w-full md:w-64">
+    <div className="relative w-full">
+      <Search aria-hidden size={17} strokeWidth={2} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
       <input
         type="search"
         aria-label="Tìm người"
-        placeholder="Tìm người (gõ không dấu được)"
+        placeholder={placeholder}
         value={query}
-        autoFocus={autoFocus}
         onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => e.key === 'Escape' && onEscape?.()}
-        className="min-h-11 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink placeholder:text-ink-muted"
+        onKeyDown={(e) => e.key === 'Escape' && setQuery('')}
+        className="min-h-11 w-full min-w-0 rounded-full bg-surface-muted pl-10 pr-4 text-[15px] text-ink placeholder:text-ink-muted focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
       {results.length > 0 && (
-        <ul className="absolute left-0 right-0 top-full z-[40] mt-1 max-h-72 overflow-y-auto rounded-md border border-line bg-surface shadow-sheet">
+        <ul className="absolute left-0 right-0 top-full z-[40] mt-2 max-h-72 min-w-56 overflow-y-auto rounded-xl bg-surface py-1.5 shadow-3 ring-1 ring-line/60">
           {results.map((p) => (
             <li key={p.id}>
-              <button type="button" className="min-h-11 w-full cursor-pointer px-3 py-2 text-left hover:bg-surface-muted" onClick={() => onPick(p.id)}>
-                {p.fullName}
+              <button type="button" className="flex min-h-11 w-full cursor-pointer items-center gap-2.5 px-3 py-1.5 text-left text-[15px] hover:bg-surface-muted" onClick={() => onPick(p.id)}>
+                <Avatar name={p.fullName} gender={p.gender} muted={p.death !== undefined} size={28} />
+                <span className="min-w-0 truncate">{p.fullName}</span>
               </button>
             </li>
           ))}
         </ul>
       )}
-      {query.trim() !== '' && results.length === 0 && <p className="mt-1 text-sm text-ink-muted">Không tìm thấy ai.</p>}
+      {query.trim() !== '' && results.length === 0 && (
+        <p className="absolute left-0 top-full z-[40] mt-2 rounded-xl bg-surface px-4 py-2.5 text-sm text-ink-muted shadow-3">Không tìm thấy ai.</p>
+      )}
     </div>
   )
 }

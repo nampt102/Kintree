@@ -62,6 +62,10 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-10-27: Chủ dự án duyệt, archive `ui-polish` (sync `app-ui-foundation`, `family-tree-viewing`, `responsive-layout`).
+- 2026-10-27: Làm xong `ui-polish`: token đỏ trầm, nút viên thuốc, trang nhà dòng họ, không gian làm việc (thanh nổi, thẻ/ngăn thông tin nổi), khung người mới, thanh bên ≥ 1200 px, đếm người/thành viên; Vitest 58, Playwright 79 qua ×3; còn chủ dự án duyệt ảnh.
+- 2026-10-27: `ui-polish` qua 3 vòng bản mẫu (`mockup.html`, `buttons.html`, `layout.html`): bỏ vàng đồng, nút viên thuốc, bố cục ghép trang nhà dòng họ + không gian làm việc; sửa thêm spec `responsive-layout`.
+- 2026-10-27: Rà giao diện bằng `ui-ux-pro-max`, đề xuất change `ui-polish` (tông đỏ trầm di sản, toàn bộ màn, chưa làm chế độ tối).
 - 2026-10-27: Làm xong `cloud-auth-storage` 25/25: migration `auth_access` (RLS, `create_tree`, `platform_*`, `apply_tree_changes`), `cloudStore` + hàng đợi ghi, đăng nhập OTP, màn dòng họ/cuốn/quản trị nền tảng; 41 test e2e mới (67 qua); ADR 0008.
 - 2026-10-26: Đổi `cloud-auth-storage` sang mô hình SaaS theo chủ dự án: chỉ quản trị nền tảng tạo dòng họ và chỉ định quản trị, bỏ vai trò biên tập (chỉ admin/viewer), xoá cuốn = đánh dấu + gõ tên xác nhận; thêm spec `platform-admin`.
 - 2026-10-26: Đề xuất `cloud-auth-storage` (tách `auth-invite-roles` làm hai: phần này và `clan-invites`).

@@ -291,7 +291,7 @@ export function ReorderDialog({ title, items, save, onClose }: { title: string; 
     >
       <ol className="space-y-2">
         {order.map((it, i) => (
-          <li key={it.id} className="flex items-center gap-2 rounded-md border border-line-strong bg-surface py-1 pl-3 pr-1">
+          <li key={it.id} className="flex items-center gap-2 rounded-md border border-line-input bg-surface py-1 pl-3 pr-1">
             <span className="tabular w-6 text-sm text-ink-muted">{i + 1}</span>
             <span className="min-w-0 flex-1">{it.label}</span>
             <IconButton icon={ArrowUp} label={`Chuyển ${it.label} lên`} disabled={i === 0} onClick={() => move(i, -1)} />

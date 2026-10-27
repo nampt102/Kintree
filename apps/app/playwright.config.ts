@@ -19,6 +19,8 @@ export default defineConfig({
     command: 'pnpm exec vite --port 5175 --strictPort',
     url: 'http://localhost:5175',
     reuseExistingServer: !process.env.CI,
+    // Bộ test chạy như máy chưa bật Google (spec "Chưa cấu hình Google"), dù .env.local của máy có bật.
+    env: { VITE_AUTH_GOOGLE: '' },
     timeout: 60_000,
   },
 })

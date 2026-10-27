@@ -15,20 +15,27 @@
   --color-transparent: transparent;
   --color-white: #ffffff;
   --color-black: #000000;
-  --color-canvas: #fafaf7;
+  /* Tông "đỏ trầm" (change ui-polish, design D1): nền trắng ấm, đỏ son là màu nhấn duy nhất. */
+  --color-canvas: #faf8f5;
   --color-surface: #ffffff;
-  --color-surface-muted: #f2f1ed;
-  --color-line: #e3e0d8;
-  --color-line-strong: #857f73;
-  --color-ink: #1c1b19;
-  --color-ink-muted: #5c5850;
-  --color-accent: #a3302a;
-  --color-accent-hover: #8a2822;
-  --color-accent-soft: #f6e8e6;
+  --color-surface-muted: #f3efea;
+  --color-rail: #f5f1ec;
+  --color-line: #ece7e1;
+  --color-line-input: #8f877c;
+  --color-connector: #bdb4aa;
+  --color-ink: #1f1a17;
+  --color-ink-muted: #6b635a;
+  --color-accent: #a42f28;
+  --color-accent-hover: #8c2721;
+  --color-accent-soft: #f8ecea;
+  --color-male: #2f5e8c;
+  --color-male-soft: #e8eff6;
+  --color-female: #a23f6b;
+  --color-female-soft: #f7e9ef;
   --color-focus: #1d4ed8;
   --color-danger: #b42318;
-  --color-danger-soft: #fdecea;
-  --color-scrim: rgb(28 27 25 / 0.45);
+  --color-danger-soft: #fbedeb;
+  --color-scrim: rgb(31 26 23 / 0.45);
 
   /* Thang chữ (rem theo cỡ gốc 112.5% = 18 px nhưng vẫn phóng theo cài đặt của người dùng). */
   --text-xs: 0.7778rem; /* 14 px */
@@ -38,9 +45,13 @@
   --text-xl: 1.3333rem; /* 24 px */
   --text-2xl: 1.6667rem; /* 30 px */
 
+  /* Bo góc theo cấp (design D2): ô nhập 12, thẻ/khung người 14–16, tấm/hộp thoại 20–28; nút chính bo tròn hẳn. */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
+  --radius-2xl: 22px;
+  --radius-3xl: 28px;
 
   /* Cỡ cửa sổ: gọn < 600, vừa 600–839, rộng ≥ 840 (design D3). */
   --breakpoint-sm: initial;
@@ -54,8 +65,12 @@
   --duration-enter: 250ms;
   --duration-exit: 160ms;
 
-  --shadow-sheet: 0 -4px 24px rgb(28 27 25 / 0.12);
-  --shadow-card: 0 1px 2px rgb(28 27 25 / 0.08);
+  /* Thang độ sâu 3 mức (design D2): thẻ < menu/toast/thanh nổi < tấm/hộp thoại/ngăn nổi. */
+  --shadow-1: 0 1px 2px rgb(31 26 23 / 0.05), 0 1px 3px rgb(31 26 23 / 0.07);
+  --shadow-2: 0 2px 4px rgb(31 26 23 / 0.05), 0 8px 20px rgb(31 26 23 / 0.09);
+  --shadow-3: 0 12px 32px rgb(31 26 23 / 0.14), 0 2px 6px rgb(31 26 23 / 0.06);
+  --shadow-pill: 0 8px 18px -6px rgb(164 47 40 / 0.55);
+  --shadow-sheet: 0 -8px 30px rgb(31 26 23 / 0.14);
 }
 
 /* Thang z-index cố định (design D1). */
@@ -112,6 +127,14 @@ label {
   display: block;
 }
 
+/* Nền kính cho thanh nổi trên sơ đồ (design D4). */
+.kt-glass {
+  background: rgb(255 255 255 / 0.84);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1px rgb(31 26 23 / 0.06), 0 8px 24px rgb(31 26 23 / 0.1);
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
 }
@@ -120,14 +143,14 @@ label {
 @keyframes kt-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 4px rgb(163 48 42 / 0.15);
+    box-shadow: 0 0 0 4px rgb(164 47 40 / 0.16);
   }
   50% {
-    box-shadow: 0 0 0 10px rgb(163 48 42 / 0.25);
+    box-shadow: 0 0 0 10px rgb(164 47 40 / 0.26);
   }
 }
 .kt-glow {
-  box-shadow: 0 0 0 4px rgb(163 48 42 / 0.15);
+  box-shadow: 0 0 0 4px rgb(164 47 40 / 0.16);
   animation: kt-glow 700ms var(--ease-out) 2;
 }
 

@@ -1,8 +1,8 @@
 import { findPerson, spouseIdsOf, type TreeDoc, type TreePerson } from '@kintree/core'
-import { ArrowUp, ArrowUpDown, ChevronsDownUp, ChevronsUpDown, Crosshair, Heart, Pencil, Trash2, UserPlus, X } from 'lucide-react'
+import { ArrowUp, ArrowUpDown, ChevronsDownUp, ChevronsUpDown, Crosshair, Heart, Landmark, Mars, Pencil, Trash2, UserPlus, Venus, X } from 'lucide-react'
 import type { PersonActions } from '../lib/actions.ts'
 import { formatPartialDate, lifespan } from '../lib/format.ts'
-import { Button, IconButton } from '../ui/index.ts'
+import { ActionList, Avatar, Badge, Button, IconButton, InfoList, type ActionItem } from '../ui/index.ts'
 
 export type PanelAction =
   | 'edit'
@@ -17,16 +17,6 @@ export type PanelAction =
   | 'remove'
   | 'removeBranch'
 
-function Row({ label, value }: { label: string; value?: string }) {
-  if (!value) return null
-  return (
-    <div>
-      <dt className="text-sm text-ink-muted">{label}</dt>
-      <dd>{value}</dd>
-    </div>
-  )
-}
-
 type Props = {
   doc: TreeDoc
   person: TreePerson
@@ -37,60 +27,115 @@ type Props = {
   onAction: (a: PanelAction) => void
 }
 
-/** Nội dung bảng thông tin một người: dùng chung cho tấm trượt (cỡ gọn) và ngăn bên (cỡ vừa/rộng). */
+const GENDER_LABEL = { male: 'Nam', female: 'Nữ', unknown: 'Chưa rõ giới tính' } as const
+
+/** Đầu bảng: ảnh chữ cái, tên, giới tính (biểu tượng + chữ), năm sống, dấu thuỷ tổ / dâu / rể. */
+function Head({ person, size }: { person: TreePerson; size: number }) {
+  const GenderIcon = person.gender === 'male' ? Mars : person.gender === 'female' ? Venus : null
+  const years = lifespan(person)
+  return (
+    <div className="flex items-center gap-3.5">
+      <Avatar name={person.fullName} gender={person.gender} muted={person.death !== undefined} size={size} />
+      <div className="min-w-0">
+        <h2 className="text-xl font-semibold leading-tight tracking-[-0.01em]">{person.fullName}</h2>
+        <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-ink-muted">
+          {GenderIcon && <GenderIcon aria-hidden size={14} strokeWidth={2.2} className={person.gender === 'male' ? 'text-male' : 'text-female'} />}
+          <span>{GENDER_LABEL[person.gender]}</span>
+          {years && <span className="tabular">· {years}</span>}
+        </p>
+        {(person.isRoot || person.isOutsider) && (
+          <div className="mt-1.5 flex gap-1.5">
+            {person.isRoot && (
+              <Badge tone="accent" icon={Landmark}>
+                Thuỷ tổ
+              </Badge>
+            )}
+            {person.isOutsider && <Badge>{person.gender === 'male' ? 'Rể' : 'Dâu'}</Badge>}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** Hàng nút nhanh: "Sửa hồ sơ" là nút chính duy nhất; các việc hay dùng khác là nút tròn có tên. */
+function QuickRow({ actions, readOnly, onAction }: Pick<Props, 'actions' | 'readOnly' | 'onAction'>) {
+  return (
+    <div className="flex items-center gap-2">
+      {!readOnly && (
+        <Button variant="primary" icon={Pencil} className="flex-1 whitespace-nowrap" onClick={() => onAction('edit')}>
+          Sửa hồ sơ
+        </Button>
+      )}
+      {actions.canAddChild && <IconButton icon={UserPlus} label="Thêm con" variant="secondary" onClick={() => onAction('addChild')} />}
+      {actions.canAddSpouse && <IconButton icon={Heart} label="Thêm vợ/chồng" variant="secondary" onClick={() => onAction('addSpouse')} />}
+      {readOnly ? (
+        <Button variant="secondary" icon={Crosshair} onClick={() => onAction('focus')}>
+          Xem riêng nhánh này
+        </Button>
+      ) : (
+        <IconButton icon={Crosshair} label="Xem riêng nhánh này" variant="secondary" onClick={() => onAction('focus')} />
+      )}
+    </div>
+  )
+}
+
+/** Thẻ gọn trên điện thoại (nấc thấp của tấm trượt). */
+export function PersonPeek({ person, actions, readOnly, onAction }: Props) {
+  return (
+    <div className="space-y-3">
+      <Head person={person} size={48} />
+      <QuickRow actions={actions} readOnly={readOnly} onAction={onAction} />
+    </div>
+  )
+}
+
+/** Nội dung đầy đủ của bảng thông tin một người: dùng chung cho tấm trượt (mở rộng) và ngăn bên. */
 export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction }: Props) {
   const spouses = spouseIdsOf(doc, person.id)
     .map((id) => findPerson(doc, id)?.fullName)
     .filter(Boolean)
-  const btn = (label: string, action: PanelAction, icon: Parameters<typeof Button>[0]['icon']) => (
-    <Button block icon={icon} onClick={() => onAction(action)}>
-      {label}
-    </Button>
-  )
-  const meta = [
-    person.gender === 'male' ? 'Nam' : person.gender === 'female' ? 'Nữ' : 'Chưa rõ giới tính',
-    person.isRoot ? 'Thuỷ tổ' : '',
-    person.isOutsider ? (person.gender === 'male' ? 'Rể' : 'Dâu') : '',
-    lifespan(person),
-  ].filter(Boolean)
+    .join(', ')
+
+  const more: ActionItem[] = [
+    ...(actions.canAddParent ? [{ label: 'Thêm cha/mẹ còn thiếu', icon: ArrowUp, onSelect: () => onAction('addParent') }] : []),
+    ...(actions.canReorderChildren ? [{ label: 'Sắp thứ tự các con', icon: ArrowUpDown, onSelect: () => onAction('reorderChildren') }] : []),
+    ...(actions.canReorderSiblings ? [{ label: 'Sắp thứ tự anh chị em', icon: ArrowUpDown, onSelect: () => onAction('reorderSiblings') }] : []),
+    ...(actions.canReorderSpouses ? [{ label: 'Sắp thứ tự vợ/chồng', icon: ArrowUpDown, onSelect: () => onAction('reorderSpouses') }] : []),
+    ...(actions.hasChildren
+      ? [{ label: collapsed ? 'Mở nhánh con cháu' : 'Thu gọn nhánh con cháu', icon: collapsed ? ChevronsUpDown : ChevronsDownUp, onSelect: () => onAction('toggleCollapse') }]
+      : []),
+  ]
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-xl font-semibold leading-snug">{person.fullName}</h2>
-        <p className="text-sm text-ink-muted">{meta.join(' · ')}</p>
-      </div>
-
-      <dl className="space-y-2">
-        <Row label="Ngày sinh" value={formatPartialDate(person.birth)} />
-        <Row label="Ngày mất" value={formatPartialDate(person.death)} />
-        <Row label="Nơi sinh" value={person.birthPlace} />
-        <Row label="Nơi an táng" value={person.burialPlace} />
-        <Row label="Vợ/chồng" value={spouses.join(', ')} />
-        {readOnly && <Row label="Tiểu sử" value={person.biography} />}
-      </dl>
-
-      <div className="grid gap-2">
-        {!readOnly && btn('Sửa hồ sơ', 'edit', Pencil)}
-        {actions.canAddChild && btn('Thêm con', 'addChild', UserPlus)}
-        {actions.canAddSpouse && btn('Thêm vợ/chồng', 'addSpouse', Heart)}
-        {actions.canAddParent && btn('Thêm cha/mẹ còn thiếu', 'addParent', ArrowUp)}
-        {actions.canReorderChildren && btn('Sắp thứ tự các con', 'reorderChildren', ArrowUpDown)}
-        {actions.canReorderSiblings && btn('Sắp thứ tự anh chị em', 'reorderSiblings', ArrowUpDown)}
-        {actions.canReorderSpouses && btn('Sắp thứ tự vợ/chồng', 'reorderSpouses', ArrowUpDown)}
-        {actions.hasChildren && btn(collapsed ? 'Mở nhánh con cháu' : 'Thu gọn nhánh con cháu', 'toggleCollapse', collapsed ? ChevronsUpDown : ChevronsDownUp)}
-        {btn('Xem riêng nhánh này', 'focus', Crosshair)}
-      </div>
-
+    <div className="space-y-5">
+      <Head person={person} size={64} />
+      <QuickRow actions={actions} readOnly={readOnly} onAction={onAction} />
+      <InfoList
+        rows={[
+          { label: 'Ngày sinh', value: formatPartialDate(person.birth) },
+          { label: 'Ngày mất', value: formatPartialDate(person.death) },
+          { label: 'Nơi sinh', value: person.birthPlace },
+          { label: 'Nơi an táng', value: person.burialPlace },
+          { label: 'Vợ/chồng', value: spouses },
+        ]}
+      />
+      {readOnly && person.biography && (
+        <div className="rounded-xl bg-canvas px-4 py-3 text-sm ring-1 ring-line/60">
+          <p className="text-ink-muted">Tiểu sử</p>
+          <p className="mt-1 whitespace-pre-line">{person.biography}</p>
+        </div>
+      )}
+      <ActionList items={more} />
       {(actions.canRemove || actions.canRemoveBranch) && (
-        <div className="grid gap-2 border-t border-line pt-4">
+        <div className="flex flex-col items-center gap-1 pt-1">
           {actions.canRemove && (
-            <Button block variant="danger" icon={Trash2} onClick={() => onAction('remove')}>
+            <Button variant="danger" icon={Trash2} onClick={() => onAction('remove')}>
               Gỡ người này
             </Button>
           )}
           {actions.canRemoveBranch && (
-            <Button block variant="danger" icon={Trash2} onClick={() => onAction('removeBranch')}>
+            <Button variant="danger" icon={Trash2} onClick={() => onAction('removeBranch')}>
               Gỡ cả nhánh
             </Button>
           )}
@@ -100,19 +145,23 @@ export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAct
   )
 }
 
-/** Ngăn bên (cỡ vừa/rộng, hoặc đoạn phải khi có hai đoạn vùng nhìn). */
+/** Ngăn nổi bên phải (cỡ vừa/rộng, hoặc đoạn phải khi có hai đoạn vùng nhìn). Giữ cột riêng nên khung người không dịch. */
 export function PersonSidePane({ width, onClose, ...props }: Props & { width: number; onClose: () => void }) {
+  const tint = props.person.gender === 'male' ? 'from-male-soft' : props.person.gender === 'female' ? 'from-female-soft' : 'from-surface-muted'
   return (
     <aside
       aria-label={`Thông tin ${props.person.fullName}`}
-      className="flex shrink-0 flex-col border-l border-line bg-surface"
-      style={{ width, paddingRight: 'env(safe-area-inset-right)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="flex shrink-0 flex-col p-3"
+      style={{ width, paddingRight: 'max(0.75rem, env(safe-area-inset-right))', paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
-      <div className="flex justify-end px-2 pt-2">
-        <IconButton icon={X} label="Đóng bảng thông tin" onClick={onClose} />
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-        <PersonDetails {...props} />
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-surface shadow-3 ring-1 ring-line/60">
+        <div aria-hidden className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b ${tint} to-transparent`} />
+        <div className="relative flex justify-end px-3 pt-3">
+          <IconButton icon={X} label="Đóng bảng thông tin" variant="raised" onClick={onClose} />
+        </div>
+        <div className="relative min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+          <PersonDetails {...props} />
+        </div>
       </div>
     </aside>
   )

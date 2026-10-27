@@ -7,12 +7,14 @@ import { useBackToClose } from './hooks.ts'
 const DRAG_THRESHOLD = 64
 
 /**
- * Tấm trượt từ đáy cho cỡ gọn: không chặn phần màn hình phía trên (sơ đồ vẫn kéo được),
- * hai nấc 50% và ~92% chiều cao, kéo tay nắm lên/xuống, kéo xuống ở nấc thấp để đóng.
- * Luôn có nút đóng và nút đổi nấc cho người không kéo được; Esc và Back cũng đóng.
+ * Tấm trượt cho cỡ gọn (spec `responsive-layout`). Có `peek`: mở thành thẻ nổi gọn ở đáy (nội dung `peek`),
+ * kéo tay nắm lên thì mở rộng gần toàn màn (nội dung `children`); không có `peek`: hai nấc 50% và ~92%.
+ * Kéo xuống ở nấc thấp để đóng. Luôn có nút đóng và nút đổi nấc cho người không kéo được; Esc và Back cũng đóng.
+ * Không chặn phần màn hình phía trên (sơ đồ vẫn kéo được).
  */
-export function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
-  const [snap, setSnap] = useState<'half' | 'full'>('half')
+export function Sheet({ title, onClose, peek, children }: { title: string; onClose: () => void; peek?: ReactNode; children: ReactNode }) {
+  const low = peek ? 'peek' : 'half'
+  const [snap, setSnap] = useState<'peek' | 'half' | 'full'>(low)
   const [dy, setDy] = useState<number | null>(null)
   const start = useRef<number | null>(null)
 
@@ -31,34 +33,37 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
     start.current = null
     setDy(null)
     if (d > DRAG_THRESHOLD) {
-      if (snap === 'full') setSnap('half')
+      if (snap === 'full') setSnap(low)
       else onClose()
     } else if (d < -DRAG_THRESHOLD) setSnap('full')
   }
 
+  const isPeek = snap === 'peek'
   return (
     <section
       role="dialog"
       aria-modal="false"
       aria-label={title}
       data-snap={snap}
-      className="fixed inset-x-0 bottom-0 z-[20] flex flex-col rounded-t-lg border-t border-line bg-surface shadow-sheet transition-[height] duration-[250ms] ease-[var(--ease-out)]"
+      className={`fixed z-[20] flex flex-col bg-surface transition-[height,inset,border-radius] duration-[250ms] ease-[var(--ease-out)] ${
+        isPeek ? 'inset-x-3 rounded-[26px] shadow-3' : 'inset-x-0 bottom-0 rounded-t-[22px] shadow-sheet'
+      }`}
       style={{
-        height: snap === 'full' ? '92dvh' : '50dvh',
+        height: isPeek ? undefined : snap === 'full' ? '92dvh' : '50dvh',
+        bottom: isPeek ? 'calc(max(12px, env(safe-area-inset-bottom)) + 72px)' : undefined,
         transform: dy ? `translateY(${Math.max(dy, -40)}px)` : undefined,
         transition: dy !== null ? 'none' : undefined,
-        paddingLeft: 'env(safe-area-inset-left)',
-        paddingRight: 'env(safe-area-inset-right)',
+        paddingLeft: isPeek ? undefined : 'env(safe-area-inset-left)',
+        paddingRight: isPeek ? undefined : 'env(safe-area-inset-right)',
       }}
     >
-      <div className="flex items-center gap-1 px-2 pt-1">
-        <IconButton icon={X} label="Đóng" onClick={onClose} />
+      <div className="relative flex items-center px-2 pt-1">
         <button
           type="button"
           aria-label={snap === 'full' ? 'Thu nhỏ bảng thông tin' : 'Mở rộng bảng thông tin'}
           data-testid="sheet-handle"
-          className="flex min-h-11 flex-1 cursor-grab touch-none items-center justify-center"
-          onClick={() => setSnap(snap === 'full' ? 'half' : 'full')}
+          className="mx-12 flex min-h-11 flex-1 cursor-grab touch-none items-center justify-center"
+          onClick={() => setSnap(snap === 'full' ? low : 'full')}
           onPointerDown={(e) => {
             start.current = e.clientY
             e.currentTarget.setPointerCapture(e.pointerId)
@@ -67,11 +72,15 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
           onPointerUp={end}
           onPointerCancel={end}
         >
-          <span aria-hidden className="h-1.5 w-12 rounded-full bg-line-strong" />
+          <span aria-hidden className="h-1.5 w-10 rounded-full bg-[#ddd6cd]" />
         </button>
-        <span className="size-11" aria-hidden />
+        <IconButton icon={X} label="Đóng" variant="secondary" onClick={onClose} className="absolute right-2 top-1" />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{children}</div>
+      {isPeek ? (
+        <div className="px-4 pb-4">{peek}</div>
+      ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{children}</div>
+      )}
     </section>
   )
 }

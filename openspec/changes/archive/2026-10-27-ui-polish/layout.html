@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree bố cục</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FAF8F5', muted: '#F3EFEA', line: '#ECE7E1', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', soft: '#F8ECEA' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)', pill: '0 8px 18px -6px rgb(164 47 40/.55)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [data-lucide] { width: 20px; height: 20px; stroke-width: 1.75; }
+  .i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i18{width:18px!important;height:18px!important}.i22{width:22px!important;height:22px!important}
+  .desk { width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 1px #d8d0c4, 0 30px 60px rgb(0 0 0/.16); }
+  .phone { width: 390px; height: 844px; border-radius: 44px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0; }
+  .dots { background-image: radial-gradient(#e5dfd7 1px, transparent 1px); background-size: 22px 22px; }
+  .pill { display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 20px; border-radius:9999px; background:#A42F28; color:#fff; font-weight:600; font-size:15px; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55); }
+  .glass { background: rgb(255 255 255 / .82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 0 0 1px rgb(31 26 23/.06), 0 8px 24px rgb(31 26 23/.10); }
+  .node { position:absolute; width:176px; border-radius:14px; background:#fff; padding:10px 12px; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07); }
+  .node.m { border-left:3px solid #2F5E8C } .node.f { border-left:3px solid #A23F6B }
+  .node.dead { background:#F3EFEA; box-shadow:none; border:1px dashed #8F877C }
+  .av { display:grid; place-items:center; width:34px; height:34px; border-radius:9999px; font-weight:600; font-size:14px; flex-shrink:0 }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1400px] space-y-14 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · ui-polish · hai hướng bố cục</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Bố cục mới, nút viên thuốc (D)</h1>
+    <p class="max-w-3xl text-sub">Hướng 1 "Không gian làm việc": cây chiếm trọn màn, mọi công cụ là thanh nổi trong suốt. Hướng 2 "Trang nhà dòng họ": vào dòng họ thấy ngay tổng quan (số người, số đời, ngày giỗ sắp tới, cuốn gần đây) trước khi vào cây. Hai hướng ghép được với nhau.</p>
+  </header>
+
+  <!-- HƯỚNG 1 -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">Hướng 1 · Không gian làm việc</h2><p class="text-sm text-sub">Thanh điều hướng mảnh bên trái (dòng họ, cuốn), sơ đồ tràn màn, công cụ nổi kiểu Figma/Apple Maps, ngăn thông tin nổi bên phải.</p></div>
+    <div class="desk flex">
+      <!-- rail -->
+      <aside class="flex w-[248px] shrink-0 flex-col bg-[#F5F1EC] px-3 py-4">
+        <div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div>
+        <button class="mt-5 flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-left shadow-1"><span class="grid size-8 place-items-center rounded-lg bg-accent-soft text-accent"><i data-lucide="landmark" class="i18"></i></span><span class="flex-1"><span class="block text-sm font-semibold leading-tight">Họ Nguyễn Văn</span><span class="block text-xs text-sub">Quản trị</span></span><i data-lucide="chevrons-up-down" class="i16 text-sub"></i></button>
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Cuốn gia phả</p>
+        <nav class="mt-2 space-y-0.5 text-[15px]">
+          <a class="flex items-center gap-2.5 rounded-lg bg-white px-2.5 py-2 font-medium shadow-1"><i data-lucide="network" class="i18 text-accent"></i>Chi trưởng<span class="ml-auto text-xs text-sub">182</span></a>
+          <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sub"><i data-lucide="network" class="i18"></i>Chi thứ hai<span class="ml-auto text-xs">51</span></a>
+          <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sub"><i data-lucide="network" class="i18"></i>Chi út (Nam Định)<span class="ml-auto text-xs">15</span></a>
+          <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-accent"><i data-lucide="plus" class="i18"></i>Tạo cuốn</a>
+        </nav>
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Dòng họ</p>
+        <nav class="mt-2 space-y-0.5 text-[15px] text-sub">
+          <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-2"><i data-lucide="calendar-heart" class="i18"></i>Ngày giỗ<span class="ml-auto rounded-full bg-accent-soft px-1.5 text-xs font-semibold text-accent">2</span></a>
+          <a class="flex items-center gap-2.5 rounded-lg px-2.5 py-2"><i data-lucide="users" class="i18"></i>Thành viên</a>
+        </nav>
+        <div class="mt-auto flex items-center gap-2 rounded-xl px-2 py-2"><span class="av bg-muted text-sub">J</span><span class="min-w-0 flex-1 truncate text-sm">jamesphan102@gmail.com</span><i data-lucide="log-out" class="i16 text-sub"></i></div>
+      </aside>
+
+      <!-- canvas -->
+      <div class="dots relative flex-1">
+        <!-- thanh nổi trên -->
+        <div class="glass absolute left-5 top-5 flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5">
+          <div><p class="text-[15px] font-semibold leading-tight">Chi trưởng họ Nguyễn</p><p class="text-xs text-sub">182 người · 7 đời · Miền Bắc</p></div>
+          <span class="mx-1 h-7 w-px bg-line"></span>
+          <div class="flex rounded-full bg-muted p-1 text-sm font-medium"><span class="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 shadow-1"><i data-lucide="network" class="i16"></i>Cây</span><span class="flex items-center gap-1.5 px-3 py-1.5 text-sub"><i data-lucide="list" class="i16"></i>Danh sách</span></div>
+          <span class="mx-1 h-7 w-px bg-line"></span>
+          <span class="flex h-9 w-44 items-center gap-2 rounded-full bg-muted px-3 text-sm text-sub"><i data-lucide="search" class="i16"></i>Tìm người…</span>
+        </div>
+        
+
+        <svg class="absolute inset-0" width="1032" height="800" fill="none" aria-hidden><g stroke="#BDB4AA" stroke-width="1.5">
+          <path d="M300 214 V250 H190 V286 M300 250 H410 V286"/><path d="M190 352 V400"/><path d="M276 182 H306" stroke="#A42F28" stroke-opacity=".5"/></g></svg>
+        <div class="node dead" style="left:100px;top:150px"><div class="flex items-center gap-2.5"><span class="av bg-[#E7E1D9] text-sub">C</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn Cả</p><p class="text-xs text-sub">1890 – 1968</p></div></div><span class="mt-2 inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-semibold text-accent"><i data-lucide="landmark" class="i14"></i>Thuỷ tổ</span></div>
+        <div class="node f" style="left:306px;top:158px"><div class="flex items-center gap-2.5"><span class="av bg-female-soft text-female">B</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Trần Thị Bình</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="venus" class="i14 text-female"></i>Dâu</p></div></div></div>
+        <div class="node m" style="left:102px;top:286px;box-shadow:0 0 0 2px #A42F28,0 8px 20px rgb(31 26 23/.10)"><div class="flex items-center gap-2.5"><span class="av bg-male-soft text-male">A</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn An</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="mars" class="i14 text-male"></i>1920 –</p></div></div></div>
+        <div class="node f" style="left:322px;top:286px"><div class="flex items-center gap-2.5"><span class="av bg-female-soft text-female">H</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Thị Hoa</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="venus" class="i14 text-female"></i>1924 –</p></div></div></div>
+        <div class="node m" style="left:102px;top:400px"><div class="flex items-center gap-2.5"><span class="av bg-male-soft text-male">C</span><div class="min-w-0"><p class="truncate text-sm font-semibold">Nguyễn Văn Cháu</p><p class="flex items-center gap-1 text-xs text-sub"><i data-lucide="mars" class="i14 text-male"></i>1950 –</p></div></div></div>
+
+        <!-- thanh nổi dưới -->
+        <div class="glass absolute bottom-5 left-1/2 flex -translate-x-[calc(50%+176px)] items-center gap-1 rounded-full p-1.5">
+          <span class="grid size-10 place-items-center rounded-full"><i data-lucide="minus" class="i18"></i></span>
+          <span class="w-12 text-center text-sm font-medium tabular-nums text-sub">100%</span>
+          <span class="grid size-10 place-items-center rounded-full"><i data-lucide="plus" class="i18"></i></span>
+          <span class="mx-1 h-6 w-px bg-line"></span>
+          <span class="grid size-10 place-items-center rounded-full"><i data-lucide="scan" class="i18"></i></span>
+          <span class="grid size-10 place-items-center rounded-full"><i data-lucide="map" class="i18"></i></span>
+          <span class="mx-1 h-6 w-px bg-line"></span>
+          <span class="pill h-10 px-4 text-sm"><i data-lucide="user-plus" class="i16"></i>Thêm người</span>
+        </div>
+
+        <!-- ngăn thông tin nổi -->
+        <aside class="absolute bottom-4 right-4 top-4 w-[340px] overflow-hidden rounded-3xl bg-white shadow-3">
+          <div class="h-24 bg-[linear-gradient(135deg,#E8EFF6,#F3EFEA)]"></div>
+          <div class="-mt-10 px-5">
+            <span class="av size-20 border-4 border-white bg-male-soft text-3xl text-male" style="width:80px;height:80px">A</span>
+            <p class="mt-2 text-2xl font-semibold tracking-tight">Nguyễn Văn An</p>
+            <p class="mt-0.5 flex items-center gap-1.5 text-sm text-sub"><i data-lucide="mars" class="i14 text-male"></i>Nam · sinh 1920 · Đời 2</p>
+            <div class="mt-4 flex gap-2"><span class="pill h-10 flex-1 justify-center px-4 text-sm"><i data-lucide="pencil" class="i16"></i>Sửa hồ sơ</span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="user-plus" class="i18"></i></span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="heart" class="i18"></i></span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="more-horizontal" class="i18"></i></span></div>
+            <div class="mt-5 flex gap-1 rounded-full bg-muted p-1 text-sm font-medium"><span class="flex-1 rounded-full bg-white py-1.5 text-center shadow-1">Thông tin</span><span class="flex-1 py-1.5 text-center text-sub">Gia đình</span><span class="flex-1 py-1.5 text-center text-sub">Nguồn</span></div>
+            <dl class="mt-4 space-y-3 text-sm">
+              <div class="flex justify-between"><dt class="text-sub">Ngày sinh</dt><dd class="font-medium">12/3/1920 (âm)</dd></div>
+              <div class="flex justify-between"><dt class="text-sub">Nơi sinh</dt><dd class="font-medium">Nam Định</dd></div>
+              <div class="flex justify-between"><dt class="text-sub">Vợ</dt><dd class="font-medium">Lê Thị Dâu</dd></div>
+              <div class="flex justify-between"><dt class="text-sub">Con</dt><dd class="font-medium">1 người</dd></div>
+            </dl>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <p class="pt-4 text-sm font-medium text-sub">Hướng 1 trên điện thoại: cây tràn màn, thanh nổi trên/dưới, thẻ người nổi thay tấm trượt toàn rộng</p>
+    <div class="flex gap-12">
+      <div class="phone">
+        <div class="dots absolute inset-0"></div>
+        <svg class="absolute inset-0" width="390" height="844" fill="none" aria-hidden><g stroke="#BDB4AA" stroke-width="1.5"><path d="M195 236 V262 H100 V290 M195 262 H290 V290"/><path d="M100 350 V390"/></g></svg>
+        <div class="node dead" style="left:60px;top:176px;width:150px"><div class="flex items-center gap-2"><span class="av bg-[#E7E1D9] text-sub" style="width:28px;height:28px;font-size:12px">C</span><div class="min-w-0"><p class="truncate text-[13px] font-semibold">Nguyễn Văn Cả</p><p class="text-[11px] text-sub">1890 – 1968</p></div></div></div>
+        <div class="node m" style="left:30px;top:290px;width:140px;box-shadow:0 0 0 2px #A42F28"><div class="flex items-center gap-2"><span class="av bg-male-soft text-male" style="width:28px;height:28px;font-size:12px">A</span><div class="min-w-0"><p class="truncate text-[13px] font-semibold">Nguyễn Văn An</p><p class="text-[11px] text-sub">1920 –</p></div></div></div>
+        <div class="node f" style="left:220px;top:290px;width:140px"><div class="flex items-center gap-2"><span class="av bg-female-soft text-female" style="width:28px;height:28px;font-size:12px">H</span><div class="min-w-0"><p class="truncate text-[13px] font-semibold">Nguyễn Thị Hoa</p><p class="text-[11px] text-sub">1924 –</p></div></div></div>
+        <div class="node m" style="left:30px;top:390px;width:140px"><div class="flex items-center gap-2"><span class="av bg-male-soft text-male" style="width:28px;height:28px;font-size:12px">C</span><div class="min-w-0"><p class="truncate text-[13px] font-semibold">Nguyễn Văn Cháu</p><p class="text-[11px] text-sub">1950 –</p></div></div></div>
+
+        <div class="absolute inset-x-3 top-[54px] flex items-center gap-2">
+          <span class="glass grid size-11 place-items-center rounded-full"><i data-lucide="arrow-left"></i></span>
+          <div class="glass flex h-11 flex-1 items-center gap-2 rounded-full px-4 text-sub"><i data-lucide="search" class="i18"></i><span class="truncate">Tìm trong Chi trưởng…</span></div>
+          <span class="glass grid size-11 place-items-center rounded-full"><i data-lucide="more-horizontal"></i></span>
+        </div>
+
+        <div class="absolute inset-x-3 bottom-[96px] rounded-[26px] bg-white p-4 shadow-3">
+          <div class="flex items-center gap-3"><span class="av bg-male-soft text-male" style="width:48px;height:48px;font-size:18px">A</span><div class="min-w-0 flex-1"><p class="text-lg font-semibold leading-tight">Nguyễn Văn An</p><p class="text-sm text-sub">Nam · sinh 1920 · Đời 2</p></div><i data-lucide="chevron-up" class="text-sub"></i></div>
+          <div class="mt-3 flex gap-2"><span class="pill h-10 flex-1 justify-center px-3 text-sm"><i data-lucide="pencil" class="i16"></i>Sửa hồ sơ</span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="user-plus" class="i18"></i></span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="heart" class="i18"></i></span><span class="grid size-10 place-items-center rounded-full bg-muted"><i data-lucide="crosshair" class="i18"></i></span></div>
+        </div>
+
+        <div class="glass absolute inset-x-6 bottom-6 flex h-16 items-center justify-around rounded-full text-[11px] font-medium">
+          <span class="flex flex-col items-center gap-0.5 text-accent"><i data-lucide="network" class="i22"></i>Cây</span>
+          <span class="flex flex-col items-center gap-0.5 text-sub"><i data-lucide="list" class="i22"></i>Danh sách</span>
+          <span class="flex flex-col items-center gap-0.5 text-sub"><i data-lucide="calendar-heart" class="i22"></i>Ngày giỗ</span>
+          <span class="flex flex-col items-center gap-0.5 text-sub"><i data-lucide="user-round" class="i22"></i>Tôi</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HƯỚNG 2 -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">Hướng 2 · Trang nhà dòng họ</h2><p class="text-sm text-sub">Vào dòng họ thấy ngay tổng quan có ích; cuốn gia phả là thẻ lớn có hình cây thu nhỏ.</p></div>
+    <div class="flex flex-wrap gap-12">
+      <div class="desk">
+        <div class="flex h-16 items-center gap-3 px-8">
+          <span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-lg font-semibold text-accent">Kintree</span>
+          <span class="flex-1"></span>
+          <div class="flex h-10 w-80 items-center gap-2 rounded-full bg-white px-4 text-sm text-sub shadow-1"><i data-lucide="search" class="i16"></i>Tìm người trong cả dòng họ</div>
+          <span class="av bg-muted text-sub">J</span>
+        </div>
+        <div class="mx-8 overflow-hidden rounded-[28px] bg-[linear-gradient(120deg,#A42F28,#7E1F1A)] px-10 py-9 text-white">
+          <svg class="pointer-events-none absolute" width="0" height="0"></svg>
+          <div class="flex items-end justify-between">
+            <div>
+              <p class="text-sm font-medium text-white/70">Dòng họ của bạn · Quản trị</p>
+              <h2 class="mt-1 text-[40px] font-semibold leading-tight tracking-tight">Họ Nguyễn Văn</h2>
+              <p class="mt-1 text-white/80">Làng Hành Thiện, Nam Định · lập phả từ năm 1890</p>
+            </div>
+            <span class="inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[15px] font-semibold text-accent shadow-[0_8px_18px_-6px_rgb(0_0_0/.3)]"><i data-lucide="plus" class="i18"></i>Tạo cuốn gia phả</span>
+          </div>
+          <div class="mt-8 grid grid-cols-4 gap-3">
+            <div class="rounded-2xl bg-white/10 px-5 py-4"><p class="text-3xl font-semibold tabular-nums">248</p><p class="text-sm text-white/75">người</p></div>
+            <div class="rounded-2xl bg-white/10 px-5 py-4"><p class="text-3xl font-semibold tabular-nums">7</p><p class="text-sm text-white/75">đời</p></div>
+            <div class="rounded-2xl bg-white/10 px-5 py-4"><p class="text-3xl font-semibold tabular-nums">3</p><p class="text-sm text-white/75">cuốn gia phả</p></div>
+            <div class="rounded-2xl bg-white/10 px-5 py-4"><p class="text-3xl font-semibold tabular-nums">12</p><p class="text-sm text-white/75">thành viên</p></div>
+          </div>
+        </div>
+        <div class="mx-8 mt-6 grid grid-cols-[1fr_340px] gap-6">
+          <div>
+            <p class="mb-3 font-semibold">Cuốn gia phả</p>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="overflow-hidden rounded-2xl bg-white shadow-1">
+                <div class="dots relative h-28 bg-canvas"><svg class="absolute inset-0" width="100%" height="112" fill="none"><g stroke="#BDB4AA" stroke-width="1.5"><path d="M180 30 V50 H120 V70 M180 50 H240 V70"/></g><g fill="#fff" stroke="#E2DBD2"><rect x="155" y="16" width="50" height="14" rx="4"/><rect x="95" y="70" width="50" height="14" rx="4"/><rect x="215" y="70" width="50" height="14" rx="4"/></g></svg></div>
+                <div class="flex items-center gap-3 p-4"><div class="flex-1"><p class="font-semibold">Chi trưởng họ Nguyễn</p><p class="text-sm text-sub">182 người · 7 đời · sửa 2 ngày trước</p></div><i data-lucide="more-horizontal" class="text-sub"></i></div>
+              </div>
+              <div class="overflow-hidden rounded-2xl bg-white shadow-1">
+                <div class="dots relative h-28 bg-canvas"><svg class="absolute inset-0" width="100%" height="112" fill="none"><g stroke="#BDB4AA" stroke-width="1.5"><path d="M180 30 V70"/></g><g fill="#fff" stroke="#E2DBD2"><rect x="155" y="16" width="50" height="14" rx="4"/><rect x="155" y="70" width="50" height="14" rx="4"/></g></svg></div>
+                <div class="flex items-center gap-3 p-4"><div class="flex-1"><p class="font-semibold">Chi thứ hai</p><p class="text-sm text-sub">51 người · 5 đời · sửa tuần trước</p></div><i data-lucide="more-horizontal" class="text-sub"></i></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="mb-3 font-semibold">Ngày giỗ sắp tới</p>
+            <div class="overflow-hidden rounded-2xl bg-white shadow-1">
+              <div class="flex items-center gap-3 px-4 py-3"><div class="w-12 rounded-xl bg-accent-soft py-1 text-center text-accent"><p class="text-lg font-semibold leading-tight">05</p><p class="text-[10px] font-semibold uppercase">tháng 3</p></div><div class="flex-1"><p class="font-medium">Cụ Nguyễn Văn Cả</p><p class="text-xs text-sub">Giỗ thường · còn 6 ngày (âm lịch)</p></div></div>
+              <div class="flex items-center gap-3 px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><div class="w-12 rounded-xl bg-muted py-1 text-center text-sub"><p class="text-lg font-semibold leading-tight">18</p><p class="text-[10px] font-semibold uppercase">tháng 4</p></div><div class="flex-1"><p class="font-medium">Cụ bà Trần Thị Bình</p><p class="text-xs text-sub">Giỗ thường · còn 1 tháng</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Lưu ý phạm vi</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Phần chỉ là bố cục/giao diện, làm trong `ui-polish`: thanh bên, thanh nổi, ngăn thông tin nổi, thẻ người nổi trên điện thoại, nút viên thuốc, trang nhà có số người/số đời/số cuốn.</li>
+      <li>Phần là tính năng mới, KHÔNG làm trong change này (chỉ để chỗ hoặc ẩn): mục "Ngày giỗ" và danh sách giỗ sắp tới (change `lunar-calendar-reminders`), "Thành viên" (change `clan-invites`), tab "Nguồn" (change AI), mô tả/địa danh của dòng họ (cần cột mới), tìm người trong cả dòng họ, phím tắt ⌘K.</li>
+    </ul>
+  </section>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

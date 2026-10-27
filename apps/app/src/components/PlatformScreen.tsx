@@ -70,8 +70,8 @@ export function PlatformScreen({ platform, email, onBack }: { platform: Platform
         <AccountMenu email={email} />
       </TopBar>
       <main className={pageClass} style={pagePad}>
-        <form onSubmit={submit} className="space-y-4 rounded-md border border-line bg-surface p-4" noValidate>
-          <h2 className="text-xl font-semibold">Tạo dòng họ mới</h2>
+        <form onSubmit={submit} className="space-y-4 rounded-2xl bg-surface p-5 shadow-1 ring-1 ring-line/60 md:p-6" noValidate>
+          <h2 className="text-xl font-semibold tracking-[-0.01em]">Tạo dòng họ mới</h2>
           <TextField ref={nameRef} label="Tên dòng họ" hint="Ví dụ: Họ Nguyễn Văn" value={name} onChange={(e) => setName(e.target.value)} error={nameError} />
           <TextField
             ref={emailRef}
@@ -88,8 +88,8 @@ export function PlatformScreen({ platform, email, onBack }: { platform: Platform
           </Button>
         </form>
 
-        <section className="space-y-2">
-          <h2 className="text-xl font-semibold">Dòng họ đã cấp</h2>
+        <section className="space-y-3">
+          <h2 className="text-xl font-semibold tracking-[-0.01em]">Dòng họ đã cấp</h2>
           {loadError ? (
             <ErrorText>{loadError}</ErrorText>
           ) : clans === null ? (
@@ -97,14 +97,14 @@ export function PlatformScreen({ platform, email, onBack }: { platform: Platform
           ) : clans.length === 0 ? (
             <p className="text-ink-muted">Chưa cấp dòng họ nào.</p>
           ) : (
-            <ul className="space-y-2" data-testid="platform-clans">
+            <ul className="grid gap-3 md:grid-cols-2" data-testid="platform-clans">
               {clans.map((c) => (
-                <li key={c.id} className="rounded-md border border-line-strong bg-surface px-4 py-3">
-                  <p className="font-medium">{c.name}</p>
+                <li key={c.id} className="rounded-xl bg-surface px-4 py-3.5 shadow-1 ring-1 ring-line/60">
+                  <p className="font-semibold">{c.name}</p>
                   <p className="text-sm text-ink-muted">
                     {c.slug} · {new Date(c.createdAt).toLocaleDateString('vi-VN')}
                   </p>
-                  <p className="text-sm">Quản trị: {c.adminEmails.join(', ') || '—'}</p>
+                  <p className="mt-1 text-sm">Quản trị: {c.adminEmails.join(', ') || '—'}</p>
                 </li>
               ))}
             </ul>

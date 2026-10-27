@@ -40,9 +40,15 @@ const PAIRS: [string, string, number][] = [
   ['white', 'danger', 4.5],
   ['focus', 'surface', 3],
   ['focus', 'canvas', 3],
-  ['line-strong', 'surface', 3],
-  ['line-strong', 'canvas', 3],
-  ['line-strong', 'surface-muted', 3],
+  ['line-input', 'surface', 3],
+  ['line-input', 'canvas', 3],
+  ['line-input', 'surface-muted', 3],
+  ['male', 'surface', 4.5],
+  ['female', 'surface', 4.5],
+  ['male', 'male-soft', 4.5],
+  ['female', 'female-soft', 4.5],
+  ['ink-muted', 'rail', 4.5],
+  ['ink', 'rail', 4.5],
 ]
 
 test.each(PAIRS)('%s trên %s ≥ %d:1', (fg, bg, min) => {

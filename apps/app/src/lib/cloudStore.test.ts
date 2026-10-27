@@ -123,3 +123,52 @@ describe('cloudStore.save với client giả', () => {
     expect(await store.save(doc, next)).toEqual({ ok: false, error: 'OFFLINE' })
   })
 })
+
+describe('cloudStore.directory với client giả', () => {
+  /** Builder giả: ghi lại bảng và bộ lọc, trả dữ liệu hoặc số đếm theo bảng. */
+  function fakeClient(rows: Record<string, unknown[]>, counts: Record<string, number>) {
+    return {
+      from(table: string) {
+        const filters: string[] = []
+        let head = false
+        const b = {
+          select: (_c: string, opts?: { head?: boolean }) => ((head = !!opts?.head), b),
+          eq: (col: string, v: string) => (filters.push(`${col}=${v}`), b),
+          is: (col: string, v: unknown) => (filters.push(`${col} is ${v}`), b),
+          order: () => b,
+          then: (ok: (r: unknown) => unknown) =>
+            Promise.resolve(head ? { count: counts[`${table}:${filters.find((f) => f.startsWith('tree_id') || f.startsWith('clan_id'))}`] ?? 0, error: null } : { data: rows[table] ?? [], error: null }).then(ok),
+        }
+        return b
+      },
+    } as unknown as SupabaseClient
+  }
+
+  test('đếm người còn hiện mỗi cuốn; số thành viên chỉ với dòng họ mình quản trị', async () => {
+    const client = fakeClient(
+      {
+        memberships: [
+          { clan_id: 'c1', tree_id: null, role: 'admin' },
+          { clan_id: 'c2', tree_id: null, role: 'viewer' },
+        ],
+        clans: [
+          { id: 'c1', name: 'Họ A' },
+          { id: 'c2', name: 'Họ B' },
+        ],
+        trees: [
+          { id: 't1', clan_id: 'c1', name: 'Chi 1', region: 'north', description: null },
+          { id: 't2', clan_id: 'c2', name: 'Chi 2', region: 'south', description: null },
+        ],
+      },
+      { 'persons:tree_id=t1': 8, 'persons:tree_id=t2': 3, 'memberships:clan_id=c1': 5 },
+    )
+    const r = await cloudStore(client, 'u1').directory()
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.value.trees.map((t) => t.personCount)).toEqual([8, 3])
+    expect(r.value.clans).toEqual([
+      { id: 'c1', name: 'Họ A', role: 'admin', memberCount: 5 },
+      { id: 'c2', name: 'Họ B', role: 'viewer' },
+    ])
+  })
+})

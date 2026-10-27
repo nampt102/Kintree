@@ -73,7 +73,7 @@ export function DateInput({
     onChange(partsToDate(next))
   }
 
-  const control = 'min-h-11 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-danger'
+  const control = 'min-h-11 w-full rounded-md border border-line-input bg-surface px-3 text-base text-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-danger'
   const num = (key: 'd' | 'm' | 'y', placeholder: string, width: string) => (
     <div className={width}>
       <input
@@ -98,7 +98,7 @@ export function DateInput({
         {num('y', 'Năm', 'w-28')}
         <select
           aria-label={`${label}: Dương hay âm lịch`}
-          className="min-h-11 cursor-pointer rounded-md border border-line-strong bg-surface px-3 text-base text-ink"
+          className="min-h-11 cursor-pointer rounded-md border border-line-input bg-surface px-3 text-base text-ink"
           value={parts.lunar ? 'lunar' : 'solar'}
           onChange={(e) => set({ lunar: e.target.value === 'lunar' })}
         >

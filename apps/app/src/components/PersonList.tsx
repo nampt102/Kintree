@@ -2,7 +2,7 @@ import { filterPersons, PERSON_FILTERS, type PersonFilter, type TreeDoc } from '
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 import { lifespan } from '../lib/format.ts'
-import { Segmented, TextField } from '../ui/index.ts'
+import { Avatar, Segmented, TextField } from '../ui/index.ts'
 
 const FILTER_LABEL: Record<PersonFilter, string> = {
   all: 'Tất cả',
@@ -30,17 +30,18 @@ export function PersonList({ doc, onOpen }: { doc: TreeDoc; onOpen: (id: string)
       <p className="text-sm text-ink-muted" aria-live="polite">
         {rows.length} người
       </p>
-      <ul className="divide-y divide-line overflow-hidden rounded-md border border-line-strong bg-surface">
+      <ul className="divide-y divide-line overflow-hidden rounded-xl bg-surface shadow-1 ring-1 ring-line/60">
         {rows.map((p) => (
           <li key={p.id}>
-            <button type="button" onClick={() => onOpen(p.id)} className="flex min-h-14 w-full cursor-pointer items-center gap-3 px-4 py-2 text-left transition-colors duration-100 hover:bg-surface-muted">
+            <button type="button" onClick={() => onOpen(p.id)} className="flex min-h-16 w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 hover:bg-surface-muted">
+              <Avatar name={p.fullName} gender={p.gender} muted={p.death !== undefined} size={40} />
               <span className="min-w-0 flex-1">
-                <span className="block font-medium">{p.fullName}</span>
+                <span className="block font-semibold">{p.fullName}</span>
                 <span className="block text-sm text-ink-muted">
                   {[p.gender === 'male' ? 'Nam' : p.gender === 'female' ? 'Nữ' : '', p.isOutsider ? 'Dâu/Rể' : '', lifespan(p)].filter(Boolean).join(' · ')}
                 </span>
               </span>
-              <ChevronRight aria-hidden size={20} className="shrink-0 text-ink-muted" />
+              <ChevronRight aria-hidden size={18} className="shrink-0 text-connector" />
             </button>
           </li>
         ))}

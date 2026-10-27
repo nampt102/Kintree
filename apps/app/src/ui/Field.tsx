@@ -47,7 +47,7 @@ export const TextField = forwardRef<HTMLInputElement, Common & InputHTMLAttribut
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, { label, hint, error })}
-        className={`${CONTROL} border-line-strong ${className}`}
+        className={`${CONTROL} border-line-input ${className}`}
         {...props}
       />
     </Shell>
@@ -67,7 +67,7 @@ export const SelectField = forwardRef<HTMLSelectElement, Common & SelectHTMLAttr
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, { label, hint, error })}
-        className={`${CONTROL} cursor-pointer border-line-strong ${className}`}
+        className={`${CONTROL} cursor-pointer border-line-input ${className}`}
         {...props}
       >
         {children}
@@ -89,7 +89,7 @@ export const TextAreaField = forwardRef<HTMLTextAreaElement, Common & TextareaHT
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(id, { label, hint, error })}
-        className={`${CONTROL} min-h-28 border-line-strong py-2 ${className}`}
+        className={`${CONTROL} min-h-28 border-line-input py-2 ${className}`}
         {...props}
       />
     </Shell>
@@ -112,7 +112,7 @@ export function Segmented<T extends string>({
   wrap?: boolean
 }) {
   return (
-    <div role="group" aria-label={label} className={`flex gap-2 ${wrap ? 'flex-wrap' : 'overflow-x-auto'}`}>
+    <div role="group" aria-label={label} className={wrap ? 'flex flex-wrap gap-2' : 'inline-flex gap-1 overflow-x-auto rounded-full bg-surface-muted p-1'}>
       {options.map((o) => {
         const on = o.value === value
         const Icon = o.icon
@@ -124,11 +124,17 @@ export function Segmented<T extends string>({
             aria-label={o.hideLabel ? o.label : undefined}
             title={o.hideLabel ? o.label : undefined}
             onClick={() => onChange(o.value)}
-            className={`inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border px-4 text-base transition-colors duration-100 ${
-              on ? 'border-accent bg-accent text-white' : 'border-line-strong bg-surface text-ink hover:bg-surface-muted'
+            className={`inline-flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full px-4 text-sm font-medium transition-[background-color,box-shadow,color] duration-150 ${
+              wrap
+                ? on
+                  ? 'bg-accent-soft text-accent ring-1 ring-accent/30'
+                  : 'bg-surface text-ink ring-1 ring-line hover:bg-surface-muted'
+                : on
+                  ? 'bg-surface text-ink shadow-1'
+                  : 'text-ink-muted hover:text-ink'
             } ${o.hideLabel ? 'px-0' : ''}`}
           >
-            {Icon && <Icon aria-hidden size={20} strokeWidth={1.75} />}
+            {Icon && <Icon aria-hidden size={18} strokeWidth={1.85} />}
             {!o.hideLabel && o.label}
           </button>
         )

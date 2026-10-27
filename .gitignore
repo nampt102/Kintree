@@ -10,3 +10,4 @@ test-results/
 playwright-report/
 
 supabase/certs/
+openspec/changes/**/screens/

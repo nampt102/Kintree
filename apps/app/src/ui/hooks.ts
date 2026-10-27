@@ -123,3 +123,17 @@ export function usePrefersReducedMotion(): boolean {
     () => false,
   )
 }
+
+/** Đúng khi cửa sổ rộng ít nhất `px` (theo dõi đổi cỡ). */
+export function useMinWidth(px: number): boolean {
+  const query = `(min-width: ${px}px)`
+  const [match, setMatch] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const on = () => setMatch(mq.matches)
+    on()
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [query])
+  return match
+}

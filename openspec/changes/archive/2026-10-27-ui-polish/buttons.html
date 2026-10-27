@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree nút chính</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #EEE9E2; color: #1F1A17; }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 2; }
+  .card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 2px 4px rgb(31 26 23 / .05), 0 8px 20px rgb(31 26 23 / .09); width: 340px; }
+  .field { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 12px; border-radius: 12px; color: #6B635A; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px; font-size: 15px; font-weight: 600; transition: all .15s; }
+  .full { width: 100%; }
+
+  /* A. Đỏ son chuyển sắc nhẹ, bóng cùng màu, viền sáng mảnh phía trên */
+  .a { color: #fff; border-radius: 12px; background: linear-gradient(180deg, #B4382E 0%, #9A2721 100%); box-shadow: inset 0 1px 0 rgb(255 255 255 / .22), 0 1px 2px rgb(120 28 22 / .35), 0 6px 14px -4px rgb(159 43 37 / .45); }
+  .a:hover { filter: brightness(1.05); }
+  .a-field { border: 1px solid #D8D0C6; background: #fff; }
+
+  /* B. Đỏ rượu trầm, phẳng, không bóng: sang và yên tĩnh */
+  .b { color: #fff; border-radius: 12px; background: #7E1F1A; letter-spacing: .01em; }
+  .b-field { border: 1px solid #D8D0C6; background: #FAF8F5; }
+
+  /* C. Nút chính màu mực (gần đen ấm); đỏ chỉ để nhấn (logo, chọn, liên kết) */
+  .c { color: #fff; border-radius: 12px; background: #2A211D; box-shadow: 0 1px 2px rgb(31 26 23 / .25); }
+  .c-field { border: 1px solid #D8D0C6; background: #fff; }
+
+  /* D. Viên thuốc đỏ son, bóng màu mềm */
+  .d { color: #fff; border-radius: 9999px; background: #A42F28; box-shadow: 0 8px 18px -6px rgb(164 47 40 / .55); }
+  .d-field { border: 1px solid #D8D0C6; background: #fff; border-radius: 9999px; padding: 0 18px; }
+</style>
+</head>
+<body>
+<div class="mx-auto max-w-[1500px] px-8 py-10 space-y-8">
+  <header class="space-y-1">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-[#9F2B25]">Kintree · chọn kiểu nút chính</p>
+    <h1 class="text-2xl font-semibold">Bốn phương án, đặt đúng chỗ dùng thật</h1>
+    <p class="text-[#6B635A]">Ô nhập cũng đổi theo: viền nhạt hơn lần trước (nhãn "Email" ở trên vẫn cho biết đây là ô nhập), viền đậm lên khi chạm vào.</p>
+  </header>
+
+  <div class="grid grid-cols-4 gap-6">
+    <!-- A -->
+    <div class="space-y-4">
+      <p class="font-semibold">A · Đỏ son chuyển sắc</p>
+      <div class="card">
+        <p class="text-sm font-medium">Email</p>
+        <div class="field a-field mt-1.5"><i data-lucide="mail"></i>ten@gmail.com</div>
+        <button class="btn a full mt-4">Gửi mã đăng nhập</button>
+      </div>
+      <div class="rounded-2xl bg-[#FAF8F5] p-6"><button class="btn a"><i data-lucide="plus"></i>Tạo cuốn gia phả</button></div>
+      <p class="text-sm text-[#6B635A]">Nổi, có chiều sâu, giống nút của ứng dụng iOS cao cấp.</p>
+    </div>
+
+    <!-- B -->
+    <div class="space-y-4">
+      <p class="font-semibold">B · Đỏ rượu phẳng</p>
+      <div class="card">
+        <p class="text-sm font-medium">Email</p>
+        <div class="field b-field mt-1.5"><i data-lucide="mail"></i>ten@gmail.com</div>
+        <button class="btn b full mt-4">Gửi mã đăng nhập</button>
+      </div>
+      <div class="rounded-2xl bg-[#FAF8F5] p-6"><button class="btn b"><i data-lucide="plus"></i>Tạo cuốn gia phả</button></div>
+      <p class="text-sm text-[#6B635A]">Trầm, cổ điển, hợp chất "gia phả"; ít bắt mắt hơn.</p>
+    </div>
+
+    <!-- C -->
+    <div class="space-y-4">
+      <p class="font-semibold">C · Mực đen ấm, đỏ để nhấn</p>
+      <div class="card">
+        <p class="text-sm font-medium">Email</p>
+        <div class="field c-field mt-1.5"><i data-lucide="mail"></i>ten@gmail.com</div>
+        <button class="btn c full mt-4">Gửi mã đăng nhập</button>
+      </div>
+      <div class="rounded-2xl bg-[#FAF8F5] p-6"><button class="btn c"><i data-lucide="plus"></i>Tạo cuốn gia phả</button></div>
+      <p class="text-sm text-[#6B635A]">Hiện đại, tối giản kiểu Apple/Notion; đỏ son còn ở logo, chọn người, liên kết.</p>
+    </div>
+
+    <!-- D -->
+    <div class="space-y-4">
+      <p class="font-semibold">D · Viên thuốc đỏ son</p>
+      <div class="card">
+        <p class="text-sm font-medium">Email</p>
+        <div class="field d-field mt-1.5"><i data-lucide="mail"></i>ten@gmail.com</div>
+        <button class="btn d full mt-4">Gửi mã đăng nhập</button>
+      </div>
+      <div class="rounded-2xl bg-[#FAF8F5] p-6"><button class="btn d"><i data-lucide="plus"></i>Tạo cuốn gia phả</button></div>
+      <p class="text-sm text-[#6B635A]">Mềm, thân thiện, kiểu ứng dụng điện thoại; bo tròn hoàn toàn.</p>
+    </div>
+  </div>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

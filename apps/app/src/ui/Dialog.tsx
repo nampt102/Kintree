@@ -57,18 +57,18 @@ export function Dialog({
       }}
       onClick={(e) => e.target === ref.current && requestClose()}
       style={{ ['--vvh' as string]: vvh ? `${vvh}px` : '100dvh' }}
-      className="m-auto max-h-[90dvh] w-[min(36rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-lg border border-line bg-surface p-0 text-ink backdrop:bg-scrim max-md:m-0 max-md:h-[var(--vvh)] max-md:max-h-none max-md:w-full max-md:rounded-none max-md:border-0"
+      className="m-auto max-h-[90dvh] w-[min(36rem,calc(100vw-2rem))] max-w-none overflow-hidden rounded-2xl bg-surface p-0 text-ink shadow-3 backdrop:bg-scrim backdrop:backdrop-blur-[2px] max-md:m-0 max-md:h-[var(--vvh)] max-md:max-h-none max-md:w-full max-md:rounded-none max-md:border-0"
     >
       <div className="flex h-full max-h-[inherit] flex-col max-md:max-h-[var(--vvh)]">
-        <header className="flex items-start gap-2 border-b border-line px-4 py-2 max-md:pt-[max(0.5rem,env(safe-area-inset-top))]">
-          <h2 id="dialog-title" className="min-w-0 flex-1 py-2 text-lg font-semibold leading-snug">
+        <header className="flex items-start gap-2 px-5 pb-1 pt-3 max-md:pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <h2 id="dialog-title" className="min-w-0 flex-1 py-2 text-xl font-semibold leading-snug tracking-[-0.01em]">
             {title}
           </h2>
-          <IconButton icon={X} label="Đóng" onClick={requestClose} className="-mr-2" />
+          <IconButton icon={X} label="Đóng" variant="secondary" onClick={requestClose} className="-mr-1" />
         </header>
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">{children}</div>
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-3">{children}</div>
         {footer && (
-          <footer className="flex flex-wrap justify-end gap-2 border-t border-line bg-surface px-4 py-3 max-md:pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <footer className="flex flex-wrap items-center justify-end gap-2 bg-surface px-5 pb-5 pt-3 max-md:pb-[max(1rem,env(safe-area-inset-bottom))]">
             {footer}
           </footer>
         )}

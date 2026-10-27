@@ -24,7 +24,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         style={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }}
       >
         {toasts.map((t) => (
-          <p key={t.id} data-testid="toast" className="flex max-w-md items-center gap-2 rounded-md bg-ink px-4 py-3 text-sm text-white shadow-sheet">
+          <p key={t.id} data-testid="toast" className="flex max-w-md items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white shadow-3">
             <CheckCircle2 aria-hidden size={20} strokeWidth={1.75} className="shrink-0" />
             {t.text}
           </p>
@@ -38,9 +38,11 @@ export const useToast = () => useContext(ToastContext)
 
 export function EmptyState({ icon: Icon, title, text, action }: { icon: LucideIcon; title: string; text: string; action?: ReactNode }) {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-10 text-center">
-      <Icon aria-hidden size={40} strokeWidth={1.5} className="text-ink-muted" />
-      <h2 className="text-xl font-semibold">{title}</h2>
+    <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-12 text-center">
+      <span aria-hidden className="mb-1 grid size-16 place-items-center rounded-2xl bg-accent-soft text-accent">
+        <Icon size={30} strokeWidth={1.6} />
+      </span>
+      <h2 className="text-xl font-semibold tracking-[-0.01em]">{title}</h2>
       <p className="text-ink-muted">{text}</p>
       {action}
     </div>
@@ -52,7 +54,7 @@ export function Skeleton({ lines = 3 }: { lines?: number }) {
   return (
     <div aria-busy="true" aria-label="Đang tải" className="space-y-3 p-4">
       {Array.from({ length: lines }, (_, i) => (
-        <div key={i} className="h-12 animate-pulse rounded-md bg-surface-muted" />
+        <div key={i} className="h-16 animate-pulse rounded-xl bg-surface-muted" />
       ))}
     </div>
   )
@@ -77,7 +79,7 @@ export function OverflowMenu({ trigger, items }: { trigger: (props: { onClick: (
     <div ref={box} className="relative">
       {trigger({ onClick: () => setOpen((o) => !o), 'aria-expanded': open })}
       {open && (
-        <ul role="menu" className="absolute right-0 top-full z-[40] mt-1 min-w-52 rounded-md border border-line bg-surface py-1 shadow-sheet">
+        <ul role="menu" className="absolute right-0 top-full z-[40] mt-2 min-w-56 overflow-hidden rounded-xl bg-surface py-1.5 shadow-3 ring-1 ring-line/60">
           {items.map((it) => {
             const Icon = it.icon
             return (
@@ -85,13 +87,13 @@ export function OverflowMenu({ trigger, items }: { trigger: (props: { onClick: (
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex min-h-11 w-full cursor-pointer items-center gap-3 px-4 text-left hover:bg-surface-muted"
+                  className="flex min-h-11 w-full cursor-pointer items-center gap-3 px-4 text-left text-[15px] hover:bg-surface-muted"
                   onClick={() => {
                     setOpen(false)
                     it.onSelect()
                   }}
                 >
-                  {Icon && <Icon aria-hidden size={20} strokeWidth={1.75} />}
+                  {Icon && <Icon aria-hidden size={18} strokeWidth={1.85} className="text-ink-muted" />}
                   {it.label}
                 </button>
               </li>
@@ -106,7 +108,7 @@ export function OverflowMenu({ trigger, items }: { trigger: (props: { onClick: (
 export function TopBar({ children }: { children: ReactNode }) {
   return (
     <header
-      className="sticky top-0 z-[10] flex min-h-14 items-center gap-1 border-b border-line bg-surface"
+      className="sticky top-0 z-[10] flex min-h-16 items-center gap-1 bg-surface/90 shadow-[0_1px_0_var(--color-line)] backdrop-blur-md"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
         paddingLeft: 'max(0.5rem, env(safe-area-inset-left))',

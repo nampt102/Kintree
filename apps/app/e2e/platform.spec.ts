@@ -50,7 +50,7 @@ test.describe('quản trị nền tảng', () => {
     await fresh.getByLabel('Mã 6 số').fill(await latestOtp(email))
     await fresh.getByRole('button', { name: 'Đăng nhập', exact: true }).click()
     await expect(fresh.getByRole('button', { name: new RegExp(name) })).toBeVisible()
-    await expect(fresh.getByText('Quản trị', { exact: true })).toBeVisible()
+    await expect(fresh.getByRole('button', { name: new RegExp(name) })).toContainText('Quản trị')
     await ctx.close()
 
     must(await admin().from('clans').delete().eq('name', name))

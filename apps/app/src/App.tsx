@@ -1,14 +1,16 @@
 import type { User } from '@supabase/supabase-js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthGate, AuthProvider } from './auth.tsx'
+import { AppRail } from './components/AppRail.tsx'
 import { ClanList } from './components/ClanList.tsx'
 import { ClanScreen } from './components/ClanScreen.tsx'
 import { PlatformScreen } from './components/PlatformScreen.tsx'
+import { CreateTreeDialog } from './components/TreeManage.tsx'
 import { TreeScreen } from './components/TreeScreen.tsx'
 import { cloudStore, platformStore, type Directory } from './lib/cloudStore.ts'
 import { messageFor } from './lib/messages.ts'
 import { supabase } from './lib/supabase.ts'
-import { ToastProvider, useBackToClose } from './ui/index.ts'
+import { ToastProvider, useBackToClose, useMinWidth } from './ui/index.ts'
 
 /** Ba tầng: danh sách dòng họ → các cuốn của dòng họ → một cuốn; thêm màn quản trị nền tảng. */
 function Home({ user }: { user: User }) {
@@ -21,6 +23,9 @@ function Home({ user }: { user: User }) {
   const [clanId, setClanId] = useState<string | null>(null)
   const [treeId, setTreeId] = useState<string | null>(null)
   const [showPlatform, setShowPlatform] = useState(false)
+  const [creating, setCreating] = useState(false)
+  // Thanh bên chỉ ở màn rất rộng và khi đang ở trong một dòng họ (spec responsive-layout).
+  const wide = useMinWidth(1200)
 
   const reload = useCallback(async () => {
     const r = await cloud.directory()
@@ -44,10 +49,47 @@ function Home({ user }: { user: User }) {
   useBackToClose(clanId !== null, () => setClanId(null))
   useBackToClose(treeId !== null, closeTree)
 
-  if (treeId) return <TreeScreen key={treeId} cloud={cloud} treeId={treeId} onBack={closeTree} />
+  const rail = wide && clanId && dir && !showPlatform
+  const withRail = (screen: React.ReactNode) =>
+    rail ? (
+      <div className="flex h-dvh">
+        <AppRail
+          email={email}
+          dir={dir}
+          clanId={clanId}
+          treeId={treeId}
+          onSwitchClan={() => {
+            setTreeId(null)
+            setClanId(null)
+          }}
+          onOpenClan={closeTree}
+          onOpenTree={setTreeId}
+          onCreateTree={() => setCreating(true)}
+        />
+        <div className="min-w-0 flex-1 overflow-y-auto">{screen}</div>
+        {creating && (
+          <CreateTreeDialog
+            cloud={cloud}
+            clanId={clanId}
+            onClose={() => setCreating(false)}
+            onCreated={(id) => {
+              setCreating(false)
+              void reload()
+              setTreeId(id)
+            }}
+          />
+        )}
+      </div>
+    ) : (
+      screen
+    )
+
+  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} treeId={treeId} onBack={closeTree} hideBack={!!rail} />)
   if (showPlatform) return <PlatformScreen platform={platform} email={email} onBack={() => setShowPlatform(false)} />
   if (clanId && dir) {
-    return <ClanScreen cloud={cloud} email={email} dir={dir} clanId={clanId} onBack={() => setClanId(null)} onOpenTree={setTreeId} reload={() => void reload()} />
+    return withRail(
+      <ClanScreen cloud={cloud} email={email} dir={dir} clanId={clanId} hideBack={!!rail} onBack={() => setClanId(null)} onOpenTree={setTreeId} reload={() => void reload()} />,
+    )
   }
   return (
     <ClanList

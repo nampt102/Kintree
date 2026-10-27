@@ -39,7 +39,7 @@ for (const size of SIZES) {
 
       // Chế độ danh sách
       await page.getByRole('button', { name: /^(Danh sách|Xem dạng danh sách)$/ }).click()
-      await expect(page.getByText(/\d+ người/)).toBeVisible()
+      await expect(page.getByText(/^\d+ người$/)).toBeVisible()
       await expectNoHorizontalScroll(page)
       await expectTouchTargets(page)
     })
