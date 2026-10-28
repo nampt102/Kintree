@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. `/opsx:propose` change `ai-sources-proposals` (AI chép phả: nguồn, đề xuất, hàng chờ duyệt; điểm khác biệt của app).
+2. Chọn model AI đọc ảnh (gợi ý `anthropic:claude-sonnet-5-5`) và thử trên ảnh bia mộ thật; làm bộ đánh giá (Phase 0); lọc người có thể còn sống trước khi gửi cho AI (chờ chủ dự án chọn mốc năm sinh, gợi ý 1940). Sau đó `/opsx:propose` change `ai-audio-proposals` (ghi âm).
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -27,7 +27,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 3a | Đăng nhập, dòng họ, RLS, lưu trên máy chủ (E3, F10) | done | `cloud-auth-storage` | 25/25 task; ADR 0007, 0008; Google + Gmail SMTP đã thử |
 | 3b | Lời mời (email + link xem), quản lý thành viên (E3) | done | `clan-invites` | "Tôi là ai" dời sang `kinship-terms` |
 | 3c | Bộ component shadcn/ui, làm lại form | done | `ui-components` | archive 2026-10-28; 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
-| 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | todo | `ai-sources-proposals` | điểm khác biệt |
+| 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | done | `ai-image-proposals` | ghi âm làm `ai-audio-proposals` sau; điểm khác biệt |
 | 5 | Lịch tháng + nhắc giỗ (E5, F8, F11) | todo | `lunar-calendar-reminders` | |
 | 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
 | 7 | Nhật ký thay đổi (E7, F12) | todo | `audit-log` | |
@@ -44,6 +44,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - `0005-ai-nhieu-nha-cung-cap` — gọi được OpenAI, Claude, Gemini qua Vercel AI SDK; chọn model bằng cấu hình.
 - `0006-gia-nguoi-danh-dau-va-du-lieu-cuc-bo-truoc` — gỡ người = đánh dấu đã gỡ (giữ dữ liệu); cây lưu `localStorage` trước, Supabase sau.
 - `0007-dang-nhap-va-luu-tru-tren-may-chu` — Google + email OTP, Supabase local trước, dữ liệu chỉ trên máy chủ (thay phần lưu cục bộ của 0006).
+- `0011-ai-doc-anh-de-xuat-va-ai-gia-lap` — AI đọc ảnh chỉ tạo đề xuất; chạy bằng bộ giả lập, nhà cung cấp thật chọn bằng `AI_IMAGE_MODEL`; nhận người kèm quan hệ; gộp không ghi đè.
 - `0008-saas-chi-quan-tri-sua-quan-tri-nen-tang-cap-dong-ho` — chỉ quản trị thêm/sửa/xoá; quản trị nền tảng cấp dòng họ; hai vai trò admin/viewer; xoá cuốn = đánh dấu.
 - `0009-moi-thanh-vien-email-va-link-xem` — mời bằng email (mọi vai trò) và link (chỉ xem, hạn, mã mời, khoá khi sai); chỉ quản trị dòng họ quản lý thành viên; luôn còn quản trị; không gửi thư.
 
@@ -64,6 +65,10 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-10-28: Archive `ai-image-proposals` (tạo `ai-sources`, `proposal-review`); chủ dự án đã thử đọc ảnh bằng Anthropic thật; gom khoá về `supabase/.env`, sửa `db:env`, sửa schema rỗng bị Anthropic từ chối.
+- 2026-10-28: `ai-image-proposals` xong giao diện (16/16): đưa ảnh vào, ngăn Tư liệu, hàng chờ duyệt cạnh ảnh (nhận người kèm quan hệ, sửa rồi nhận, gộp người trùng, bỏ kèm lý do), dấu và hộp nguồn; ADR 0011; pgTAP 168, Vitest core 335 + app 101, Playwright 120 qua ×2 (1 bỏ qua). Nhà cung cấp AI thật chưa thử (chưa có khoá).
+- 2026-10-28: `ai-image-proposals` xong hạ tầng + DB + Edge Function + lớp dữ liệu (8/16): Storage và edge-runtime bật trong `db:start` (thêm function mới phải `db:stop` rồi `db:start`), migration `ai_image_proposals`, function `extract-image` với AI giả lập, `core` thêm `findSimilarPersons`/`linkParent`, thông dịch đề xuất; pgTAP 168, Vitest core 335 + app 101, e2e function 5; bản mẫu giao diện chờ duyệt.
+- 2026-10-28: Đề xuất `ai-image-proposals` (lát đầu AI chép phả: ảnh bia mộ/phả → Edge Function → đề xuất → hàng chờ duyệt, nguồn từng trường; AI giả lập vì chưa có khoá; ghi âm để change sau).
 - 2026-10-28: Archive `ui-components` (sync `app-ui-foundation`) và `clan-invites` (tạo `clan-membership`, sync `platform-admin`); chủ dự án đã thử tay luồng Google với link mời: ổn.
 - 2026-10-28: Làm xong `ui-components`: shadcn/Radix cho nút, ô nhập, ô chọn (danh sách tự vẽ), nhóm nút chọn một, công tắc, hộp thoại, menu, thông báo (Sonner); form hồ sơ chia 4 nhóm; e2e 105 qua ×3 (1 bỏ qua), Vitest 73, JS gzip 226 → 282 KB; còn chủ dự án duyệt app chạy thật.
 - 2026-10-28: Đề xuất `ui-components` (dùng shadcn/ui, làm lại form hồ sơ và ô chọn) + bản mẫu chờ duyệt; sửa ngay: nút quanh khung người bị khung kế bên che, thanh "Đang xem riêng nhánh" dính thanh trên. Thêm `supabase/seed.sql` (4 dòng họ mẫu).

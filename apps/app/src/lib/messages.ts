@@ -15,6 +15,12 @@ export type StoreError =
   | 'LINK_REVOKED'
   | 'LINK_LOCKED'
   | 'WRONG_CODE'
+  | 'NOT_PENDING'
+  | 'ALREADY_PROCESSING'
+  | 'FILE_TYPE'
+  | 'NEEDS_ATTACH'
+  | 'NEEDS_PERSON'
+  | 'UNSUPPORTED_RELATION'
 export type AppError = EditError | StoreError
 
 /** Bảng dịch mã lỗi duy nhất của giao diện; kiểu `Record` buộc phải có câu cho mọi mã. */
@@ -57,6 +63,12 @@ export const MESSAGES: Record<AppError, string> = {
   LINK_REVOKED: 'Link đã bị quản trị thu hồi, hãy xin link mới.',
   LINK_LOCKED: 'Link đang tạm khoá vì nhập sai mã mời nhiều lần. Thử lại sau 15 phút.',
   WRONG_CODE: 'Mã mời không đúng.',
+  NOT_PENDING: 'Đề xuất này đã được duyệt rồi.',
+  ALREADY_PROCESSING: 'Tư liệu này đang được đọc, hãy chờ một lát.',
+  FILE_TYPE: 'Chỉ nhận ảnh JPEG, PNG hoặc WebP.',
+  NEEDS_ATTACH: 'Người này chưa gắn được vào cây. Hãy dùng "Sửa rồi nhận" để chọn cha mẹ hoặc vợ/chồng.',
+  NEEDS_PERSON: 'Cần nhận người liên quan trước.',
+  UNSUPPORTED_RELATION: 'Chưa nối được kiểu quan hệ này từ đề xuất; hãy bỏ hoặc thêm bằng tay.',
 }
 
 export const messageFor = (error: AppError): string => MESSAGES[error]

@@ -10,6 +10,8 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
+    // Các file dùng chung với Edge Function (supabase/functions/_shared) nằm ngoài app: chỉ cho `zod` trỏ vào node_modules của app.
+    "paths": { "zod": ["./node_modules/zod"] },
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",

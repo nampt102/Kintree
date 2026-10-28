@@ -169,7 +169,7 @@ type DbError = { message?: string; code?: string; status?: number } | null
 export function mapError(e: NonNullable<DbError>, fallback: StoreError): StoreError {
   if (e.status === 401 || e.code === 'PGRST301' || /jwt/i.test(e.message ?? '')) return 'NOT_SIGNED_IN'
   // Lỗi có tên do hàm trong cơ sở dữ liệu raise (migration clan_invites).
-  const named = /\b(LAST_ADMIN|EMAIL_INVALID|CODE_TOO_SHORT|TREE_NOT_FOUND)\b/.exec(e.message ?? '')
+  const named = /\b(LAST_ADMIN|EMAIL_INVALID|CODE_TOO_SHORT|TREE_NOT_FOUND|NOT_PENDING)\b/.exec(e.message ?? '')
   if (named) return named[1] as StoreError
   if (e.code === '42501' || e.status === 403) return 'FORBIDDEN'
   if (!e.code && /fetch|network|load failed/i.test(e.message ?? '')) return 'OFFLINE'

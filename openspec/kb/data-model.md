@@ -15,9 +15,9 @@ Nguồn: `supabase/migrations/20261026000000_init.sql`, `20261027000000_auth_acc
 | `platform_admins` | quản trị nền tảng (nhà vận hành) | chỉ ghi bằng `service_role` (`pnpm admin:promote <email>`); không policy cho client |
 | `invites` | lời mời bằng email cho người chưa có tài khoản (thay `clan_admin_invites`) | `email` chữ thường, `role`, đúng một trong `clan_id`/`tree_id`, duy nhất theo (email, phạm vi); trigger `on_auth_user_created` đổi thành `memberships` khi đăng ký |
 | `invite_links` | link mời, chỉ cấp vai trò xem | `token_hash` = sha256 của mã link (không lưu mã gốc); `code_hash` = bcrypt mã mời tuỳ chọn; `expires_at`, `revoked_at`, `failed_attempts`/`locked_until` (5 lần sai → khoá 15 phút), `accepted_count` |
-| `sources` | tư liệu: ghi âm, ảnh, lời kể, văn bản | `consent_at` = lúc xác nhận người được ghi âm đồng ý |
-| `proposals` | đề xuất do AI sinh | `op`, `payload`, `anchor` (mốc ghi âm / vùng ảnh), `provider`, `model`, `status` |
-| `field_sources` | nguồn của từng trường đã nhận | khoá (`person_id`, `field`, `source_id`) |
+| `sources` | tư liệu: ảnh (lát đầu), ghi âm, lời kể, văn bản | thêm `tree_id`, `image_kind` (`grave`/`page`/`altar`/`other`), `status` (`queued`/`processing`/`done`/`failed`), `status_at`, `error`, `proposal_count`; `consent_at` cho ghi âm; ảnh ở bucket `sources` (`<clan>/<tree>/<source>.jpg`) |
+| `proposals` | đề xuất do AI sinh | `op` (`add_person`/`update_field`/`add_relation`), `payload` (jsonb, schema ở `supabase/functions/_shared/schema.ts`), `anchor` (vùng ảnh 0–1), `ref` (mã tạm của người trong lô), `quote` (chữ AI đọc), `provider`/`model`, `status` (`pending`/`accepted`/`rejected`/`superseded`), `edited`, `review_note`, `result_person_id`; chỉ quản trị cuốn đọc |
+| `field_sources` | nguồn của từng trường (kể cả nguồn không chọn) | `person_id`, `field` (`fullName`/`gender`/`birth`/`death`/`birthPlace`/`burialPlace`/`biography`), `source_id`, `proposal_id`, `value`, `anchor`, `accepted`, `note`; mọi người có vai trò ở cuốn đọc được |
 | `audit_log` | nhật ký thay đổi | giá trị `old`/`new` dạng jsonb, `actor` = `auth.uid()` |
 
 ## Ngày không đầy đủ
@@ -53,6 +53,8 @@ Hai vai trò `admin`/`viewer` ở hai tầng (dòng họ, cuốn); quyền thự
 | `link_create(clan, tree, days 1/7/30, code)`, `link_list`, `link_revoke` | chỉ quản trị cấp dòng họ; `link_create` trả mã link một lần |
 | `link_peek(token)`, `link_accept(token, code)` | người đã đăng nhập; trả jsonb `status` (`ok`/`invalid`/`expired`/`revoked`/`locked`/`wrong_code`). `link_accept` **không raise** khi sai mã để giữ được bộ đếm lần sai (raise sẽ rollback) |
 | `apply_tree_changes(tree, persons, parents, marriages)` | `security invoker`: ghi các dòng đã đổi trong một giao dịch, thứ tự khoá ngoại; RLS và trigger áp dụng nguyên |
+| `ingest_proposals(source, items, provider, model)` | `security definer`, chỉ `service_role` (Edge Function): bỏ đề xuất chờ cũ của tư liệu (`superseded`), chèn đề xuất mới theo thứ tự AI trả về, đánh dấu tư liệu `done` |
+| `review_proposal(proposal, decision, edited, note, result_person, changes, fields, children)` | `security invoker`, quản trị cuốn: nhận (gọi `apply_tree_changes` với `changes`, kèm `changes.also` = quan hệ đi cùng) hoặc bỏ; ghi `field_sources`; chèn đề xuất sửa trường khi gộp; nhận người thì quan hệ chờ trỏ đúng người, bỏ người thì quan hệ bỏ theo. Lỗi: `FORBIDDEN`, `NOT_PENDING`, `DECISION_INVALID` |
 
 | Bảng | select | insert | update |
 |---|---|---|---|

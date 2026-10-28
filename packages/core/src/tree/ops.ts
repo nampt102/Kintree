@@ -267,6 +267,22 @@ export function reorderSpouses(doc: TreeDoc, personId: string, orderedSpouseIds:
   };
 }
 
+/**
+ * Nối một người cha/mẹ đã có với một người con đã có (đề xuất quan hệ giữa hai người sẵn trong cuốn).
+ * Vai trò theo giới tính của cha/mẹ; giới tính chưa rõ thì phải nói `role`. Luật toàn vẹn như mọi quan hệ khác.
+ */
+export function linkParent(doc: TreeDoc, input: { parentId: string; childId: string; kind: ChildKind; role?: ParentRole }): Result {
+  const parent = findPerson(doc, input.parentId);
+  const child = findPerson(doc, input.childId);
+  if (!parent || !child) return fail('NOT_FOUND');
+  const role = parent.gender === 'unknown' ? input.role : roleFor[parent.gender];
+  if (!role) return fail('MISSING_ROLE');
+  const link: TreeParentLink = { parentId: parent.id, childId: child.id, role, kind: input.kind };
+  const err = checkParentLink(toTreeData(doc), link);
+  if (err) return fail(err);
+  return { ok: true, doc: { ...doc, parents: [...doc.parents, link] } };
+}
+
 // ---- Hồ sơ ----
 
 export type PersonPatch = {

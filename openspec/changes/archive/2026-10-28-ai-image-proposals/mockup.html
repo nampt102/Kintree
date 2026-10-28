@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree AI chép phả</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FAF8F5', muted: '#F3EFEA', rail: '#F5F1EC', line: '#ECE7E1', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', hover: '#8C2721', soft: '#F8ECEA' }, danger: { DEFAULT: '#B42318', soft: '#FBEDEB' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' }, ok: { DEFAULT: '#1F7A45', soft: '#E8F3EC' }, warn: { DEFAULT: '#7A4B00', soft: '#FFF7E6' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)', pill: '0 8px 18px -6px rgb(164 47 40/.55)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; flex-shrink: 0; }
+  .i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i20{width:20px!important;height:20px!important}.i24{width:24px!important;height:24px!important}
+  .desk { width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 1px #d8d0c4, 0 30px 60px rgb(0 0 0/.16); flex-shrink: 0 }
+  .phone { width: 375px; height: 812px; border-radius: 44px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0 }
+  .dots { background-image: radial-gradient(#e5dfd7 1px, transparent 1px); background-size: 22px 22px }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; font-weight:600; font-size:15px; white-space:nowrap }
+  .btn-primary { background:#A42F28; color:#fff; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55) }
+  .btn-secondary { background:#fff; color:#1F1A17; box-shadow: 0 0 0 1px #DDD5CB, 0 1px 2px rgb(31 26 23/.05) }
+  .btn-ghost { color:#1F1A17; font-weight:500 }
+  .btn-danger { color:#B42318; font-weight:500 }
+  .btn-off { opacity:.45 }
+  .icb { display:grid; place-items:center; width:44px; height:44px; border-radius:9999px }
+  .label { display:block; font-size:14px; font-weight:500; margin-bottom:6px }
+  .input { display:flex; align-items:center; gap:8px; height:44px; padding:0 14px; border-radius:12px; background:#fff; border:1px solid #8F877C; font-size:16px }
+  .toggle { display:flex; gap:4px; padding:4px; border-radius:9999px; background:#F3EFEA }
+  .toggle > span { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:0 12px; border-radius:9999px; font-size:15px; font-weight:500; color:#6B635A }
+  .toggle > span.on { background:#fff; color:#1F1A17; font-weight:600; box-shadow: 0 1px 2px rgb(31 26 23/.08), 0 0 0 1px rgb(31 26 23/.04) }
+  .badge { display:inline-flex; align-items:center; gap:4px; border-radius:9999px; padding:1px 9px; font-size:12.5px; font-weight:600; line-height:22px }
+  .card { border-radius:16px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07) }
+  .sec { font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:#6B635A }
+  .scrim { position:absolute; inset:0; background: rgb(31 26 23/.38) }
+  .glass { background: rgb(255 255 255 / .84); backdrop-filter: blur(14px); box-shadow: 0 0 0 1px rgb(31 26 23/.06), 0 8px 24px rgb(31 26 23/.1) }
+  .tag { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.06em; color:#A42F28; background:#F8ECEA; border-radius:9999px; padding:2px 10px }
+  /* "Ảnh bia mộ" vẽ bằng CSS */
+  .stone { position:relative; background:linear-gradient(160deg,#cfc9c0,#b7b0a5); border-radius:12px; overflow:hidden }
+  .stone .eng { position:absolute; color:#4b463f; font-family: 'Be Vietnam Pro'; font-weight:600; letter-spacing:.04em; text-shadow: 0 1px 0 rgb(255 255 255/.35) }
+  .box { position:absolute; border:2.5px solid #A42F28; background: rgb(164 47 40/.12); border-radius:6px; box-shadow: 0 0 0 9999px rgb(31 26 23/.22) }
+  .box.plain { box-shadow:none }
+  .row + .row { box-shadow: inset 0 1px 0 #ECE7E1 }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1420px] space-y-16 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · ai-image-proposals · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">AI chép phả từ ảnh: đưa ảnh vào, duyệt đề xuất, xem nguồn</h1>
+    <p class="max-w-3xl text-sub">Giữ hệ thiết kế đỏ trầm và thành phần shadcn đã duyệt. Dữ liệu trong ảnh là ví dụ hư cấu. 6 phần: A. Đưa ảnh vào · B. Danh sách tư liệu · C. Hàng chờ duyệt cạnh ảnh (máy tính) · D. Hàng chờ trên điện thoại · E. Sửa rồi nhận và gộp người trùng · F. Dấu nguồn và hộp nguồn.</p>
+  </header>
+
+  <!-- A. ĐƯA ẢNH VÀO -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">A · Đưa ảnh vào</h2><p class="text-sm text-sub">Vào từ menu "Thêm" của cuốn hoặc nút "Đưa ảnh vào" trong ngăn Tư liệu. Chụp bằng camera trên điện thoại hoặc chọn tệp. App thu nhỏ ảnh còn cạnh dài 2048 px trước khi tải lên. Chỉ quản trị của cuốn thấy.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[520px] overflow-hidden rounded-[22px] bg-white shadow-3">
+        <div class="flex items-start gap-3 px-6 pb-1 pt-5"><div class="flex-1 py-1.5"><h3 class="text-xl font-semibold">Đưa ảnh vào</h3><p class="text-ink-muted text-sub">Chi trưởng họ Nguyễn Văn</p></div><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+        <div class="space-y-5 px-6 py-3">
+          <div class="relative grid h-52 place-items-center overflow-hidden rounded-2xl bg-muted">
+            <div class="stone absolute inset-3"><span class="eng left-[18%] top-[14%] text-[22px]">NGUYỄN VĂN THỬ</span><span class="eng left-[18%] top-[34%] text-[13px]">SINH 1901 · MẤT NGÀY 5 THÁNG 3</span><span class="eng left-[18%] top-[48%] text-[13px]">NĂM QUÝ TỴ</span></div>
+            <span class="absolute bottom-5 right-5 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-medium shadow-2"><i data-lucide="refresh-cw" class="i16"></i>Chọn ảnh khác</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3"><span class="btn btn-secondary"><i data-lucide="camera"></i>Chụp ảnh</span><span class="btn btn-secondary"><i data-lucide="image-plus"></i>Chọn từ máy</span></div>
+          <div><span class="label">Loại tư liệu</span><div class="toggle"><span class="on"><i data-lucide="landmark" class="i16 text-accent"></i>Bia mộ</span><span>Trang phả</span><span>Bài vị</span><span>Khác</span></div></div>
+          <div><label class="label">Tên gọi (tuỳ chọn)</label><div class="input">Bia cụ Thử, nghĩa trang làng</div><p class="mt-1.5 text-sm text-sub">Giúp nhớ ảnh này là gì khi duyệt đề xuất sau này.</p></div>
+          <p class="flex items-start gap-2 rounded-xl bg-muted px-4 py-3 text-sm text-sub"><i data-lucide="shield-check" class="i16 mt-0.5"></i>Ảnh lưu riêng tư, chỉ người trong dòng họ thấy. AI chỉ đề xuất, bạn duyệt rồi mới vào cây.</p>
+        </div>
+        <div class="flex items-center justify-between gap-3 px-6 py-4 shadow-[0_-1px_0_#ECE7E1]"><span class="text-sm text-sub">2,4 MB → 380 KB sau khi thu nhỏ</span><div class="flex gap-2"><span class="btn btn-secondary">Huỷ</span><span class="btn btn-primary"><i data-lucide="sparkles"></i>Đưa vào và đọc</span></div></div>
+      </div>
+      <div class="space-y-4">
+        <div class="w-[420px] rounded-2xl bg-white p-5 shadow-2">
+          <p class="flex items-center gap-2 font-semibold text-danger"><i data-lucide="circle-alert" class="i20"></i>Tệp không phải ảnh</p>
+          <p class="mt-1 text-sm text-sub">Chỉ nhận ảnh JPEG, PNG hoặc WebP. Hãy chọn ảnh khác. (Lỗi hiện dưới vùng chọn ảnh, không tải gì lên.)</p>
+        </div>
+        <div class="w-[420px] rounded-2xl bg-warn-soft p-5 text-warn">
+          <p class="flex items-center gap-2 font-semibold"><i data-lucide="triangle-alert" class="i20"></i>Đang chạy bộ giả lập</p>
+          <p class="mt-1 text-sm">Chưa cấu hình AI thật: kết quả đọc là dữ liệu mẫu cố định, không phải chữ trong ảnh. Chỉ hiện khi quản trị mở ngăn Tư liệu trên môi trường thử.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B. DANH SÁCH TƯ LIỆU -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">B · Danh sách tư liệu</h2><p class="text-sm text-sub">Ngăn nổi bên phải của cuốn (cột 384 px, như ngăn thông tin người). Có hai tab: <b>Đề xuất</b> (số chờ duyệt) và <b>Tư liệu</b>. Trạng thái: Đang đọc (xoay), Đã đọc (số đề xuất), Đọc lỗi (nút Đọc lại). App tự làm mới mỗi 2 giây khi có tư liệu đang đọc.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[384px] rounded-3xl bg-white shadow-3">
+        <div class="flex items-center gap-2 px-5 pb-2 pt-5"><h3 class="flex-1 text-xl font-semibold">Tư liệu</h3><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+        <div class="px-5"><div class="toggle"><span><i data-lucide="inbox" class="i16"></i>Đề xuất <b class="rounded-full bg-accent px-1.5 text-xs text-white">3</b></span><span class="on"><i data-lucide="image" class="i16"></i>Tư liệu</span></div></div>
+        <div class="space-y-3 p-5">
+          <span class="btn btn-primary w-full"><i data-lucide="image-plus"></i>Đưa ảnh vào</span>
+          <div class="card row-card flex items-center gap-3 p-3"><div class="stone h-14 w-14 shrink-0"><span class="eng left-1 top-2 text-[7px]">BIA</span></div><div class="min-w-0 flex-1"><p class="truncate font-semibold">Bia cụ Thử</p><p class="text-sm text-sub">Bia mộ · vừa xong</p></div><span class="badge bg-muted text-sub"><i data-lucide="loader-circle" class="i14 animate-spin"></i>Đang đọc</span></div>
+          <div class="card flex items-center gap-3 p-3"><div class="stone h-14 w-14 shrink-0"><span class="eng left-1 top-2 text-[7px]">PHẢ</span></div><div class="min-w-0 flex-1"><p class="truncate font-semibold">Phả trang 12</p><p class="text-sm text-sub">Trang phả · hôm qua</p></div><span class="badge bg-ok-soft text-ok"><i data-lucide="check" class="i14"></i>3 đề xuất</span></div>
+          <div class="card p-3"><div class="flex items-center gap-3"><div class="stone h-14 w-14 shrink-0"><span class="eng left-1 top-2 text-[7px]">BÀI</span></div><div class="min-w-0 flex-1"><p class="truncate font-semibold">Bài vị nhà thờ</p><p class="text-sm text-sub">Bài vị · 2 ngày trước</p></div><span class="badge bg-danger-soft text-danger"><i data-lucide="circle-alert" class="i14"></i>Đọc lỗi</span></div>
+            <p class="mt-2 text-sm text-sub">Kết quả AI sai định dạng, chưa tạo đề xuất nào.</p><div class="mt-1 flex justify-end"><span class="btn btn-secondary h-10"><i data-lucide="rotate-cw"></i>Đọc lại</span></div></div>
+        </div>
+      </div>
+      <div class="phone" style="height:640px">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb"><i data-lucide="x" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">Tư liệu</p></div>
+        <div class="px-4"><div class="toggle"><span>Đề xuất <b class="rounded-full bg-accent px-1.5 text-xs text-white">3</b></span><span class="on">Tư liệu</span></div>
+          <div class="mt-3 space-y-2.5"><span class="btn btn-primary w-full"><i data-lucide="image-plus"></i>Đưa ảnh vào</span>
+            <div class="card flex items-center gap-3 p-3"><div class="stone h-12 w-12 shrink-0"></div><div class="min-w-0 flex-1"><p class="truncate font-semibold">Bia cụ Thử</p><p class="text-xs text-sub">Bia mộ · vừa xong</p></div><span class="badge bg-muted text-sub"><i data-lucide="loader-circle" class="i14 animate-spin"></i>Đang đọc</span></div>
+            <div class="card flex items-center gap-3 p-3"><div class="stone h-12 w-12 shrink-0"></div><div class="min-w-0 flex-1"><p class="truncate font-semibold">Phả trang 12</p><p class="text-xs text-sub">Trang phả · hôm qua</p></div><span class="badge bg-ok-soft text-ok">3 đề xuất</span></div>
+          </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C. HÀNG CHỜ DUYỆT (MÁY TÍNH) -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Hàng chờ duyệt cạnh ảnh (máy tính)</h2><p class="text-sm text-sub">Mở từ nút "Đề xuất 3" trên thanh nổi. Màn chia đôi: <b>ảnh nguồn bên trái</b> (khung đỏ tô vùng chữ AI đọc, phần còn lại tối đi), <b>danh sách đề xuất bên phải</b>. Chọn một đề xuất thì ảnh cuộn tới đúng vùng. Mỗi đề xuất ghi chữ AI đọc được (<i>quote</i>) để so mắt với ảnh.</p></div>
+    <div class="desk flex">
+      <div class="relative flex-1 bg-[#2a2622] p-6">
+        <div class="mb-3 flex items-center gap-3 text-white"><span class="icb bg-white/10"><i data-lucide="arrow-left"></i></span><div class="flex-1"><p class="font-semibold leading-tight">Bia cụ Thử</p><p class="text-sm text-white/60">Bia mộ · mô phỏng AI · 3 đề xuất chờ</p></div><span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm"><i data-lucide="zoom-in" class="i16"></i>Phóng to</span></div>
+        <div class="stone mx-auto" style="width:560px;height:640px">
+          <span class="eng left-[14%] top-[10%] text-[24px]">NGUYỄN VĂN THỬ</span>
+          <span class="eng left-[14%] top-[22%] text-[15px]">SINH NĂM 1901</span>
+          <span class="eng left-[14%] top-[30%] text-[15px]">MẤT NGÀY 5 THÁNG 3 NĂM QUÝ TỴ</span>
+          <span class="eng left-[14%] top-[44%] text-[15px]">CON CỤ NGUYỄN VĂN CẢ</span>
+          <span class="eng left-[14%] top-[58%] text-[15px]">AN TÁNG TẠI NGHĨA TRANG LÀNG</span>
+          <div class="box" style="left:12%;top:28%;width:76%;height:7%"></div>
+          <span class="absolute left-[12%] top-[24.5%] rounded-md bg-accent px-2 py-0.5 text-xs font-semibold text-white">Đề xuất 1 · ngày mất</span>
+        </div>
+      </div>
+      <aside class="flex w-[440px] shrink-0 flex-col bg-white shadow-[-1px_0_0_#ECE7E1]">
+        <div class="flex items-center gap-2 px-5 pb-2 pt-5"><h3 class="flex-1 text-xl font-semibold">Đề xuất</h3><span class="badge bg-accent-soft text-accent">3 chờ duyệt</span></div>
+        <div class="flex-1 space-y-3 overflow-hidden px-4 pb-4 pt-1">
+          <!-- đề xuất đang chọn -->
+          <div class="rounded-2xl bg-accent-soft/50 p-4 shadow-[inset_0_0_0_2px_#A42F28]">
+            <div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-male-soft text-male"><i data-lucide="user-plus" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Thêm người: Nguyễn Văn Thử</p><p class="mt-0.5 text-sm text-sub">Nam · sinh 1901 · mất 5/3 âm lịch (năm Quý Tỵ)</p></div><span class="badge bg-muted text-sub">AI</span></div>
+            <p class="mt-3 rounded-lg bg-white px-3 py-2 text-sm"><span class="text-sub">AI đọc:</span> "MẤT NGÀY 5 THÁNG 3 NĂM QUÝ TỴ"</p>
+            <div class="mt-2 flex items-start gap-2 rounded-lg bg-muted px-3 py-2 text-sm"><i data-lucide="link-2" class="i16 mt-0.5 text-sub"></i><span><b>Kèm quan hệ:</b> là con của Nguyễn Văn Cả. Nhận sẽ thêm người và nối vào cây cùng lúc.</span></div>
+            <div class="mt-3 flex flex-wrap items-center gap-2"><span class="btn btn-primary h-10"><i data-lucide="check"></i>Nhận</span><span class="btn btn-secondary h-10"><i data-lucide="pencil"></i>Sửa rồi nhận</span><span class="btn btn-danger h-10"><i data-lucide="x"></i>Bỏ</span></div>
+          </div>
+          <!-- sửa trường -->
+          <div class="card p-4">
+            <div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="pen-line" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Sửa nơi an táng của Nguyễn Văn Cả</p><p class="mt-0.5 text-sm"><span class="text-sub line-through">chưa ghi</span> <i data-lucide="arrow-right" class="i14 inline text-sub"></i> <b>Nghĩa trang làng</b></p></div><span class="badge bg-muted text-sub">AI</span></div>
+            <div class="mt-3 flex gap-2"><span class="btn btn-secondary h-10 flex-1">Chọn để duyệt</span></div>
+          </div>
+          <!-- quan hệ chờ người -->
+          <div class="card p-4 opacity-90">
+            <div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="link-2" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Quan hệ: Nguyễn Văn Thử là con của Nguyễn Văn Cả</p><p class="mt-1 flex items-center gap-1.5 text-sm text-sub"><i data-lucide="corner-down-right" class="i14"></i>Nhận cùng người Nguyễn Văn Thử ở trên</p></div></div>
+            <div class="mt-3"><span class="btn btn-secondary btn-off h-10"><i data-lucide="check"></i>Cần nhận người Nguyễn Văn Thử trước</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <div class="grid max-w-5xl grid-cols-3 gap-4 text-sm">
+      <div class="card p-4"><p class="mb-1 font-semibold">Bị chặn bởi luật cây</p><div class="rounded-xl bg-danger-soft p-3 text-danger"><p class="flex items-start gap-2"><i data-lucide="octagon-alert" class="i16 mt-0.5"></i>Quan hệ này sẽ khiến một người trở thành tổ tiên của chính mình.</p></div><div class="mt-2 flex gap-2"><span class="btn btn-primary btn-off h-10">Nhận</span><span class="btn btn-secondary h-10">Sửa rồi nhận</span><span class="btn btn-danger h-10">Bỏ</span></div></div>
+      <div class="card p-4"><p class="mb-1 font-semibold">Người chưa có chỗ gắn</p><div class="rounded-xl bg-warn-soft p-3 text-warn"><p class="flex items-start gap-2"><i data-lucide="triangle-alert" class="i16 mt-0.5"></i>Người này chưa gắn được vào cây. Hãy dùng "Sửa rồi nhận" để chọn cha mẹ hoặc vợ/chồng.</p></div></div>
+      <div class="card p-4"><p class="mb-1 font-semibold">Hết đề xuất</p><div class="grid place-items-center rounded-xl bg-muted py-6 text-center"><span class="grid size-12 place-items-center rounded-full bg-ok-soft text-ok"><i data-lucide="check-check"></i></span><p class="mt-2 font-semibold">Đã duyệt hết</p><p class="text-sub">Ảnh này không còn đề xuất chờ.</p></div></div>
+    </div>
+  </section>
+
+  <!-- D. ĐIỆN THOẠI -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Hàng chờ trên điện thoại</h2><p class="text-sm text-sub">Hai bước: danh sách đề xuất (thẻ), chạm một thẻ thì mở <b>chi tiết toàn màn</b> có ảnh phóng được ở trên, đề xuất ở dưới, nút Nhận / Bỏ dính đáy. Dùng chung quy tắc toàn màn đã chọn (D1) cho hộp thoại.</p></div>
+    <div class="flex items-start gap-10 overflow-x-auto pb-4">
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb"><i data-lucide="x" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">Đề xuất</p><span class="badge mr-2 bg-accent-soft text-accent">3 chờ</span></div>
+        <div class="space-y-3 px-4 pt-1">
+          <p class="sec">Bia cụ Thử · 3</p>
+          <div class="card p-4"><div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-male-soft text-male"><i data-lucide="user-plus" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Thêm người: Nguyễn Văn Thử</p><p class="mt-0.5 text-sm text-sub">Nam · sinh 1901 · kèm quan hệ con của cụ Cả</p></div><i data-lucide="chevron-right" class="text-sub"></i></div></div>
+          <div class="card p-4"><div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="pen-line" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Sửa nơi an táng của cụ Cả</p><p class="mt-0.5 text-sm text-sub">→ Nghĩa trang làng</p></div><i data-lucide="chevron-right" class="text-sub"></i></div></div>
+          <div class="card p-4 opacity-80"><div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-muted text-sub"><i data-lucide="link-2" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Quan hệ: Thử là con của cụ Cả</p><p class="mt-0.5 text-sm text-sub">Nhận cùng người ở trên</p></div></div></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb"><i data-lucide="arrow-left" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">Đề xuất 1/3</p></div>
+        <div class="stone mx-4" style="height:250px"><span class="eng left-[14%] top-[12%] text-[16px]">NGUYỄN VĂN THỬ</span><span class="eng left-[14%] top-[32%] text-[10px]">SINH NĂM 1901</span><span class="eng left-[14%] top-[46%] text-[10px]">MẤT NGÀY 5 THÁNG 3 NĂM QUÝ TỴ</span><div class="box" style="left:12%;top:42%;width:76%;height:13%"></div></div>
+        <div class="space-y-3 px-4 pt-3">
+          <div><p class="text-lg font-semibold leading-tight">Thêm người: Nguyễn Văn Thử</p><p class="mt-1 text-sm text-sub">Nam · sinh 1901 · mất 5/3 âm lịch</p></div>
+          <p class="rounded-lg bg-muted px-3 py-2 text-sm"><span class="text-sub">AI đọc:</span> "MẤT NGÀY 5 THÁNG 3 NĂM QUÝ TỴ"</p>
+          <p class="flex items-start gap-2 rounded-lg bg-muted px-3 py-2 text-sm text-sub"><i data-lucide="link-2" class="i16 mt-0.5"></i>Kèm quan hệ: con của Nguyễn Văn Cả</p>
+        </div>
+        <div class="absolute inset-x-0 bottom-0 flex gap-2 bg-white px-4 pb-8 pt-3 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-danger">Bỏ</span><span class="btn btn-secondary flex-1">Sửa</span><span class="btn btn-primary flex-[1.4]">Nhận</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E. SỬA RỒI NHẬN VÀ GỘP -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">E · Sửa rồi nhận, và gộp người trùng</h2><p class="text-sm text-sub">"Sửa rồi nhận" mở form điền sẵn (cùng các thành phần của form hồ sơ), ảnh vẫn nằm cạnh để đối chiếu. Đề xuất giống người đã có thì hiện khung gợi ý gộp ngay trên thẻ.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[500px] overflow-hidden rounded-[22px] bg-white shadow-3">
+        <div class="flex items-start gap-3 px-6 pb-1 pt-5"><div class="flex-1 py-1.5"><h3 class="text-xl font-semibold">Sửa rồi nhận</h3><p class="text-sub">Từ ảnh "Bia cụ Thử"</p></div><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+        <div class="space-y-5 px-6 py-3">
+          <div class="stone" style="height:120px"><span class="eng left-[14%] top-[18%] text-[15px]">MẤT NGÀY 5 THÁNG 3 NĂM QUÝ TỴ</span><div class="box plain" style="left:12%;top:12%;width:76%;height:34%"></div></div>
+          <p class="sec">Thông tin chung</p>
+          <div><label class="label">Họ tên</label><div class="input">Nguyễn Văn Thử</div></div>
+          <div><span class="label">Giới tính</span><div class="toggle"><span class="on"><i data-lucide="mars" class="i16 text-male"></i>Nam</span><span><i data-lucide="venus" class="i16"></i>Nữ</span><span>Chưa rõ</span></div></div>
+          <p class="sec">Ngày mất (ngày giỗ)</p>
+          <div class="flex gap-2"><div class="input w-16">5</div><div class="input w-16">3</div><div class="input w-24 border-2 border-warn">1953</div><div class="toggle flex-1"><span>Dương lịch</span><span class="on">Âm lịch</span></div></div>
+          <p class="flex items-start gap-2 rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn"><i data-lucide="triangle-alert" class="i16 mt-0.5"></i>Bia ghi "năm Quý Tỵ" (lặp mỗi 60 năm: 1893, 1953…). AI đoán 1953; hãy kiểm lại theo thế hệ.</p>
+          <p class="sec">Gắn vào cây</p>
+          <div><label class="label">Là con của</label><div class="input justify-between">Nguyễn Văn Cả<i data-lucide="chevrons-up-down" class="i16 text-sub"></i></div></div>
+        </div>
+        <div class="flex justify-end gap-2 px-6 py-4 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-secondary">Huỷ</span><span class="btn btn-primary">Lưu và nhận</span></div>
+      </div>
+      <div class="w-[420px] space-y-4">
+        <div class="rounded-2xl bg-white p-4 shadow-[inset_0_0_0_2px_#A42F28,0_8px_20px_rgb(31_26_23/.09)]">
+          <div class="flex items-start gap-3"><span class="grid size-9 place-items-center rounded-full bg-male-soft text-male"><i data-lucide="user-plus" class="i16"></i></span><div class="min-w-0 flex-1"><p class="font-semibold leading-tight">Thêm người: Nguyễn Văn Cả</p><p class="mt-0.5 text-sm text-sub">Nam · sinh 1890 · quê Làng Cổ</p></div><span class="badge bg-muted text-sub">AI</span></div>
+          <div class="mt-3 rounded-xl bg-warn-soft p-3 text-sm text-warn"><p class="flex items-start gap-2 font-semibold"><i data-lucide="users" class="i16 mt-0.5"></i>Có thể là Nguyễn Văn Cả đã có trong cuốn</p><p class="mt-1">Cùng họ tên, cùng năm sinh 1890. Gộp thì chỉ thêm các trường còn trống; trường đã có mà khác thì thành đề xuất riêng.</p></div>
+          <div class="mt-3 rounded-xl bg-muted p-3 text-sm"><p class="font-semibold">Nếu gộp vào Nguyễn Văn Cả:</p><ul class="mt-1 space-y-1"><li class="flex items-center gap-2"><i data-lucide="plus" class="i14 text-ok"></i>Ghi nơi sinh "Làng Cổ" (đang trống)</li><li class="flex items-center gap-2"><i data-lucide="minus" class="i14 text-sub"></i>Năm sinh 1890: trùng, giữ nguyên</li></ul></div>
+          <div class="mt-3 flex flex-wrap gap-2"><span class="btn btn-primary h-10"><i data-lucide="git-merge"></i>Gộp vào Nguyễn Văn Cả</span><span class="btn btn-secondary h-10">Thêm như người mới</span><span class="btn btn-danger h-10">Bỏ</span></div>
+        </div>
+        <p class="text-sm text-sub">"Thêm như người mới" chỉ dùng khi người này thật sự là người khác trùng tên (vd. hai người cùng tên khác đời); phải gắn vào cây qua "Sửa rồi nhận".</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- F. NGUỒN -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">F · Dấu nguồn và hộp nguồn</h2><p class="text-sm text-sub">Trên bảng thông tin người, trường có nguồn có biểu tượng <i data-lucide="file-search" class="i14 inline"></i> kèm chữ "nguồn" (không chỉ màu). Bấm mở hộp nguồn: ảnh cắt theo vùng, giá trị, ngày duyệt và người duyệt. Người xem cũng bấm được. Hai nguồn mâu thuẫn hiện cả hai.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[384px] rounded-3xl bg-white shadow-3">
+        <div class="flex items-start gap-3 px-5 pt-5"><span class="grid size-14 place-items-center rounded-full bg-male-soft text-2xl font-semibold text-male">C</span><div class="flex-1"><p class="text-xl font-semibold leading-tight">Nguyễn Văn Cả</p><p class="mt-1 flex items-center gap-1.5 text-sm text-sub"><i data-lucide="mars" class="i14 text-male"></i>Nam · 1890 – 1968</p></div></div>
+        <div class="m-5 overflow-hidden rounded-xl bg-canvas text-sm shadow-[0_0_0_1px_#ECE7E1]">
+          <div class="flex items-center justify-between gap-3 px-4 py-3"><span class="text-sub">Ngày sinh</span><span class="flex items-center gap-2 font-medium">1890<span class="inline-flex min-h-8 items-center gap-1 rounded-full bg-accent-soft px-2 text-xs font-semibold text-accent"><i data-lucide="file-search" class="i14"></i>2 nguồn</span></span></div>
+          <div class="flex items-center justify-between gap-3 px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Ngày mất</span><span class="flex items-center gap-2 font-medium">5/3 âm lịch 1968<span class="inline-flex min-h-8 items-center gap-1 rounded-full bg-muted px-2 text-xs font-semibold text-sub"><i data-lucide="file-search" class="i14"></i>nguồn</span></span></div>
+          <div class="flex items-center justify-between gap-3 px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Nơi an táng</span><span class="flex items-center gap-2 font-medium">Nghĩa trang làng<span class="inline-flex min-h-8 items-center gap-1 rounded-full bg-muted px-2 text-xs font-semibold text-sub"><i data-lucide="file-search" class="i14"></i>nguồn</span></span></div>
+          <div class="flex items-center justify-between gap-3 px-4 py-3 shadow-[inset_0_1px_0_#ECE7E1]"><span class="text-sub">Nơi sinh</span><span class="font-medium">Làng Hành Thiện</span></div>
+        </div>
+      </div>
+      <div class="w-[480px] overflow-hidden rounded-[22px] bg-white shadow-3">
+        <div class="flex items-start gap-3 px-6 pb-1 pt-5"><div class="flex-1 py-1.5"><h3 class="text-xl font-semibold">Nguồn: Ngày sinh</h3><p class="text-sub">Nguyễn Văn Cả · 2 nguồn khác nhau</p></div><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+        <div class="space-y-4 px-6 py-3">
+          <div class="rounded-2xl p-4 shadow-[inset_0_0_0_2px_#A42F28] bg-accent-soft/40">
+            <div class="flex items-center gap-2"><span class="badge bg-ok-soft text-ok"><i data-lucide="check" class="i14"></i>Được chọn</span><b class="text-lg">1890</b></div>
+            <div class="stone mt-3" style="height:96px"><span class="eng left-[14%] top-[22%] text-[13px]">SINH NĂM 1890</span><div class="box plain" style="left:10%;top:14%;width:62%;height:44%"></div></div>
+            <p class="mt-2 text-sm text-sub">Bia cụ Cả · bia mộ · nhận 28/10/2026 bởi Anh Ba</p>
+            <p class="mt-1 rounded-lg bg-white px-3 py-2 text-sm"><span class="text-sub">Ghi chú:</span> bia mộ khắc rõ hơn</p>
+          </div>
+          <div class="rounded-2xl p-4 shadow-[inset_0_0_0_1px_#DDD5CB]">
+            <div class="flex items-center gap-2"><span class="badge bg-muted text-sub"><i data-lucide="x" class="i14"></i>Không chọn</span><b class="text-lg text-sub">1891</b></div>
+            <div class="stone mt-3" style="height:96px"><span class="eng left-[14%] top-[22%] text-[13px]">SINH NĂM 1891</span></div>
+            <p class="mt-2 text-sm text-sub">Phả trang 12 · trang phả · bỏ 28/10/2026 bởi Anh Ba</p>
+          </div>
+        </div>
+        <div class="flex justify-end px-6 py-4 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-secondary">Đóng</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần anh chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Hàng chờ <b>chia đôi ảnh | đề xuất</b> toàn màn trên máy tính (như mục C): được chưa, hay muốn ngăn nhỏ bên phải như ngăn thông tin người?</li>
+      <li><b>Nhận người kèm quan hệ</b> trong một lần (thay vì nhận người rồi nhận quan hệ riêng): đồng ý chứ? Lý do: cây không cho phép người chưa nối vào ai. (Spec đã sửa theo hướng này.)</li>
+      <li>Cảnh báo "Đang chạy bộ giả lập" trên môi trường thử: giữ hay bỏ?</li>
+      <li>Mục "Đề xuất" và "Tư liệu" nằm cùng một ngăn hai tab (mục B): đồng ý?</li>
+    </ul>
+  </section>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

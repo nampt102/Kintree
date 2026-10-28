@@ -105,7 +105,7 @@ export function ActionList({ items, className = '' }: { items: ActionItem[]; cla
 }
 
 /** Bảng nhãn–giá trị trên nền nhạt (thông tin một người). */
-export function InfoList({ rows }: { rows: { label: string; value?: string }[] }) {
+export function InfoList({ rows }: { rows: { label: string; value?: string; /** Nút nhỏ cạnh giá trị (vd. dấu nguồn). */ extra?: ReactNode }[] }) {
   const shown = rows.filter((r) => r.value)
   if (shown.length === 0) return null
   return (
@@ -113,7 +113,10 @@ export function InfoList({ rows }: { rows: { label: string; value?: string }[] }
       {shown.map((r) => (
         <div key={r.label} className="flex items-baseline justify-between gap-4 px-4 py-3">
           <dt className="shrink-0 text-ink-muted">{r.label}</dt>
-          <dd className="min-w-0 text-right font-medium">{r.value}</dd>
+          <dd className="flex min-w-0 items-center justify-end gap-2 text-right font-medium">
+            <span className="min-w-0">{r.value}</span>
+            {r.extra}
+          </dd>
         </div>
       ))}
     </dl>

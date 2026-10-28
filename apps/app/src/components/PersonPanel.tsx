@@ -2,7 +2,9 @@ import { findPerson, spouseIdsOf, type TreeDoc, type TreePerson } from '@kintree
 import { ArrowUp, ArrowUpDown, ChevronsDownUp, ChevronsUpDown, Crosshair, Heart, Landmark, Mars, Pencil, Trash2, UserPlus, Venus, X } from 'lucide-react'
 import type { PersonActions } from '../lib/actions.ts'
 import { formatPartialDate, lifespan } from '../lib/format.ts'
+import type { FieldSource } from '../lib/sourceStore.ts'
 import { ActionList, Avatar, Badge, Button, IconButton, InfoList, type ActionItem } from '../ui/index.ts'
+import { SourceChip } from './Sources.tsx'
 
 export type PanelAction =
   | 'edit'
@@ -25,6 +27,9 @@ type Props = {
   /** Người xem: hồ sơ chỉ đọc, không có nút sửa. */
   readOnly?: boolean
   onAction: (a: PanelAction) => void
+  /** Nguồn của các trường (từ ảnh được AI đọc và duyệt); bấm dấu nguồn mở hộp nguồn. */
+  fieldSources?: FieldSource[]
+  onOpenSource?: (field: string) => void
 }
 
 const GENDER_LABEL = { male: 'Nam', female: 'Nữ', unknown: 'Chưa rõ giới tính' } as const
@@ -91,7 +96,11 @@ export function PersonPeek({ person, actions, readOnly, onAction }: Props) {
 }
 
 /** Nội dung đầy đủ của bảng thông tin một người: dùng chung cho tấm trượt (mở rộng) và ngăn bên. */
-export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction }: Props) {
+export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction, fieldSources = [], onOpenSource }: Props) {
+  const chip = (field: string) => {
+    const list = fieldSources.filter((s) => s.field === field)
+    return onOpenSource && list.length > 0 ? <SourceChip field={field} sources={list} onOpen={() => onOpenSource(field)} /> : undefined
+  }
   const spouses = spouseIdsOf(doc, person.id)
     .map((id) => findPerson(doc, id)?.fullName)
     .filter(Boolean)
@@ -113,10 +122,10 @@ export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAct
       <QuickRow actions={actions} readOnly={readOnly} onAction={onAction} />
       <InfoList
         rows={[
-          { label: 'Ngày sinh', value: formatPartialDate(person.birth) },
-          { label: 'Ngày mất', value: formatPartialDate(person.death) },
-          { label: 'Nơi sinh', value: person.birthPlace },
-          { label: 'Nơi an táng', value: person.burialPlace },
+          { label: 'Ngày sinh', value: formatPartialDate(person.birth), extra: chip('birth') },
+          { label: 'Ngày mất', value: formatPartialDate(person.death), extra: chip('death') },
+          { label: 'Nơi sinh', value: person.birthPlace, extra: chip('birthPlace') },
+          { label: 'Nơi an táng', value: person.burialPlace, extra: chip('burialPlace') },
           { label: 'Vợ/chồng', value: spouses },
         ]}
       />

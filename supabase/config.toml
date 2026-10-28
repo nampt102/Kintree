@@ -402,8 +402,10 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Biến cho Edge Function, lấy từ supabase/.env (cùng tệp với Google, SMTP). Trống = AI giả lập (ADR 0011).
+[edge_runtime.secrets]
+AI_IMAGE_MODEL = "env(AI_IMAGE_MODEL)"
+ANTHROPIC_API_KEY = "env(ANTHROPIC_API_KEY)"
 
 [analytics]
 enabled = true

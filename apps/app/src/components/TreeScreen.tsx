@@ -13,11 +13,12 @@ import {
   type TreeDoc,
   type TreePerson,
 } from '@kintree/core'
-import { ArrowLeft, Download, List, MoreHorizontal, Network, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { ArrowLeft, Download, ImagePlus, Inbox, List, MoreHorizontal, Network, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { bloodParentOf, buildActions } from '../lib/actions.ts'
 import { messageFor } from '../lib/messages.ts'
 import type { CloudStore, Role } from '../lib/cloudStore.ts'
+import type { FieldSource, SourceStore } from '../lib/sourceStore.ts'
 import { downloadBackup } from '../lib/store.ts'
 import { useTreeDoc } from '../state/useTreeDoc.ts'
 import {
@@ -41,13 +42,15 @@ import {
 import { AddChildDialog, AddParentDialog, AddSpouseDialog, ProfileDialog, RemoveDialog, ReorderDialog, type EditFn } from './ActionDialogs.tsx'
 import { PersonDetails, PersonPeek, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
 import { PersonList } from './PersonList.tsx'
+import { ProposalReview } from './ProposalReview.tsx'
+import { SourceBoxDialog, SourcesPanel, UploadDialog, useSources } from './Sources.tsx'
 import { DeleteTreeDialog, EditTreeInfoDialog } from './TreeManage.tsx'
 import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
 
 type DialogKind = 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'
 type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | { kind: 'editTree' } | { kind: 'deleteTree' } | null
 
-export function TreeScreen({ cloud, treeId, onBack, hideBack = false }: { cloud: CloudStore; treeId: string; onBack: () => void; hideBack?: boolean }) {
+export function TreeScreen({ cloud, sources, clanId, treeId, onBack, hideBack = false }: { cloud: CloudStore; sources: SourceStore; clanId: string; treeId: string; onBack: () => void; hideBack?: boolean }) {
   const { state, edit, saveError, reload } = useTreeDoc(cloud, treeId)
 
   const back = <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
@@ -73,14 +76,21 @@ export function TreeScreen({ cloud, treeId, onBack, hideBack = false }: { cloud:
       </>
     )
   }
-  return <Loaded doc={state.doc} role={state.role} cloud={cloud} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} />
+  return <Loaded doc={state.doc} role={state.role} cloud={cloud} sources={sources} clanId={clanId} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} />
 }
 
 /** Người xem: chỉ giữ thao tác không ghi (thu gọn nhánh, xem riêng nhánh); quyền thật do RLS cưỡng chế. */
 const READ_ONLY_FLAGS = { canAddChild: false, canAddSpouse: false, canAddParent: false, canRemove: false, canRemoveBranch: false, canReorderChildren: false, canReorderSpouses: false, canReorderSiblings: false }
 
-function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }: { doc: TreeDoc; role: Role; cloud: CloudStore; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean }) {
+function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, reload, hideBack }: { doc: TreeDoc; role: Role; cloud: CloudStore; sources: SourceStore; clanId: string; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean }) {
   const readOnly = role !== 'admin'
+  // Tư liệu và đề xuất chỉ quản trị của cuốn đọc được (RLS); người xem chỉ xem nguồn của từng trường.
+  const src = useSources(sources, doc.meta.id, !readOnly)
+  const [panel, setPanel] = useState<null | 'proposals' | 'sources'>(null)
+  const [upload, setUpload] = useState(false)
+  const [review, setReview] = useState<{ sourceId: string | null } | null>(null)
+  const [personSources, setPersonSources] = useState<FieldSource[]>([])
+  const [sourceBox, setSourceBox] = useState<string | null>(null)
   const view = useMemo(() => activeView(doc), [doc])
   const windowClass = useWindowClass()
   const segments = useViewportSegments()
@@ -161,7 +171,24 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
     setQuery('')
   }
 
-  const detailsProps = selected ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), readOnly, onAction: onPanelAction } : null
+  // Nguồn của các trường người đang chọn (đọc lại khi hàng chờ đổi: vừa nhận hoặc bỏ một đề xuất).
+  const selectedKey = selected?.id ?? null
+  const pendingCount = src.pending.length
+  useEffect(() => {
+    let alive = true
+    if (!selectedKey) {
+      setPersonSources([])
+      return
+    }
+    void sources.fieldSources(selectedKey).then((r) => alive && setPersonSources(r.ok ? r.value : []))
+    return () => {
+      alive = false
+    }
+  }, [sources, selectedKey, pendingCount])
+
+  const detailsProps = selected
+    ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), readOnly, onAction: onPanelAction, fieldSources: personSources, onOpenSource: setSourceBox }
+    : null
   const paneWidth = windowClass === 'expanded' ? 384 : 340
 
   const paneOpen = !!detailsProps && !compact && !segments && mode === 'tree'
@@ -217,6 +244,11 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
             </>
         )}
         {compact && empty && <span className="flex-1" />}
+        {!readOnly && !compact && (
+          <Button variant="secondary" icon={Inbox} onClick={() => setPanel('proposals')} className="shrink-0">
+            Đề xuất{src.pending.length > 0 && <span className="rounded-full bg-accent px-1.5 text-xs font-semibold text-white">{src.pending.length}</span>}
+          </Button>
+        )}
         <OverflowMenu
           trigger={(p) => <IconButton icon={MoreHorizontal} label="Thêm" {...p} />}
           items={[
@@ -224,6 +256,8 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
             ...(readOnly
               ? []
               : [
+                  { label: 'Đưa ảnh vào', icon: ImagePlus, onSelect: () => setUpload(true) },
+                  { label: `Tư liệu và đề xuất${src.pending.length ? ` (${src.pending.length})` : ''}`, icon: Inbox, onSelect: () => setPanel(src.pending.length > 0 ? 'proposals' : 'sources') },
                   { label: 'Sửa thông tin cuốn', icon: Pencil, onSelect: () => setDialog({ kind: 'editTree' }) },
                   { label: 'Xoá cuốn', icon: Trash2, danger: true, onSelect: () => setDialog({ kind: 'deleteTree' }) },
                 ]),
@@ -306,6 +340,48 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
         </div>
       )}
 
+      {panel && !readOnly && (
+        <SourcesPanel
+          store={sources}
+          sources={src.sources}
+          pending={src.pending}
+          error={src.error}
+          tab={panel}
+          setTab={setPanel}
+          onUpload={() => setUpload(true)}
+          onReload={() => void src.reload()}
+          onReview={(id) => setReview({ sourceId: id })}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {upload && (
+        <UploadDialog
+          store={sources}
+          clanId={clanId}
+          treeId={doc.meta.id}
+          treeName={doc.meta.name}
+          onClose={() => setUpload(false)}
+          onDone={() => {
+            setPanel('sources')
+            void src.reload()
+          }}
+        />
+      )}
+      {review && !readOnly && (
+        <ProposalReview
+          doc={doc}
+          store={sources}
+          sources={src.sources}
+          pending={src.pending}
+          initialSourceId={review.sourceId}
+          edit={edit}
+          onChanged={() => void src.reload()}
+          onClose={() => setReview(null)}
+        />
+      )}
+      {sourceBox && selected && (
+        <SourceBoxDialog store={sources} personName={selected.fullName} field={sourceBox} sources={personSources.filter((s) => s.field === sourceBox)} sourceList={src.sources} onClose={() => setSourceBox(null)} />
+      )}
       {dialog?.kind === 'addRoot' && <AddRootDialog edit={edit} onClose={closeDialog} />}
       {dialog?.kind === 'editTree' && (
         <EditTreeInfoDialog

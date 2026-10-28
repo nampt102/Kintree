@@ -14,11 +14,12 @@ export function createSaveQueue(store: Saver, initial: TreeDoc, on: { saved: () 
   let chain: Promise<void> = Promise.resolve()
   let generation = 0
   return {
-    push(next: TreeDoc): void {
+    /** `via` thay cách ghi mặc định cho riêng lần này (vd. nhận đề xuất của AI gọi `review_proposal` thay vì `save`), vẫn xếp hàng và hoàn lại như mọi lần ghi. */
+    push(next: TreeDoc, via?: (prev: TreeDoc, next: TreeDoc) => Promise<SaveResult>): void {
       const g = generation
       chain = chain.then(async () => {
         if (g !== generation) return
-        const result = await store.save(confirmed, next)
+        const result = await (via ?? store.save.bind(store))(confirmed, next)
         if (g !== generation) return
         if (result.ok) {
           confirmed = next

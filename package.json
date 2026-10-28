@@ -9,7 +9,7 @@
     "dev": "pnpm --filter app dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
-    "db:start": "supabase start -x realtime,storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor",
+    "db:start": "supabase start -x realtime,imgproxy,postgres-meta,studio,logflare,vector,supavisor",
     "db:env": "node scripts/db-env.mjs",
     "db:trust-ca": "node scripts/trust-corp-ca.mjs",
     "admin:promote": "node scripts/promote-platform-admin.mjs",

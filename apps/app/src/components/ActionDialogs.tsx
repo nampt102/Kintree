@@ -21,11 +21,13 @@ import {
 } from '@kintree/core'
 import { ArrowDown, ArrowUp, Mars, Trash2, Venus } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react'
+import type { SaveResult } from '../lib/cloudStore.ts'
 import { messageFor } from '../lib/messages.ts'
 import { Button, ChoiceField, Dialog, ErrorText, IconButton, SelectField, TextAreaField, TextField, useToast } from '../ui/index.ts'
 import { DateInput } from './DateInput.tsx'
 
-export type EditFn = <T extends object>(op: (doc: TreeDoc) => Result<T>) => Result<T>
+/** `via` thay cách ghi mặc định cho riêng lần này (nhận đề xuất của AI gọi `review_proposal`). */
+export type EditFn = <T extends object>(op: (doc: TreeDoc) => Result<T>, via?: (prev: TreeDoc, next: TreeDoc) => Promise<SaveResult>) => Result<T>
 
 type Common = {
   doc: TreeDoc

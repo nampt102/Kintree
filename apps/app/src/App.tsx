@@ -11,6 +11,7 @@ import { CreateTreeDialog } from './components/TreeManage.tsx'
 import { TreeScreen } from './components/TreeScreen.tsx'
 import { cloudStore, platformStore, type Directory } from './lib/cloudStore.ts'
 import { captureInvite, clearInvite, memberStore, pendingInvite } from './lib/memberStore.ts'
+import { sourceStore } from './lib/sourceStore.ts'
 import { messageFor } from './lib/messages.ts'
 import { supabase } from './lib/supabase.ts'
 import { ToastProvider, useBackToClose, useMinWidth, useToast } from './ui/index.ts'
@@ -21,6 +22,7 @@ function Home({ user }: { user: User }) {
   const cloud = useMemo(() => cloudStore(supabase!, user.id), [user.id])
   const platform = useMemo(() => platformStore(supabase!), [])
   const members = useMemo(() => memberStore(supabase!), [])
+  const sources = useMemo(() => sourceStore(supabase!, user.id), [user.id])
   const toast = useToast()
   // Mã link mời cất từ lúc mở app (main.tsx), còn qua bước đăng nhập.
   const [invite, setInvite] = useState(() => pendingInvite(sessionStorage))
@@ -137,7 +139,7 @@ function Home({ user }: { user: User }) {
       />
     )
   }
-  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} treeId={treeId} onBack={closeTree} hideBack={!!rail} />)
+  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} sources={sources} clanId={dir?.trees.find((t) => t.id === treeId)?.clanId ?? ''} treeId={treeId} onBack={closeTree} hideBack={!!rail} />)
   if (showPlatform) return <PlatformScreen platform={platform} email={email} onBack={() => setShowPlatform(false)} />
   const clan = dir?.clans.find((c) => c.id === clanId)
   if (showMembers && clanId && dir && clan?.role === 'admin') {

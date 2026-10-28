@@ -1,6 +1,6 @@
 import type { Result, TreeDoc } from '@kintree/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Role, TreeStore } from '../lib/cloudStore.ts'
+import type { Role, SaveResult, TreeStore } from '../lib/cloudStore.ts'
 import { messageFor, type AppError } from '../lib/messages.ts'
 import { createSaveQueue } from './saveQueue.ts'
 
@@ -44,14 +44,14 @@ export function useTreeDoc(store: TreeStore, treeId: string) {
   }, [store, treeId, nonce])
 
   /** Chạy một thao tác của core; nếu thành công thì cập nhật màn hình ngay và xếp hàng ghi. */
-  const edit = useCallback(<T extends object>(op: (doc: TreeDoc) => Result<T>): Result<T> => {
+  const edit = useCallback(<T extends object>(op: (doc: TreeDoc) => Result<T>, via?: (prev: TreeDoc, next: TreeDoc) => Promise<SaveResult>): Result<T> => {
     const current = docRef.current
     if (!current || !queueRef.current) return { ok: false, error: 'NOT_FOUND' }
     const result = op(current)
     if (!result.ok) return result
     docRef.current = result.doc
     setState({ status: 'ready', doc: result.doc, role: roleRef.current })
-    queueRef.current.push(result.doc)
+    queueRef.current.push(result.doc, via)
     return result
   }, [])
 

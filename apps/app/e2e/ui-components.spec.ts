@@ -18,7 +18,10 @@ test.describe('ô chọn', () => {
     expect(style.bg).toBe('rgb(255, 255, 255)')
     expect(parseFloat(style.radius)).toBeGreaterThanOrEqual(12)
     for (const o of await page.getByRole('option').all()) expect((await o.boundingBox())!.height).toBeGreaterThanOrEqual(43.5)
+    // Radix đưa con trỏ vào mục đang chọn khi mở; chờ xong rồi mới bấm mũi tên (tránh bấm trước khi danh sách nhận phím).
+    await expect(page.getByRole('option', { name: 'Cả dòng họ (mọi cuốn)' })).toBeFocused()
     await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('option', { name: 'Chi trưởng họ Nguyễn' })).toBeFocused()
     await page.keyboard.press('Enter')
     await expect(list).toBeHidden()
     await expect(scope).toContainText('Chi trưởng họ Nguyễn')

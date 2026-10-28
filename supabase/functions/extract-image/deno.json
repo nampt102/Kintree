@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "zod": "npm:zod@^3.25",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "ai": "npm:ai@^5",
+    "@ai-sdk/anthropic": "npm:@ai-sdk/anthropic@^2",
+    "@ai-sdk/openai": "npm:@ai-sdk/openai@^2",
+    "@ai-sdk/google": "npm:@ai-sdk/google@^2"
+  }
+}
