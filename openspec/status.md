@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. `ui-components` xong, chờ chủ dự án duyệt app chạy thật. `clan-invites` 14/15: còn task 5.2 — chủ dự án thử tay luồng Google (mở link mời khi chưa đăng nhập → đăng nhập Google → màn nhận lời mời; cần `pnpm db:trust-ca` sau `db:reset`), duyệt app chạy thật, rồi commit + archive.
+2. `/opsx:propose` change `ai-sources-proposals` (AI chép phả: nguồn, đề xuất, hàng chờ duyệt; điểm khác biệt của app).
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -25,8 +25,8 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 2 | Dựng cây (E2, F1–F4), dữ liệu cục bộ trước | done | `tree-editing` | archive 2026-10-26 |
 | 2b | Thiết kế UI/UX: hệ thống thiết kế, làm lại màn hiện có | done | `ui-design-system` | archive 2026-10-26; còn kiểm tay máy thật |
 | 3a | Đăng nhập, dòng họ, RLS, lưu trên máy chủ (E3, F10) | done | `cloud-auth-storage` | 25/25 task; ADR 0007, 0008; Google + Gmail SMTP đã thử |
-| 3b | Lời mời (email + link xem), quản lý thành viên (E3) | in-progress 14/15 | `clan-invites` | "Tôi là ai" dời sang `kinship-terms` |
-| 3c | Bộ component shadcn/ui, làm lại form | done (chờ duyệt app) | `ui-components` | 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
+| 3b | Lời mời (email + link xem), quản lý thành viên (E3) | done | `clan-invites` | "Tôi là ai" dời sang `kinship-terms` |
+| 3c | Bộ component shadcn/ui, làm lại form | done | `ui-components` | archive 2026-10-28; 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | todo | `ai-sources-proposals` | điểm khác biệt |
 | 5 | Lịch tháng + nhắc giỗ (E5, F8, F11) | todo | `lunar-calendar-reminders` | |
 | 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
@@ -64,6 +64,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-10-28: Archive `ui-components` (sync `app-ui-foundation`) và `clan-invites` (tạo `clan-membership`, sync `platform-admin`); chủ dự án đã thử tay luồng Google với link mời: ổn.
 - 2026-10-28: Làm xong `ui-components`: shadcn/Radix cho nút, ô nhập, ô chọn (danh sách tự vẽ), nhóm nút chọn một, công tắc, hộp thoại, menu, thông báo (Sonner); form hồ sơ chia 4 nhóm; e2e 105 qua ×3 (1 bỏ qua), Vitest 73, JS gzip 226 → 282 KB; còn chủ dự án duyệt app chạy thật.
 - 2026-10-28: Đề xuất `ui-components` (dùng shadcn/ui, làm lại form hồ sơ và ô chọn) + bản mẫu chờ duyệt; sửa ngay: nút quanh khung người bị khung kế bên che, thanh "Đang xem riêng nhánh" dính thanh trên. Thêm `supabase/seed.sql` (4 dòng họ mẫu).
 - 2026-10-27: `clan-invites` làm xong giao diện theo bản mẫu đã duyệt: màn Thành viên (mời email, link mời, đổi vai trò, gỡ), màn nhận lời mời (giữ link qua đăng nhập, cả khi dán link vào thẻ đang mở), chi tiết dòng họ cho quản trị nền tảng; ADR 0009; pgTAP 120, Vitest 328 + 73, Playwright 100 qua ×3 (1 bỏ qua), build sạch.

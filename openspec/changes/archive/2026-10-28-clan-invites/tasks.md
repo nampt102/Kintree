@@ -70,7 +70,7 @@
   - chấp nhận việc lộ email có tài khoản hay chưa.
 
   Cập nhật `kb/data-model.md` và `kb/design-system.md`. Kiểm: `openspec validate --specs --strict` qua.
-- [ ] 5.2 Chạy đủ bộ kiểm tra: Vitest core và app, pgTAP, Playwright, build. Kiểm thử tay luồng Google: mở link khi chưa đăng nhập, đăng nhập Google, vào được màn nhận. Kiểm: ghi kết quả vào `status.md`.
+- [x] 5.2 Chạy đủ bộ kiểm tra: Vitest core và app, pgTAP, Playwright, build. Kiểm thử tay luồng Google: mở link khi chưa đăng nhập, đăng nhập Google, vào được màn nhận. Kiểm: ghi kết quả vào `status.md`.
 
 ## Workflow follow-up
 
