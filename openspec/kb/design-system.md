@@ -39,12 +39,19 @@ Lớp tiện ích riêng: `.kt-glass` (nền kính của thanh nổi), `.tabular
 | `PageHeader`, `GroupLabel` | tiêu đề màn có dòng phụ; nhãn nhóm chữ hoa nhỏ |
 | `ActionList` | danh sách việc ít dùng: biểu tượng mảnh, chữ, mũi tên; mỗi dòng là nút giữ đúng tên |
 | `InfoList` | bảng nhãn–giá trị (ngày sinh, nơi sinh…) |
-| `TextField`, `SelectField`, `TextAreaField` | ô nhập có nhãn hiện, lỗi dưới ô (`aria-invalid`, `role="alert"`) |
+| `TextField`, `TextAreaField` | ô nhập có nhãn hiện, lỗi dưới ô (`aria-invalid`, `role="alert"`); bo 12, viền ≥ 3:1, viền đỏ trầm khi đang nhập |
+| `SelectField` | ô chọn dài (Radix `Select`, danh sách tự vẽ nền trắng bo 14, mục chọn có dấu tích đỏ); nhận `options: {value,label}[]`, `value=''` là chưa chọn |
+| `ChoiceField` | chọn một trong 2–4 giá trị ngắn bằng nhóm nút (Radix `RadioGroup`; giới tính, Dương/Âm lịch, vai trò, hạn link); `ref` trỏ vào nhóm, lỗi thì con trỏ vào nút đầu |
+| `Switch` | công tắc có nhãn và mô tả (Radix `Switch`), vùng chạm 44 px |
 | `Segmented` | nhóm chuyển viên thuốc trong nền xám (chế độ xem); `wrap` thành chip (bộ lọc) |
-| `Dialog` | `<dialog>` bo 22, `shadow-3`; toàn màn ở cỡ gọn; `dirty` thì hỏi trước khi bỏ; Back đóng được |
+| `Dialog` | Radix `Dialog`, bo 16 (`shadow-3`); toàn màn ở cỡ gọn (phương án D1 đã duyệt); `wide` cho form dài (640 px); `subtitle`; chân dính đáy; `dirty` thì Esc/đóng/bấm ra ngoài/Back đều hỏi trước khi bỏ; trả con trỏ về nút đã mở |
 | `Sheet` | tấm trượt cỡ gọn; có `peek` thì nấc thấp là thẻ nổi gọn (bo 26, cách mép 12, trên thanh nổi dưới), kéo lên mở gần toàn màn; không `peek` thì 50% / 92% |
 | `TopBar` | thanh trên nền trắng mờ, đường kẻ mảnh |
-| `OverflowMenu`, `ToastProvider`/`useToast`, `EmptyState`, `Skeleton` | menu "Thêm"; thông báo viên thuốc đen; trạng thái trống có ô biểu tượng đỏ nhạt; khung đang tải |
+| `OverflowMenu` | Radix `DropdownMenu`; mục `danger` chữ đỏ, tách bằng vạch |
+| `ToastProvider`/`useToast` | Sonner, thẻ trắng có dấu tích xanh, `data-testid="toast"`, tự ẩn 4 giây |
+| `EmptyState`, `Skeleton` | trạng thái trống có ô biểu tượng đỏ nhạt; khung đang tải |
+| `cn` | ghép lớp Tailwind (`clsx` + `tailwind-merge`) |
+| (cũ) |
 | `useWindowClass`, `useMinWidth`, `useViewportSegments`, `useVisualViewportHeight`, `useBackToClose`, `usePrefersReducedMotion` | cỡ cửa sổ; ngưỡng bề rộng; máy gập; bàn phím ảo; Back đóng lớp; giảm chuyển động |
 
 ## Bố cục
@@ -53,7 +60,10 @@ Lớp tiện ích riêng: `.kt-glass` (nền kính của thanh nổi), `.tabular
 - **Không gian làm việc** (`TreeScreen`): sơ đồ tràn màn; thanh nổi trên (quay lại khi không có thanh bên, tên cuốn + số người, Cây/Danh sách, ô tìm có kết quả kèm ảnh chữ cái, menu); thanh nổi dưới trái (thu nhỏ, phóng to, vừa khung); bản đồ thu nhỏ dịu màu ở cỡ rộng. Cỡ gọn: thanh trên chỉ quay lại + ô tìm + menu, nút đổi Cây/Danh sách nổi góc dưới phải, thông tin người là `Sheet` có `peek`. Vừa/rộng: ngăn nổi bo 24 trong cột riêng 340/384 px (khung không dịch khi mở). Máy gập: sơ đồ đoạn trái, thông tin đoạn phải, khe nếp gập trống (`data-testid="hinge"`).
 - **Khung người** (`TreeDiagram`): 176 × 72, ảnh chữ cái 34 px, tên, ♂/♀ + năm sống (+ Dâu/Rể); vạch màu giới tính mép trái; đã mất: nền nhạt, viền đứt, không vạch; thuỷ tổ: nhãn "Thuỷ tổ" đỏ nhạt trên mép; đang chọn: viền đỏ 2 px + `shadow-2`. Đường nối 1,5 px màu `connector` (nuôi: đứt, riêng: chấm), vợ chồng: đỏ mờ. Nhãn "Đời n" là chip xám.
 - **Thông tin một người** (`PersonPanel`): đầu (ảnh chữ cái, tên, ♂/♀, năm sống, Thuỷ tổ/Dâu/Rể), hàng nhanh ("Sửa hồ sơ" viên thuốc + nút tròn Thêm con, Thêm vợ/chồng, Xem riêng nhánh này), `InfoList`, `ActionList` (thêm cha/mẹ, sắp thứ tự, thu gọn), "Gỡ" chữ đỏ cuối. Người xem: không nút sửa, có nút "Xem riêng nhánh này" và tiểu sử.
-- **Thanh bên** (`AppRail`, ≥ 1200 px, 248 px): logo, thẻ dòng họ đang mở (bấm để đổi dòng họ), "Cuốn gia phả" (về trang nhà), danh sách cuốn + số người (`aria-current` cho cuốn đang mở), "Thêm cuốn mới" (quản trị dòng họ), tài khoản + đăng xuất.
+- **Thanh bên** (`AppRail`, ≥ 1200 px, 248 px): logo, thẻ dòng họ đang mở (bấm để đổi dòng họ), "Cuốn gia phả" (về trang nhà), danh sách cuốn + số người (`aria-current` cho cuốn đang mở), "Thêm cuốn mới" và mục "Thành viên" (quản trị dòng họ), tài khoản + đăng xuất.
+- **Thành viên** (`Members.tsx`, change `clan-invites`, bản mẫu `openspec/changes/clan-invites/mockup.html`): vào từ ô "thành viên" trên khối tiêu đề (cả ô là nút "Xem danh sách thành viên") hoặc thanh bên; `Segmented` Thành viên / Link mời; danh sách nhóm theo phạm vi, lời mời chờ có ảnh chữ cái viền đứt; menu "⋯" mỗi dòng; nút chính đổi theo tab ("Mời người" / "Tạo link mời"). Chọn vai trò bằng hai thẻ radio có mô tả. Link chỉ hiện một lần sau khi tạo.
+- **Nhận lời mời** (`AcceptInvite.tsx`): thẻ giữa màn (tên dòng họ, cuốn, ô mã mời nếu cần, "Nhận lời mời" / "Bỏ qua"); link hỏng thì thẻ báo lý do + "Về trang chính". Màn đăng nhập có dòng nhắc khi có link đang chờ (không lộ tên dòng họ).
+- **Quản trị nền tảng**: thẻ dòng họ là `CardButton`, mở hộp thoại chỉ có quản trị (thêm bằng email, gỡ; quản trị cuối bị khoá nút).
 
 ## Cách thêm màn mới
 1. Màn danh sách: `TopBar` (hoặc thanh bên khi ≥ 1200 px) + nội dung `pageClass`/`pagePad` (`ClanList.tsx`); tiêu đề bằng `PageHeader`, mục bằng `CardButton`.

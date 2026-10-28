@@ -41,6 +41,7 @@ Hiện trạng sau change `cloud-auth-storage`. Lý do chọn: `openspec/decisio
 | `src/lib/cloudStore.ts` | hàm thuần `rowsToDoc`/`docToRows`/`diffDocs`/`mapError`; `cloudStore(client, userId)` (danh bạ dòng họ+cuốn, tạo/sửa/xoá cuốn, `load` có phân trang 1.000 dòng, `save` qua `apply_tree_changes`) và `platformStore` |
 | `src/lib/store.ts` | chỉ còn `backupFileName`, `downloadBackup` (không lưu cục bộ) |
 | `src/lib/messages.ts` | bảng dịch mọi mã lỗi sang tiếng Việt (kiểu `Record` buộc đủ mã), gồm `NOT_SIGNED_IN`, `FORBIDDEN`, `OFFLINE`, `LOAD_FAILED`, `SAVE_FAILED`, `TREE_NOT_FOUND` |
+| `src/ui/` | thành phần UI dựa trên shadcn/ui (`radix-ui`, `class-variance-authority`, `clsx`, `tailwind-merge`, `sonner`), theo token đỏ trầm; xem `kb/design-system.md`, ADR 0010. Gói JS gzip ~282 KB, CSS ~11 KB (2026-10-28) |
 | `src/lib/actions.ts` | nút nào hiện cho một người (luật thật vẫn ở `core`) |
 | `src/state/saveQueue.ts` | hàng đợi ghi tuần tự; lỗi thì huỷ các lần chờ và hoàn về bản máy chủ đã xác nhận |
 | `src/state/useTreeDoc.ts` | giữ `TreeDoc` + vai trò, `edit(op)` chạy thao tác của `core` rồi xếp hàng ghi; `reload()` |

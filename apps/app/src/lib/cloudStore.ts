@@ -168,6 +168,9 @@ type DbError = { message?: string; code?: string; status?: number } | null
 /** Đổi lỗi PostgREST/fetch sang mã của giao diện (design D4). `fallback` là mã khi không rõ nguyên nhân. */
 export function mapError(e: NonNullable<DbError>, fallback: StoreError): StoreError {
   if (e.status === 401 || e.code === 'PGRST301' || /jwt/i.test(e.message ?? '')) return 'NOT_SIGNED_IN'
+  // Lỗi có tên do hàm trong cơ sở dữ liệu raise (migration clan_invites).
+  const named = /\b(LAST_ADMIN|EMAIL_INVALID|CODE_TOO_SHORT|TREE_NOT_FOUND)\b/.exec(e.message ?? '')
+  if (named) return named[1] as StoreError
   if (e.code === '42501' || e.status === 403) return 'FORBIDDEN'
   if (!e.code && /fetch|network|load failed/i.test(e.message ?? '')) return 'OFFLINE'
   return fallback
@@ -375,7 +378,37 @@ export function platformStore(client: SupabaseClient) {
         return { ok: false, error: mapError(netError(e), 'SAVE_FAILED') }
       }
     },
+    /** Chỉ quản trị cấp dòng họ (đã vào và đang chờ); không có người xem (design D3). */
+    listClanAdmins: async (clanId: string): Promise<Outcome<PlatformClanAdmin[]>> => {
+      try {
+        const { data, error } = await client.rpc('platform_list_clan_admins', { p_clan: clanId })
+        if (error) return { ok: false, error: mapError(error, 'LOAD_FAILED') }
+        return { ok: true, value: (data ?? []) as PlatformClanAdmin[] }
+      } catch (e) {
+        return { ok: false, error: mapError(netError(e), 'LOAD_FAILED') }
+      }
+    },
+    addClanAdmin: async (clanId: string, email: string): Promise<Outcome<'added' | 'pending'>> => {
+      try {
+        const { data, error } = await client.rpc('platform_add_clan_admin', { p_clan: clanId, p_email: email })
+        if (error) return { ok: false, error: mapError(error, 'SAVE_FAILED') }
+        return { ok: true, value: data as 'added' | 'pending' }
+      } catch (e) {
+        return { ok: false, error: mapError(netError(e), 'SAVE_FAILED') }
+      }
+    },
+    removeClanAdmin: async (admin: Pick<PlatformClanAdmin, 'kind' | 'id'>): Promise<Outcome<null>> => {
+      try {
+        const { error } = await client.rpc('platform_remove_clan_admin', { p_kind: admin.kind, p_id: admin.id })
+        if (error) return { ok: false, error: mapError(error, 'SAVE_FAILED') }
+        return { ok: true, value: null }
+      } catch (e) {
+        return { ok: false, error: mapError(netError(e), 'SAVE_FAILED') }
+      }
+    },
   }
 }
+
+export type PlatformClanAdmin = { kind: 'member' | 'invite'; id: string; email: string }
 
 export type PlatformStore = ReturnType<typeof platformStore>

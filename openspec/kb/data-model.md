@@ -1,6 +1,6 @@
 # Data model
 
-Nguồn: `supabase/migrations/20261026000000_init.sql`, `20261027000000_auth_access.sql`. Test: `supabase/tests/integrity.test.sql`, `access.test.sql`. Lý do thiết kế: `openspec/changes/archive/2026-10-26-bootstrap-core/design.md` (D4, D5) và ADR 0002, 0003.
+Nguồn: `supabase/migrations/20261026000000_init.sql`, `20261027000000_auth_access.sql`, `20261028000000_clan_invites.sql`. Test: `supabase/tests/integrity.test.sql`, `access.test.sql`, `members.test.sql`. Lý do thiết kế: `openspec/changes/archive/2026-10-26-bootstrap-core/design.md` (D4, D5) và ADR 0002, 0003.
 
 ## Bảng
 
@@ -11,9 +11,10 @@ Nguồn: `supabase/migrations/20261026000000_init.sql`, `20261027000000_auth_acc
 | `persons` | một người trong một cuốn | `is_root` = thuỷ tổ (duy nhất một đang hiện mỗi cuốn); `removed_at`/`removal_id` = đã gỡ (ADR 0006, cũng có ở `parent_child`, `marriages`); `gender` = `male`/`female`/`unknown`; `is_outsider` = dâu/rể; ngày sinh, ngày mất dạng không đầy đủ (xem dưới); `biography` in vào sách, `note` không in |
 | `parent_child` | quan hệ cha/mẹ–con | `role` = `father`/`mother`; `kind` = `biological`/`adopted`/`step`; `UNIQUE (child_id, role, kind)` |
 | `marriages` | vợ chồng | `wife_order` = thứ tự các bà |
-| `memberships` | vai trò người dùng | đúng một trong `clan_id`/`tree_id`; `role` = `admin`/`viewer` (không có biên tập) |
+| `memberships` | vai trò người dùng | đúng một trong `clan_id`/`tree_id`; `role` = `admin`/`viewer` (không có biên tập); trigger `memberships_keep_last_admin` chặn gỡ/hạ quản trị cấp dòng họ cuối cùng (`LAST_ADMIN`, trừ khi chính dòng họ hoặc tài khoản đang bị xoá) |
 | `platform_admins` | quản trị nền tảng (nhà vận hành) | chỉ ghi bằng `service_role` (`pnpm admin:promote <email>`); không policy cho client |
-| `clan_admin_invites` | email được chỉ định quản trị dòng họ nhưng chưa có tài khoản | `email` chữ thường; trigger `on_auth_user_created` đổi thành `memberships` khi đăng ký |
+| `invites` | lời mời bằng email cho người chưa có tài khoản (thay `clan_admin_invites`) | `email` chữ thường, `role`, đúng một trong `clan_id`/`tree_id`, duy nhất theo (email, phạm vi); trigger `on_auth_user_created` đổi thành `memberships` khi đăng ký |
+| `invite_links` | link mời, chỉ cấp vai trò xem | `token_hash` = sha256 của mã link (không lưu mã gốc); `code_hash` = bcrypt mã mời tuỳ chọn; `expires_at`, `revoked_at`, `failed_attempts`/`locked_until` (5 lần sai → khoá 15 phút), `accepted_count` |
 | `sources` | tư liệu: ghi âm, ảnh, lời kể, văn bản | `consent_at` = lúc xác nhận người được ghi âm đồng ý |
 | `proposals` | đề xuất do AI sinh | `op`, `payload`, `anchor` (mốc ghi âm / vùng ảnh), `provider`, `model`, `status` |
 | `field_sources` | nguồn của từng trường đã nhận | khoá (`person_id`, `field`, `source_id`) |
@@ -44,8 +45,13 @@ Hai vai trò `admin`/`viewer` ở hai tầng (dòng họ, cuốn); quyền thự
 | `tree_role(tree)` | mức cao nhất giữa vai trò ở dòng họ chứa cuốn và ở chính cuốn; **null nếu cuốn đã xoá** |
 | `membership_clan(clan, tree)` | dòng họ của một membership (cho policy `memberships`) |
 | `create_tree(clan, name, region, description)` | `security definer`, chỉ admin dòng họ (`FORBIDDEN` 42501); tạo cuốn và trả dòng vừa tạo |
-| `platform_create_clan(name, admin_email)` | chỉ quản trị nền tảng; tạo dòng họ + slug `<tên-không-dấu>-<6 ký tự>`; email có tài khoản → membership admin ngay, chưa có → `clan_admin_invites`. Lỗi: `NOT_PLATFORM_ADMIN` (42501), `NAME_REQUIRED`, `EMAIL_INVALID` (23514) |
+| `platform_create_clan(name, admin_email)` | chỉ quản trị nền tảng; tạo dòng họ + slug `<tên-không-dấu>-<6 ký tự>`; quản trị đầu tiên qua `_grant_by_email`. Lỗi: `NOT_PLATFORM_ADMIN` (42501), `NAME_REQUIRED`, `EMAIL_INVALID` (23514) |
 | `platform_list_clans()` | chỉ quản trị nền tảng; dòng họ + email quản trị (cả đang chờ) |
+| `platform_list_clan_admins(clan)`, `platform_add_clan_admin(clan, email)`, `platform_remove_clan_admin(kind, id)` | chỉ quản trị nền tảng; chỉ quản trị cấp dòng họ (không thấy người xem, không đọc cây) |
+| `_grant_by_email(clan, tree, email, role)` | nội bộ, client không gọi được: email có tài khoản → upsert `memberships`, chưa có → upsert `invites`; trả `added`/`pending` |
+| `member_invite`, `member_list`, `member_set_role`, `member_remove`, `invite_cancel` | chỉ quản trị cấp dòng họ (`require_clan_admin`, `FORBIDDEN` 42501), kể cả thành viên chỉ thuộc một cuốn; `member_list` trả email (đọc `auth.users`) |
+| `link_create(clan, tree, days 1/7/30, code)`, `link_list`, `link_revoke` | chỉ quản trị cấp dòng họ; `link_create` trả mã link một lần |
+| `link_peek(token)`, `link_accept(token, code)` | người đã đăng nhập; trả jsonb `status` (`ok`/`invalid`/`expired`/`revoked`/`locked`/`wrong_code`). `link_accept` **không raise** khi sai mã để giữ được bộ đếm lần sai (raise sẽ rollback) |
 | `apply_tree_changes(tree, persons, parents, marriages)` | `security invoker`: ghi các dòng đã đổi trong một giao dịch, thứ tự khoá ngoại; RLS và trigger áp dụng nguyên |
 
 | Bảng | select | insert | update |
@@ -55,6 +61,6 @@ Hai vai trò `admin`/`viewer` ở hai tầng (dòng họ, cuốn); quyền thự
 | `persons` | `tree_role` không null | admin | admin |
 | `parent_child`, `marriages` | thấy người liên quan | admin của cuốn chứa người | như insert |
 | `memberships` | dòng của mình, hoặc admin dòng họ | admin dòng họ | admin dòng họ (có cả delete) |
-| `platform_admins`, `clan_admin_invites`, `sources`, `proposals`, `field_sources`, `audit_log` | không | không | không |
+| `platform_admins`, `invites`, `invite_links`, `sources`, `proposals`, `field_sources`, `audit_log` | không | không | không |
 
-Quản trị nền tảng không có policy đọc gia phả: chỉ gọi được hai hàm `platform_*`. Lưu ý đã gặp: `INSERT … RETURNING` trên `trees` bị policy select chặn (hàm `tree_role` không thấy dòng vừa chèn trong cùng câu lệnh), nên cuốn chỉ tạo qua `create_tree`, không có policy insert trực tiếp.
+Quản trị nền tảng không có policy đọc gia phả: chỉ gọi được các hàm `platform_*` (ADR 0008, 0009). Người chỉ có vai trò ở một cuốn không đọc được dòng `clans` (policy cần vai trò cấp dòng họ), nên nhận link một cuốn thì app mở thẳng cuốn ấy. Supabase cấp sẵn `execute` cho `authenticated` trên hàm mới: hàm nội bộ phải `revoke` riêng. Lưu ý đã gặp: `INSERT … RETURNING` trên `trees` bị policy select chặn (hàm `tree_role` không thấy dòng vừa chèn trong cùng câu lệnh), nên cuốn chỉ tạo qua `create_tree`, không có policy insert trực tiếp.

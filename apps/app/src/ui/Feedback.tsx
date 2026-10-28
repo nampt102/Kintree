@@ -1,40 +1,34 @@
-import { CheckCircle2, type LucideIcon } from 'lucide-react'
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Check, type LucideIcon } from 'lucide-react'
+import { DropdownMenu } from 'radix-ui'
+import { useCallback, type ReactNode } from 'react'
+import { toast, Toaster } from 'sonner'
 
-type Toast = { id: number; text: string }
-
-const ToastContext = createContext<(text: string) => void>(() => {})
-
-/** Thông báo ngắn sau mỗi thao tác: `aria-live="polite"` (không cướp con trỏ), tự ẩn sau 4 giây. */
+/**
+ * Thông báo ngắn sau mỗi thao tác (Sonner, thẻ trắng như bản mẫu mục E): không cướp con trỏ, tự ẩn sau 4 giây,
+ * góc dưới phải trên máy tính, trên đầu màn trên điện thoại.
+ */
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const next = useRef(1)
-  const show = useCallback((text: string) => {
-    const id = next.current++
-    setToasts((t) => [...t.slice(-2), { id, text }])
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
-  }, [])
   return (
-    <ToastContext.Provider value={show}>
+    <>
       {children}
-      <div
-        aria-live="polite"
-        role="status"
-        className="pointer-events-none fixed inset-x-0 z-[1000] flex flex-col items-center gap-2 px-4"
-        style={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }}
-      >
-        {toasts.map((t) => (
-          <p key={t.id} data-testid="toast" className="flex max-w-md items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-white shadow-3">
-            <CheckCircle2 aria-hidden size={20} strokeWidth={1.75} className="shrink-0" />
-            {t.text}
-          </p>
-        ))}
-      </div>
-    </ToastContext.Provider>
+      <Toaster position="bottom-right" mobileOffset={{ top: 'calc(env(safe-area-inset-top) + 4.5rem)' }} duration={4000} visibleToasts={3} />
+    </>
   )
 }
 
-export const useToast = () => useContext(ToastContext)
+export const useToast = () =>
+  useCallback(
+    (text: string) =>
+      toast.custom(() => (
+        <p data-testid="toast" className="flex w-[min(22rem,calc(100vw-2rem))] items-center gap-3 rounded-2xl bg-surface p-4 font-medium text-ink shadow-3 ring-1 ring-line">
+          <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-[#e8f3ec] text-[#1f7a45]">
+            <Check size={16} strokeWidth={2.4} />
+          </span>
+          {text}
+        </p>
+      )),
+    [],
+  )
 
 export function EmptyState({ icon: Icon, title, text, action }: { icon: LucideIcon; title: string; text: string; action?: ReactNode }) {
   return (
@@ -60,48 +54,41 @@ export function Skeleton({ lines = 3 }: { lines?: number }) {
   )
 }
 
-/** Menu thêm (⋯): đóng khi bấm ra ngoài hoặc Esc. */
-export function OverflowMenu({ trigger, items }: { trigger: (props: { onClick: () => void; 'aria-expanded': boolean }) => ReactNode; items: { label: string; icon?: LucideIcon; onSelect: () => void }[] }) {
-  const [open, setOpen] = useState(false)
-  const box = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: PointerEvent) => !box.current?.contains(e.target as Node) && setOpen(false)
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    window.addEventListener('pointerdown', onDown)
-    window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('pointerdown', onDown)
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [open])
+/** Menu thêm (⋯): Radix DropdownMenu (mũi tên, Enter, Esc, đóng khi bấm ra ngoài). Mục `danger` chữ đỏ, tách bằng vạch. */
+export function OverflowMenu({
+  trigger,
+  items,
+}: {
+  trigger: (props: { 'aria-expanded'?: boolean }) => ReactNode
+  items: { label: string; icon?: LucideIcon; onSelect: () => void; danger?: boolean }[]
+}) {
   return (
-    <div ref={box} className="relative">
-      {trigger({ onClick: () => setOpen((o) => !o), 'aria-expanded': open })}
-      {open && (
-        <ul role="menu" className="absolute right-0 top-full z-[40] mt-2 min-w-56 overflow-hidden rounded-xl bg-surface py-1.5 shadow-3 ring-1 ring-line/60">
-          {items.map((it) => {
+    <DropdownMenu.Root modal={false}>
+      <DropdownMenu.Trigger asChild>{trigger({})}</DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="end"
+          sideOffset={6}
+          className="z-[110] min-w-56 rounded-[14px] bg-surface p-1.5 shadow-3 ring-1 ring-line data-[state=open]:animate-[kt-pop-in_160ms_ease-out]"
+        >
+          {items.map((it, i) => {
             const Icon = it.icon
             return (
-              <li key={it.label} role="none">
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="flex min-h-11 w-full cursor-pointer items-center gap-3 px-4 text-left text-[15px] hover:bg-surface-muted"
-                  onClick={() => {
-                    setOpen(false)
-                    it.onSelect()
-                  }}
+              <div key={it.label}>
+                {it.danger && i > 0 && <DropdownMenu.Separator className="mx-1 my-1 h-px bg-line" />}
+                <DropdownMenu.Item
+                  onSelect={it.onSelect}
+                  className={`flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[10px] px-3 text-[15px] outline-none data-[highlighted]:bg-surface-muted ${it.danger ? 'text-danger data-[highlighted]:bg-danger-soft' : 'text-ink'}`}
                 >
-                  {Icon && <Icon aria-hidden size={18} strokeWidth={1.85} className="text-ink-muted" />}
+                  {Icon && <Icon aria-hidden size={18} strokeWidth={1.85} className={it.danger ? '' : 'text-ink-muted'} />}
                   {it.label}
-                </button>
-              </li>
+                </DropdownMenu.Item>
+              </div>
             )
           })}
-        </ul>
-      )}
-    </div>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   )
 }
 

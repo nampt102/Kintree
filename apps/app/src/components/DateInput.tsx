@@ -8,7 +8,7 @@ import {
 } from '@kintree/core'
 import { useState } from 'react'
 import type { Ref } from 'react'
-import { ErrorText } from '../ui/index.ts'
+import { ChoiceField, ErrorText, Switch } from '../ui/index.ts'
 
 type Parts = { d: string; m: string; y: string; lunar: boolean; leap: boolean }
 
@@ -73,7 +73,7 @@ export function DateInput({
     onChange(partsToDate(next))
   }
 
-  const control = 'min-h-11 w-full rounded-md border border-line-input bg-surface px-3 text-base text-ink aria-[invalid=true]:border-2 aria-[invalid=true]:border-danger'
+  const control = 'min-h-11 w-full rounded-xl border border-line-input bg-surface px-3 text-base text-ink shadow-[0_1px_2px_rgb(31_26_23/0.04)] focus:border-accent aria-[invalid=true]:border-2 aria-[invalid=true]:border-danger'
   const num = (key: 'd' | 'm' | 'y', placeholder: string, width: string) => (
     <div className={width}>
       <input
@@ -96,22 +96,20 @@ export function DateInput({
         {num('d', 'Ngày', 'w-20')}
         {num('m', 'Tháng', 'w-20')}
         {num('y', 'Năm', 'w-28')}
-        <select
-          aria-label={`${label}: Dương hay âm lịch`}
-          className="min-h-11 cursor-pointer rounded-md border border-line-input bg-surface px-3 text-base text-ink"
-          value={parts.lunar ? 'lunar' : 'solar'}
-          onChange={(e) => set({ lunar: e.target.value === 'lunar' })}
-        >
-          <option value="solar">Dương lịch</option>
-          <option value="lunar">Âm lịch</option>
-        </select>
-        {parts.lunar && (
-          <label className="flex min-h-11 cursor-pointer items-center gap-2 text-ink">
-            <input type="checkbox" className="size-5 accent-[var(--color-accent)]" checked={parts.leap} onChange={(e) => set({ leap: e.target.checked })} />
-            Tháng nhuận
-          </label>
-        )}
+        <div className="min-w-44 flex-1">
+          <ChoiceField
+            hideLabel
+            label={`${label}: Dương hay âm lịch`}
+            value={parts.lunar ? 'lunar' : 'solar'}
+            onChange={(v) => set({ lunar: v === 'lunar' })}
+            options={[
+              { value: 'solar', label: 'Dương lịch' },
+              { value: 'lunar', label: 'Âm lịch' },
+            ]}
+          />
+        </div>
       </div>
+      {parts.lunar && <Switch label="Tháng nhuận" description="Chỉ chọn khi năm đó có tháng nhuận" checked={parts.leap} onChange={(leap) => set({ leap })} />}
       {invalid && <ErrorText>Ngày tháng không hợp lệ. Kiểm lại ngày, tháng, năm (năm từ 1800).</ErrorText>}
       {!invalid && note && <p className="text-sm text-ink-muted">{note}</p>}
     </fieldset>

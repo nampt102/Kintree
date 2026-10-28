@@ -28,7 +28,7 @@ import {
   IconButton,
   OverflowMenu,
   Segmented,
-  SelectField,
+  ChoiceField,
   Sheet,
   Skeleton,
   TextField,
@@ -173,9 +173,9 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
       <ErrorText>{saveError}</ErrorText>
     </div>
   ) : focusPerson && mode === 'tree' ? (
-    <div className="kt-glass flex flex-wrap items-center gap-2 rounded-full py-1 pl-4 pr-1">
+    <div className="kt-glass flex flex-wrap items-center gap-3 rounded-full py-1.5 pl-5 pr-1.5">
       <span className="min-w-0 flex-1 text-sm">Đang xem riêng nhánh của {focusPerson.fullName}.</span>
-      <Button variant="ghost" onClick={() => setFocusId(null)}>
+      <Button icon={Network} onClick={() => setFocusId(null)}>
         Xem toàn bộ cây
       </Button>
     </div>
@@ -225,7 +225,7 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
               ? []
               : [
                   { label: 'Sửa thông tin cuốn', icon: Pencil, onSelect: () => setDialog({ kind: 'editTree' }) },
-                  { label: 'Xoá cuốn', icon: Trash2, onSelect: () => setDialog({ kind: 'deleteTree' }) },
+                  { label: 'Xoá cuốn', icon: Trash2, danger: true, onSelect: () => setDialog({ kind: 'deleteTree' }) },
                 ]),
           ]}
         />
@@ -239,7 +239,7 @@ function Loaded({ doc, role, cloud, edit, saveError, onBack, reload, hideBack }:
       )}
 
       {banner && (
-        <div className="absolute z-[9] flex justify-center" style={{ top: 'calc(max(12px, env(safe-area-inset-top)) + 64px)', left: edge, right: paneOpen ? `${paneWidth}px` : edgeR }}>
+        <div className="absolute z-[9] flex justify-center" style={{ top: 'calc(max(12px, env(safe-area-inset-top)) + 3.5rem + 12px)', left: edge, right: paneOpen ? `${paneWidth}px` : edgeR }}>
           {banner}
         </div>
       )}
@@ -407,7 +407,7 @@ function AddRootDialog({ edit, onClose }: { edit: EditFn; onClose: (newId?: stri
   const [gender, setGender] = useState<Gender | ''>('')
   const [error, setError] = useState<{ field: 'name' | 'gender'; text: string } | null>(null)
   const nameRef = useRef<HTMLInputElement>(null)
-  const genderRef = useRef<HTMLSelectElement>(null)
+  const genderRef = useRef<HTMLDivElement>(null)
   const toast = useToast()
 
   function submit(e: FormEvent) {
@@ -439,11 +439,17 @@ function AddRootDialog({ edit, onClose }: { edit: EditFn; onClose: (newId?: stri
     >
       <form id="add-root" onSubmit={submit} className="space-y-4" noValidate>
         <TextField ref={nameRef} label="Họ tên thuỷ tổ" value={name} onChange={(e) => setName(e.target.value)} error={error?.field === 'name' ? error.text : null} autoFocus autoComplete="off" />
-        <SelectField ref={genderRef} label="Giới tính" value={gender} onChange={(e) => setGender(e.target.value as Gender | '')} error={error?.field === 'gender' ? error.text : null}>
-          <option value="">— Chọn —</option>
-          <option value="male">Nam</option>
-          <option value="female">Nữ</option>
-        </SelectField>
+        <ChoiceField
+          ref={genderRef}
+          label="Giới tính"
+          value={gender}
+          onChange={(v) => setGender(v as Gender | '')}
+          error={error?.field === 'gender' ? error.text : null}
+          options={[
+            { value: 'male', label: 'Nam' },
+            { value: 'female', label: 'Nữ' },
+          ]}
+        />
       </form>
     </Dialog>
   )

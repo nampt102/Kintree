@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree thành viên</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FAF8F5', muted: '#F3EFEA', rail: '#F5F1EC', line: '#ECE7E1', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', soft: '#F8ECEA' }, danger: { DEFAULT: '#B42318', soft: '#FBEDEB' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)', pill: '0 8px 18px -6px rgb(164 47 40/.55)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [data-lucide] { width: 20px; height: 20px; stroke-width: 1.75; flex-shrink: 0; }
+  .i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i18{width:18px!important;height:18px!important}.i24{width:24px!important;height:24px!important}
+  .desk { width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 1px #d8d0c4, 0 30px 60px rgb(0 0 0/.16); flex-shrink: 0; }
+  .phone { width: 375px; height: 812px; border-radius: 44px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0; }
+  .pill { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 20px; border-radius:9999px; background:#A42F28; color:#fff; font-weight:600; font-size:15px; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55); }
+  .pill2 { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; background:#fff; color:#1F1A17; font-weight:600; font-size:15px; box-shadow: 0 0 0 1px #E2DBD2; }
+  .ghost { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 14px; border-radius:9999px; font-weight:600; font-size:15px; color:#6B635A; }
+  .icb { display:grid; place-items:center; width:44px; height:44px; border-radius:9999px; color:#6B635A; }
+  .av { display:grid; place-items:center; width:36px; height:36px; border-radius:9999px; font-weight:600; font-size:14px; flex-shrink:0 }
+  .av.wait { background:#fff; color:#6B635A; border:1.5px dashed #8F877C }
+  .field { display:flex; align-items:center; gap:8px; height:48px; padding:0 14px; border-radius:12px; background:#fff; box-shadow: inset 0 0 0 1px #8F877C; font-size:16px; }
+  .field.focus { box-shadow: inset 0 0 0 2px #A42F28, 0 0 0 4px #F8ECEA; }
+  .label { font-size:14px; font-weight:500; margin-bottom:6px; display:block }
+  .badge { display:inline-flex; align-items:center; gap:4px; border-radius:9999px; padding:2px 10px; font-size:13px; font-weight:600 }
+  .row + .row { box-shadow: inset 0 1px 0 #ECE7E1; }
+  .scrim { position:absolute; inset:0; background: rgb(31 26 23/.38); }
+  .tag { font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#6B635A }
+  .note { border-radius:14px; background:#F3EFEA; padding:12px 14px; font-size:14px; color:#6B635A; display:flex; gap:10px }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1440px] space-y-16 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · clan-invites · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Thành viên, lời mời và link mời</h1>
+    <p class="max-w-3xl text-sub">Giữ nguyên hệ thống đỏ trầm đã duyệt ở <code>ui-polish</code>: nền trắng ấm, nút viên thuốc, mỗi màn một nút chính. Có 6 phần: A. Màn Thành viên · B. Tab Link mời · C. Mời bằng email · D. Tạo link · E. Nhận lời mời · F. Quản trị nền tảng.</p>
+  </header>
+
+  <!-- ========== A. MÀN THÀNH VIÊN ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">A · Màn Thành viên (quản trị dòng họ)</h2><p class="text-sm text-sub">Vào từ mục "Thành viên" ở thanh bên hoặc ô "12 thành viên" trên khối tiêu đề đỏ. Danh sách nhóm theo phạm vi; lời mời chờ có ảnh chữ cái viền đứt và chữ "Chờ đăng nhập". Menu "⋯" mở ở dòng thứ 3 để minh hoạ.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="desk flex">
+        <aside class="flex w-[248px] shrink-0 flex-col bg-rail px-3 py-4">
+          <div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div>
+          <button class="mt-5 flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-left shadow-1"><span class="grid size-8 place-items-center rounded-lg bg-accent-soft text-accent"><i data-lucide="landmark" class="i18"></i></span><span class="flex-1"><span class="block text-sm font-semibold leading-tight">Họ Nguyễn Văn</span><span class="block text-xs text-sub">Quản trị</span></span><i data-lucide="chevrons-up-down" class="i16 text-sub"></i></button>
+          <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Cuốn gia phả</p>
+          <nav class="mt-2 space-y-0.5 text-[15px] text-sub">
+            <a class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi trưởng<span class="ml-auto text-xs">182</span></a>
+            <a class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi thứ hai<span class="ml-auto text-xs">51</span></a>
+            <a class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 text-accent"><i data-lucide="plus" class="i18"></i>Thêm cuốn mới</a>
+          </nav>
+          <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Dòng họ</p>
+          <nav class="mt-2 space-y-0.5 text-[15px]">
+            <a class="flex min-h-11 items-center gap-2.5 rounded-lg bg-white px-2.5 font-medium shadow-1"><i data-lucide="users" class="i18 text-accent"></i>Thành viên<span class="ml-auto text-xs text-sub">12</span></a>
+          </nav>
+          <div class="mt-auto flex items-center gap-2 rounded-xl px-2 py-2"><span class="av bg-muted text-sub">J</span><span class="min-w-0 flex-1 truncate text-sm">jamesphan102@gmail.com</span><i data-lucide="log-out" class="i16 text-sub"></i></div>
+        </aside>
+        <main class="relative flex-1 overflow-hidden px-10 py-8">
+          <div class="flex items-end justify-between">
+            <div><h3 class="text-[28px] font-semibold tracking-tight">Thành viên</h3><p class="mt-1 text-sub">Họ Nguyễn Văn · 12 người · 2 lời mời đang chờ</p></div>
+            <span class="pill"><i data-lucide="user-plus" class="i18"></i>Mời người</span>
+          </div>
+          <div class="mt-6 flex items-center justify-between">
+            <div class="flex rounded-full bg-muted p-1 text-sm font-medium"><span class="flex min-h-9 items-center gap-1.5 rounded-full bg-white px-4 shadow-1"><i data-lucide="users" class="i16"></i>Thành viên <span class="text-sub">14</span></span><span class="flex min-h-9 items-center gap-1.5 px-4 text-sub"><i data-lucide="link" class="i16"></i>Link mời <span>2</span></span></div>
+            <div class="field h-11 w-72 text-sm text-sub" style="box-shadow:inset 0 0 0 1px #E2DBD2"><i data-lucide="search" class="i16"></i>Tìm theo email</div>
+          </div>
+
+          <p class="tag mt-7 mb-2">Cả dòng họ · 9</p>
+          <div class="rounded-2xl bg-white shadow-1">
+            <div class="row flex min-h-[60px] items-center gap-3 px-4"><span class="av bg-accent-soft text-accent">J</span><div class="min-w-0 flex-1"><p class="truncate font-medium">jamesphan102@gmail.com <span class="text-sm font-normal text-sub">(bạn)</span></p></div><span class="badge bg-accent-soft text-accent"><i data-lucide="shield" class="i14"></i>Quản trị</span><span class="icb opacity-40"><i data-lucide="more-horizontal"></i></span></div>
+            <div class="row flex min-h-[60px] items-center gap-3 px-4"><span class="av bg-accent-soft text-accent">B</span><div class="min-w-0 flex-1"><p class="truncate font-medium">nguyenvanba@gmail.com</p></div><span class="badge bg-accent-soft text-accent"><i data-lucide="shield" class="i14"></i>Quản trị</span><span class="icb"><i data-lucide="more-horizontal"></i></span></div>
+            <div class="row relative flex min-h-[60px] items-center gap-3 bg-canvas px-4"><span class="av bg-muted text-sub">H</span><div class="min-w-0 flex-1"><p class="truncate font-medium">hoa.nguyen@yahoo.com</p></div><span class="badge bg-muted text-sub"><i data-lucide="eye" class="i14"></i>Người xem</span><span class="icb bg-muted text-ink"><i data-lucide="more-horizontal"></i></span>
+              <div class="absolute right-4 top-14 z-10 w-60 rounded-2xl bg-white p-1.5 shadow-3">
+                <a class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px]"><i data-lucide="shield" class="i18 text-sub"></i>Đổi thành quản trị</a>
+                <div class="my-1 h-px bg-line"></div>
+                <a class="flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px] text-danger"><i data-lucide="user-minus" class="i18"></i>Gỡ khỏi dòng họ</a>
+              </div>
+            </div>
+            <div class="row flex min-h-[60px] items-center gap-3 px-4"><span class="av wait">C</span><div class="min-w-0 flex-1"><p class="truncate font-medium">chu.ut@gmail.com</p><p class="flex items-center gap-1 text-sm text-sub"><i data-lucide="clock" class="i14"></i>Chờ đăng nhập lần đầu</p></div><span class="badge bg-muted text-sub"><i data-lucide="eye" class="i14"></i>Người xem</span><span class="icb"><i data-lucide="more-horizontal"></i></span></div>
+          </div>
+          <p class="tag mt-6 mb-2">Chi trưởng họ Nguyễn · 3</p>
+          <div class="rounded-2xl bg-white shadow-1">
+            <div class="row flex min-h-[60px] items-center gap-3 px-4"><span class="av bg-accent-soft text-accent">T</span><div class="min-w-0 flex-1"><p class="truncate font-medium">truongchi@gmail.com</p></div><span class="badge bg-accent-soft text-accent"><i data-lucide="shield" class="i14"></i>Quản trị cuốn</span><span class="icb"><i data-lucide="more-horizontal"></i></span></div>
+          </div>
+        </main>
+      </div>
+
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb text-ink"><i data-lucide="arrow-left"></i></span><p class="flex-1 text-[17px] font-semibold">Thành viên</p><span class="icb bg-accent text-white shadow-pill" title="Mời người"><i data-lucide="user-plus"></i></span></div>
+        <div class="px-4">
+          <p class="text-sm text-sub">Họ Nguyễn Văn · 12 người · 2 chờ</p>
+          <div class="mt-3 flex rounded-full bg-muted p-1 text-sm font-medium"><span class="flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-full bg-white shadow-1">Thành viên 14</span><span class="flex min-h-9 flex-1 items-center justify-center text-sub">Link mời 2</span></div>
+          <p class="tag mt-5 mb-2">Cả dòng họ · 9</p>
+          <div class="rounded-2xl bg-white shadow-1">
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3"><span class="av bg-accent-soft text-accent">J</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">jamesphan102@gmail.com</p><p class="text-sm text-accent">Quản trị · bạn</p></div><span class="icb opacity-40"><i data-lucide="more-vertical"></i></span></div>
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3"><span class="av bg-accent-soft text-accent">B</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">nguyenvanba@gmail.com</p><p class="text-sm text-accent">Quản trị</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div>
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3"><span class="av bg-muted text-sub">H</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">hoa.nguyen@yahoo.com</p><p class="text-sm text-sub">Người xem</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div>
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3"><span class="av wait">C</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">chu.ut@gmail.com</p><p class="flex items-center gap-1 text-sm text-sub"><i data-lucide="clock" class="i14"></i>Người xem · chờ đăng nhập</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div>
+          </div>
+          <p class="tag mt-5 mb-2">Chi trưởng họ Nguyễn · 3</p>
+          <div class="rounded-2xl bg-white shadow-1">
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3"><span class="av bg-accent-soft text-accent">T</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">truongchi@gmail.com</p><p class="text-sm text-accent">Quản trị cuốn</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div>
+          </div>
+        </div>
+        <!-- tấm trượt menu dòng -->
+        <div class="scrim"></div>
+        <div class="absolute inset-x-0 bottom-0 rounded-t-[26px] bg-white px-4 pb-8 pt-2 shadow-3">
+          <div class="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line"></div>
+          <div class="flex items-center gap-3 px-2 pb-3"><span class="av bg-muted text-sub">H</span><div><p class="font-semibold">hoa.nguyen@yahoo.com</p><p class="text-sm text-sub">Người xem · cả dòng họ</p></div></div>
+          <a class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-[16px]"><i data-lucide="shield" class="text-sub"></i>Đổi thành quản trị</a>
+          <a class="flex min-h-12 items-center gap-3 rounded-xl px-2 text-[16px] text-danger"><i data-lucide="user-minus"></i>Gỡ khỏi dòng họ</a>
+        </div>
+      </div>
+    </div>
+    <div class="note max-w-4xl"><i data-lucide="info" class="i18"></i><span>Dòng của chính mình không có menu khi là quản trị duy nhất. Gỡ hay hạ quyền một quản trị khác sẽ hỏi lại bằng hộp xác nhận. Nếu cơ sở dữ liệu báo "quản trị cuối", hiện thông báo: <b>"Dòng họ phải còn ít nhất một quản trị. Hãy thêm quản trị khác trước."</b></span></div>
+  </section>
+
+  <!-- ========== B. TAB LINK MỜI ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">B · Tab Link mời</h2><p class="text-sm text-sub">Chỉ hiện link còn hiệu lực. Địa chỉ link không hiện lại (máy chủ chỉ giữ bản băm), nên mỗi thẻ chỉ ghi phạm vi, hạn, mã mời, số người đã nhận. Ở tab này nút chính đổi thành "Tạo link mời".</p></div>
+    <div class="flex items-start gap-10">
+      <div class="desk" style="height:520px">
+        <main class="px-10 py-8">
+          <div class="flex items-end justify-between">
+            <div><h3 class="text-[28px] font-semibold tracking-tight">Thành viên</h3><p class="mt-1 text-sub">Họ Nguyễn Văn · 12 người · 2 lời mời đang chờ</p></div>
+            <span class="pill"><i data-lucide="link" class="i18"></i>Tạo link mời</span>
+          </div>
+          <div class="mt-6 flex rounded-full bg-muted p-1 text-sm font-medium w-fit"><span class="flex min-h-9 items-center gap-1.5 px-4 text-sub"><i data-lucide="users" class="i16"></i>Thành viên 14</span><span class="flex min-h-9 items-center gap-1.5 rounded-full bg-white px-4 shadow-1"><i data-lucide="link" class="i16"></i>Link mời 2</span></div>
+          <div class="note mt-6"><i data-lucide="eye" class="i18"></i><span>Link mời chỉ cấp quyền <b class="text-ink">xem</b>. Muốn thêm quản trị, hãy dùng "Mời người" bằng email.</span></div>
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="rounded-2xl bg-white p-5 shadow-1">
+              <div class="flex items-start gap-3"><span class="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="link"></i></span><div class="flex-1"><p class="font-semibold">Cả dòng họ</p><p class="text-sm text-sub">Tạo 27/10 · hết hạn sau 6 ngày</p></div></div>
+              <div class="mt-4 flex flex-wrap gap-2"><span class="badge bg-muted text-sub"><i data-lucide="users" class="i14"></i>3 người đã nhận</span><span class="badge bg-muted text-sub"><i data-lucide="lock-open" class="i14"></i>Không mã</span></div>
+              <div class="mt-4 flex justify-end"><span class="ghost text-danger"><i data-lucide="ban" class="i18"></i>Thu hồi</span></div>
+            </div>
+            <div class="rounded-2xl bg-white p-5 shadow-1">
+              <div class="flex items-start gap-3"><span class="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="link"></i></span><div class="flex-1"><p class="font-semibold">Chi trưởng họ Nguyễn</p><p class="text-sm text-sub">Tạo hôm nay · hết hạn sau 23 giờ</p></div></div>
+              <div class="mt-4 flex flex-wrap gap-2"><span class="badge bg-muted text-sub"><i data-lucide="users" class="i14"></i>0 người đã nhận</span><span class="badge bg-accent-soft text-accent"><i data-lucide="key-round" class="i14"></i>Có mã mời</span><span class="badge bg-danger-soft text-danger"><i data-lucide="lock" class="i14"></i>Tạm khoá đến 15:20</span></div>
+              <div class="mt-4 flex justify-end"><span class="ghost text-danger"><i data-lucide="ban" class="i18"></i>Thu hồi</span></div>
+            </div>
+          </div>
+        </main>
+      </div>
+      <div class="phone" style="height:640px">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb text-ink"><i data-lucide="arrow-left"></i></span><p class="flex-1 text-[17px] font-semibold">Thành viên</p><span class="icb bg-accent text-white shadow-pill"><i data-lucide="link"></i></span></div>
+        <div class="px-4">
+          <div class="flex rounded-full bg-muted p-1 text-sm font-medium"><span class="flex min-h-9 flex-1 items-center justify-center text-sub">Thành viên 14</span><span class="flex min-h-9 flex-1 items-center justify-center rounded-full bg-white shadow-1">Link mời 2</span></div>
+          <div class="note mt-4 text-[13px]"><i data-lucide="eye" class="i16"></i><span>Link chỉ cấp quyền xem.</span></div>
+          <div class="mt-3 space-y-3">
+            <div class="rounded-2xl bg-white p-4 shadow-1"><div class="flex items-center gap-3"><span class="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="link" class="i18"></i></span><div class="flex-1"><p class="font-semibold">Cả dòng họ</p><p class="text-sm text-sub">Còn 6 ngày · 3 người đã nhận</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div></div>
+            <div class="rounded-2xl bg-white p-4 shadow-1"><div class="flex items-center gap-3"><span class="grid size-10 place-items-center rounded-xl bg-accent-soft text-accent"><i data-lucide="link" class="i18"></i></span><div class="flex-1"><p class="font-semibold">Chi trưởng họ Nguyễn</p><p class="flex items-center gap-1 text-sm text-sub"><i data-lucide="key-round" class="i14"></i>Có mã · còn 23 giờ</p></div><span class="icb"><i data-lucide="more-vertical"></i></span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C. MỜI BẰNG EMAIL ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Mời bằng email</h2><p class="text-sm text-sub">Hộp thoại trên máy tính, toàn màn trên điện thoại. Vai trò chọn bằng hai thẻ có mô tả (không chỉ bằng màu). Kintree không gửi thư: sau khi mời có lời nhắn soạn sẵn để quản trị tự gửi qua Zalo/Messenger.</p></div>
+    <div class="flex items-start gap-10">
+      <!-- form -->
+      <div class="w-[480px] rounded-[22px] bg-white p-6 shadow-3">
+        <div class="flex items-center justify-between"><h3 class="text-xl font-semibold">Mời người vào dòng họ</h3><span class="icb"><i data-lucide="x"></i></span></div>
+        <div class="mt-5 space-y-5">
+          <div><label class="label">Email</label><div class="field focus">anh.ba@gmail.com</div><p class="mt-1.5 text-sm text-sub">Người được mời đăng nhập bằng đúng email này.</p></div>
+          <div><span class="label">Vai trò</span>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="rounded-xl p-3.5 shadow-[inset_0_0_0_2px_#A42F28] bg-accent-soft/50"><div class="flex items-center justify-between"><span class="flex items-center gap-2 font-semibold"><i data-lucide="eye" class="i18 text-accent"></i>Người xem</span><span class="grid size-5 place-items-center rounded-full bg-accent text-white"><i data-lucide="check" class="i14"></i></span></div><p class="mt-1 text-sm text-sub">Xem cây và hồ sơ, không sửa.</p></div>
+              <div class="rounded-xl p-3.5 shadow-[inset_0_0_0_1px_#E2DBD2]"><div class="flex items-center justify-between"><span class="flex items-center gap-2 font-semibold"><i data-lucide="shield" class="i18 text-sub"></i>Quản trị</span><span class="size-5 rounded-full shadow-[inset_0_0_0_1.5px_#8F877C]"></span></div><p class="mt-1 text-sm text-sub">Thêm, sửa người; mời người khác.</p></div>
+            </div>
+          </div>
+          <div><label class="label">Phạm vi</label><div class="field justify-between">Cả dòng họ (mọi cuốn)<i data-lucide="chevron-down" class="i18 text-sub"></i></div></div>
+        </div>
+        <div class="mt-7 flex justify-end gap-3"><span class="pill2">Huỷ</span><span class="pill">Mời</span></div>
+      </div>
+      <!-- sau khi mời: chờ -->
+      <div class="w-[480px] rounded-[22px] bg-white p-6 shadow-3">
+        <div class="flex justify-end"><span class="icb"><i data-lucide="x"></i></span></div>
+        <div class="-mt-4 flex flex-col items-center text-center"><span class="grid size-14 place-items-center rounded-full bg-accent-soft text-accent"><i data-lucide="mail-check" class="i24"></i></span>
+          <h3 class="mt-3 text-xl font-semibold">Đã ghi lời mời</h3>
+          <p class="mt-1 text-sub"><b class="text-ink">anh.ba@gmail.com</b> chưa có tài khoản Kintree. Khi người ấy đăng nhập lần đầu bằng email này sẽ thành <b class="text-ink">người xem</b> của Họ Nguyễn Văn.</p></div>
+        <div class="mt-5 rounded-xl bg-muted p-4 text-[15px] leading-relaxed">Chào bạn, mình đã mời bạn xem gia phả <b>Họ Nguyễn Văn</b> trên Kintree. Vào https://kintree.vn và đăng nhập bằng email anh.ba@gmail.com nhé.</div>
+        <div class="mt-5 flex justify-end gap-3"><span class="pill2"><i data-lucide="copy" class="i18"></i>Sao chép lời nhắn</span><span class="pill">Xong</span></div>
+        <p class="mt-4 text-center text-sm text-sub">Nếu email đã có tài khoản: tiêu đề là "Đã thêm vào dòng họ" và người ấy có quyền ngay.</p>
+      </div>
+      <!-- phone -->
+      <div class="phone" style="height:700px">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb text-ink"><i data-lucide="x"></i></span><p class="flex-1 text-[17px] font-semibold">Mời người</p></div>
+        <div class="space-y-5 px-4 pt-2">
+          <div><label class="label">Email</label><div class="field">anh.ba@gmail.com</div></div>
+          <div><span class="label">Vai trò</span>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3 rounded-xl bg-accent-soft/50 p-3.5 shadow-[inset_0_0_0_2px_#A42F28]"><i data-lucide="eye" class="text-accent"></i><div class="flex-1"><p class="font-semibold">Người xem</p><p class="text-sm text-sub">Xem cây, không sửa</p></div><span class="grid size-5 place-items-center rounded-full bg-accent text-white"><i data-lucide="check" class="i14"></i></span></div>
+              <div class="flex items-center gap-3 rounded-xl p-3.5 shadow-[inset_0_0_0_1px_#E2DBD2]"><i data-lucide="shield" class="text-sub"></i><div class="flex-1"><p class="font-semibold">Quản trị</p><p class="text-sm text-sub">Thêm, sửa; mời người khác</p></div><span class="size-5 rounded-full shadow-[inset_0_0_0_1.5px_#8F877C]"></span></div>
+            </div>
+          </div>
+          <div><label class="label">Phạm vi</label><div class="field justify-between">Cả dòng họ<i data-lucide="chevron-down" class="i18 text-sub"></i></div></div>
+        </div>
+        <div class="absolute inset-x-4 bottom-8"><span class="pill w-full">Mời</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== D. TẠO LINK ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Tạo link mời</h2><p class="text-sm text-sub">Hạn dùng là nhóm chọn viên thuốc; mã mời là công tắc mở ô nhập. Sau khi tạo, link hiện <b>một lần</b>; có nút Chia sẻ dùng bảng chia sẻ của điện thoại.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[480px] rounded-[22px] bg-white p-6 shadow-3">
+        <div class="flex items-center justify-between"><h3 class="text-xl font-semibold">Tạo link mời xem</h3><span class="icb"><i data-lucide="x"></i></span></div>
+        <div class="mt-5 space-y-5">
+          <div><label class="label">Phạm vi</label><div class="field justify-between">Chi trưởng họ Nguyễn<i data-lucide="chevron-down" class="i18 text-sub"></i></div></div>
+          <div><span class="label">Hạn dùng</span><div class="flex rounded-full bg-muted p-1 text-sm font-medium"><span class="flex min-h-10 flex-1 items-center justify-center text-sub">1 ngày</span><span class="flex min-h-10 flex-1 items-center justify-center rounded-full bg-white shadow-1">7 ngày</span><span class="flex min-h-10 flex-1 items-center justify-center text-sub">30 ngày</span></div></div>
+          <div>
+            <div class="flex min-h-11 items-center justify-between"><div><p class="font-medium">Đặt mã mời</p><p class="text-sm text-sub">Người mở link phải nhập đúng mã</p></div><span class="relative h-7 w-12 rounded-full bg-accent"><span class="absolute right-0.5 top-0.5 size-6 rounded-full bg-white shadow-1"></span></span></div>
+            <div class="field mt-3 focus">1945</div><p class="mt-1.5 text-sm text-sub">Ít nhất 4 ký tự. Gửi mã riêng, không gửi cùng link. Sai 5 lần thì link khoá 15 phút.</p>
+          </div>
+          <div class="note"><i data-lucide="eye" class="i18"></i><span>Link chỉ cấp quyền xem.</span></div>
+        </div>
+        <div class="mt-7 flex justify-end gap-3"><span class="pill2">Huỷ</span><span class="pill">Tạo link</span></div>
+      </div>
+      <div class="w-[480px] rounded-[22px] bg-white p-6 shadow-3">
+        <div class="flex justify-end"><span class="icb"><i data-lucide="x"></i></span></div>
+        <div class="-mt-4 flex flex-col items-center text-center"><span class="grid size-14 place-items-center rounded-full bg-accent-soft text-accent"><i data-lucide="link" class="i24"></i></span>
+          <h3 class="mt-3 text-xl font-semibold">Link đã sẵn sàng</h3><p class="mt-1 text-sub">Xem <b class="text-ink">Chi trưởng họ Nguyễn</b> · hết hạn sau 7 ngày · có mã mời</p></div>
+        <div class="mt-5 flex items-center gap-2 rounded-xl bg-muted p-1.5 pl-4"><span class="min-w-0 flex-1 truncate font-mono text-[14px]">https://kintree.vn/#invite=q8Zr2mK0bWfX4uPnD1sLh7vC</span><span class="pill h-10 px-4 text-sm"><i data-lucide="copy" class="i16"></i>Sao chép</span></div>
+        <div class="mt-3 flex items-start gap-2 rounded-xl bg-[#FFF7E6] p-3 text-sm text-[#7A4B00]"><i data-lucide="triangle-alert" class="i18"></i><span>Link chỉ hiện lần này. Đóng hộp thoại là không xem lại được; mất link thì tạo link mới.</span></div>
+        <div class="mt-5 flex justify-end gap-3"><span class="pill2"><i data-lucide="share-2" class="i18"></i>Chia sẻ</span><span class="pill2">Xong</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== E. NHẬN LỜI MỜI ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">E · Nhận lời mời qua link</h2><p class="text-sm text-sub">1 → chưa đăng nhập: màn đăng nhập có dòng nhắc (không lộ tên dòng họ). 2 → sau khi đăng nhập: thẻ nhận lời mời. 3 → nhập sai mã. 4 → link hết hạn / thu hồi / tạm khoá. Trên máy tính cùng thẻ này nằm giữa màn.</p></div>
+    <div class="flex items-start gap-8 overflow-x-auto pb-4">
+      <!-- 1 -->
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="px-6 pt-10">
+          <div class="flex items-center gap-2"><span class="grid size-9 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-xl font-semibold text-accent">Kintree</span></div>
+          <div class="mt-8 flex items-start gap-3 rounded-2xl bg-accent-soft p-4 text-accent"><i data-lucide="mail-open"></i><p class="text-[15px] font-medium">Bạn có lời mời vào một dòng họ. Đăng nhập để nhận lời mời.</p></div>
+          <h3 class="mt-6 text-[26px] font-semibold tracking-tight">Đăng nhập</h3>
+          <p class="mt-1 text-sub">Nhận mã 6 số qua email, không cần mật khẩu.</p>
+          <div class="mt-6"><label class="label">Email</label><div class="field">chu.ut@gmail.com</div></div>
+          <span class="pill mt-5 w-full">Gửi mã đăng nhập</span>
+          <div class="my-5 flex items-center gap-3 text-sm text-sub"><span class="h-px flex-1 bg-line"></span>hoặc<span class="h-px flex-1 bg-line"></span></div>
+          <span class="pill2 w-full"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Tiếp tục với Google</span>
+        </div>
+      </div>
+      <!-- 2 -->
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-[760px] flex-col justify-center px-5">
+          <div class="rounded-[24px] bg-white p-6 text-center shadow-2">
+            <span class="mx-auto grid size-16 place-items-center rounded-2xl bg-accent-soft text-accent"><i data-lucide="landmark" class="i24"></i></span>
+            <p class="mt-4 text-sm font-medium text-sub">Bạn được mời xem gia phả</p>
+            <h3 class="mt-1 text-[26px] font-semibold leading-tight tracking-tight">Họ Nguyễn Văn</h3>
+            <p class="mt-1 text-sub">Cuốn: Chi trưởng họ Nguyễn</p>
+            <span class="badge mt-3 bg-muted text-sub"><i data-lucide="eye" class="i14"></i>Người xem</span>
+            <div class="mt-6 text-left"><label class="label">Mã mời</label><div class="field focus">····</div><p class="mt-1.5 text-sm text-sub">Hỏi người gửi link để biết mã.</p></div>
+            <span class="pill mt-6 w-full">Nhận lời mời</span>
+            <span class="ghost mt-1 w-full">Bỏ qua</span>
+          </div>
+        </div>
+      </div>
+      <!-- 3 -->
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-[760px] flex-col justify-center px-5">
+          <div class="rounded-[24px] bg-white p-6 text-center shadow-2">
+            <span class="mx-auto grid size-16 place-items-center rounded-2xl bg-accent-soft text-accent"><i data-lucide="landmark" class="i24"></i></span>
+            <p class="mt-4 text-sm font-medium text-sub">Bạn được mời xem gia phả</p>
+            <h3 class="mt-1 text-[26px] font-semibold leading-tight tracking-tight">Họ Nguyễn Văn</h3>
+            <p class="mt-1 text-sub">Cuốn: Chi trưởng họ Nguyễn</p>
+            <div class="mt-6 text-left"><label class="label">Mã mời</label><div class="field" style="box-shadow:inset 0 0 0 2px #B42318">1954</div><p class="mt-1.5 flex items-center gap-1.5 text-sm font-medium text-danger"><i data-lucide="circle-alert" class="i16"></i>Mã mời không đúng. Còn 3 lần thử.</p></div>
+            <span class="pill mt-6 w-full">Nhận lời mời</span>
+            <span class="ghost mt-1 w-full">Bỏ qua</span>
+          </div>
+        </div>
+      </div>
+      <!-- 4 -->
+      <div class="phone">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-[760px] flex-col justify-center gap-4 px-5">
+          <div class="rounded-[24px] bg-white p-6 text-center shadow-2">
+            <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-muted text-sub"><i data-lucide="hourglass" class="i24"></i></span>
+            <h3 class="mt-4 text-xl font-semibold">Link đã hết hạn</h3>
+            <p class="mt-1 text-sub">Hãy xin quản trị dòng họ link mới.</p>
+            <span class="pill2 mt-5 w-full">Về trang chính</span>
+          </div>
+          <div class="rounded-2xl bg-white p-4 shadow-1"><div class="flex items-center gap-3"><span class="grid size-10 place-items-center rounded-xl bg-muted text-sub"><i data-lucide="ban" class="i18"></i></span><p class="text-left text-sm"><b>Link đã bị thu hồi</b><br><span class="text-sub">Xin quản trị link mới.</span></p></div></div>
+          <div class="rounded-2xl bg-white p-4 shadow-1"><div class="flex items-center gap-3"><span class="grid size-10 place-items-center rounded-xl bg-danger-soft text-danger"><i data-lucide="lock" class="i18"></i></span><p class="text-left text-sm"><b>Link đang tạm khoá</b><br><span class="text-sub">Nhập sai mã nhiều lần. Thử lại sau 15 phút.</span></p></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="note max-w-4xl"><i data-lucide="info" class="i18"></i><span>"Còn 3 lần thử" cần máy chủ trả thêm số lần còn lại; nếu không muốn lộ, bỏ dòng này và chỉ ghi "Mã mời không đúng". Đã nhận rồi (vai trò bằng hoặc cao hơn): nhận vẫn thành công, đưa thẳng vào dòng họ.</span></div>
+  </section>
+
+  <!-- ========== F. QUẢN TRỊ NỀN TẢNG ========== -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">F · Quản trị nền tảng: chi tiết dòng họ</h2><p class="text-sm text-sub">Thẻ dòng họ trên màn "Quản trị nền tảng" bấm được, mở hộp thoại chỉ có quản trị (không thấy người xem, không đọc cây). Không gỡ được quản trị cuối đã vào.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="desk" style="height:640px">
+        <div class="flex h-16 items-center gap-3 bg-white/80 px-6 shadow-[inset_0_-1px_0_#ECE7E1]"><span class="icb text-ink"><i data-lucide="arrow-left"></i></span><p class="text-lg font-semibold">Quản trị nền tảng</p></div>
+        <div class="grid grid-cols-2 gap-4 px-[200px] pt-8 opacity-60">
+          <div class="rounded-2xl bg-white p-5 shadow-1"><p class="font-semibold">Họ Nguyễn Văn</p><p class="text-sm text-sub">ho-nguyen-van-ba0d79 · 27/10/2026</p><p class="text-sm">Quản trị: jamesphan102@gmail.com</p></div>
+          <div class="rounded-2xl bg-white p-5 shadow-1"><p class="font-semibold">Họ Trần</p><p class="text-sm text-sub">ho-tran-d364bc · 26/10/2026</p><p class="text-sm">Quản trị: tran@example.com</p></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="absolute left-1/2 top-12 w-[520px] -translate-x-1/2 rounded-[22px] bg-white p-6 shadow-3">
+          <div class="flex items-start justify-between"><div><h3 class="text-xl font-semibold">Họ Nguyễn Văn</h3><p class="text-sm text-sub">ho-nguyen-van-ba0d79 · tạo 27/10/2026</p></div><span class="icb"><i data-lucide="x"></i></span></div>
+          <p class="tag mt-5 mb-2">Quản trị dòng họ · 3</p>
+          <div class="rounded-2xl shadow-[inset_0_0_0_1px_#ECE7E1]">
+            <div class="row flex min-h-[60px] items-center gap-3 pl-4 pr-1"><span class="av bg-accent-soft text-accent">J</span><p class="min-w-0 flex-1 truncate font-medium">jamesphan102@gmail.com</p><span class="ghost text-danger">Gỡ</span></div>
+            <div class="row flex min-h-[60px] items-center gap-3 pl-4 pr-1"><span class="av bg-accent-soft text-accent">B</span><p class="min-w-0 flex-1 truncate font-medium">nguyenvanba@gmail.com</p><span class="ghost text-danger">Gỡ</span></div>
+            <div class="row flex min-h-[60px] items-center gap-3 pl-4 pr-1"><span class="av wait">T</span><div class="min-w-0 flex-1"><p class="truncate font-medium">truongtoc@gmail.com</p><p class="flex items-center gap-1 text-sm text-sub"><i data-lucide="clock" class="i14"></i>Chờ đăng nhập</p></div><span class="ghost text-danger">Huỷ</span></div>
+          </div>
+          <div class="mt-5"><label class="label">Thêm quản trị bằng email</label><div class="flex gap-3"><div class="field flex-1 text-sub">email@example.com</div><span class="pill">Thêm</span></div></div>
+          <p class="mt-4 flex items-start gap-2 text-sm text-sub"><i data-lucide="shield-check" class="i16 mt-0.5"></i>Quản trị nền tảng chỉ thấy quản trị của dòng họ. Người xem do quản trị dòng họ tự mời.</p>
+        </div>
+      </div>
+      <div class="phone" style="height:640px">
+        <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+        <div class="flex h-14 items-center gap-1 px-2"><span class="icb text-ink"><i data-lucide="x"></i></span><div class="flex-1"><p class="text-[17px] font-semibold leading-tight">Họ Nguyễn Văn</p><p class="text-xs text-sub">ho-nguyen-van-ba0d79</p></div></div>
+        <div class="px-4 pt-2">
+          <p class="tag mb-2">Quản trị dòng họ · 1</p>
+          <div class="rounded-2xl bg-white shadow-1">
+            <div class="row flex min-h-[64px] items-center gap-3 pl-3 pr-1"><span class="av bg-accent-soft text-accent">J</span><div class="min-w-0 flex-1"><p class="truncate text-[15px] font-medium">jamesphan102@gmail.com</p><p class="text-sm text-sub">Quản trị cuối · không gỡ được</p></div><span class="ghost opacity-40">Gỡ</span></div>
+          </div>
+          <div class="mt-5"><label class="label">Thêm quản trị bằng email</label><div class="field text-sub">email@example.com</div></div>
+          <span class="pill mt-4 w-full">Thêm quản trị</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần chủ dự án chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Hạn link 1 / 7 / 30 ngày và khoá 15 phút sau 5 lần sai: giữ hay đổi?</li>
+      <li>Có hiện "Còn N lần thử" khi nhập sai mã mời không (mục E-3)?</li>
+      <li>Ô tìm theo email ở màn Thành viên: cần ngay, hay để khi dòng họ đông người?</li>
+      <li>Lời nhắn soạn sẵn (mục C): dùng câu mẫu này hay anh muốn câu khác?</li>
+    </ul>
+  </section>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

@@ -41,5 +41,31 @@ for (const [size, viewport] of [
       await page.waitForTimeout(300)
       await page.screenshot({ path: out(`${size}-6-ho-so`) })
     })
+
+    test(`thành viên và lời mời ở ${size}`, async ({ page, world }) => {
+      await login(page, world.admin)
+      await page.goto('/')
+      await page.getByRole('button', { name: new RegExp(world.clanName) }).click()
+      await page.getByRole('button', { name: 'Xem danh sách thành viên' }).click()
+      await expect(page.getByTestId('member-row').first()).toBeVisible()
+      await page.screenshot({ path: out(`${size}-7-thanh-vien`) })
+
+      await page.getByRole('button', { name: 'Mời người' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: out(`${size}-8-moi`) })
+      await page.keyboard.press('Escape')
+
+      await page.getByRole('button', { name: /Link mời/ }).click()
+      await page.getByRole('button', { name: 'Tạo link mời' }).click()
+      await page.getByRole('button', { name: 'Tạo link', exact: true }).click()
+      const url = new URL((await page.getByTestId('invite-url').textContent())!)
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: out(`${size}-9-link`) })
+
+      await page.goto(url.pathname + url.hash)
+      await expect(page.getByRole('button', { name: 'Nhận lời mời' })).toBeVisible()
+      await page.screenshot({ path: out(`${size}-10-nhan-loi-moi`) })
+    })
   })
 }

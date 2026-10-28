@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Landmark, LogOut, Network, Plus } from 'lucide-react'
+import { ChevronsUpDown, Landmark, LogOut, Network, Plus, Users } from 'lucide-react'
 import { useAuth } from '../auth.tsx'
 import type { Directory } from '../lib/cloudStore.ts'
 import { Avatar } from '../ui/index.ts'
@@ -13,8 +13,10 @@ export function AppRail({
   dir,
   clanId,
   treeId,
+  membersOpen,
   onSwitchClan,
   onOpenClan,
+  onOpenMembers,
   onOpenTree,
   onCreateTree,
 }: {
@@ -22,8 +24,10 @@ export function AppRail({
   dir: Directory
   clanId: string
   treeId: string | null
+  membersOpen: boolean
   onSwitchClan: () => void
   onOpenClan: () => void
+  onOpenMembers: () => void
   onOpenTree: (id: string) => void
   onCreateTree: () => void
 }) {
@@ -49,7 +53,7 @@ export function AppRail({
         <ChevronsUpDown aria-hidden size={16} className="shrink-0 text-ink-muted" />
       </button>
 
-      <button type="button" onClick={onOpenClan} className={`mt-4 min-h-11 cursor-pointer rounded-lg px-2 text-left text-xs font-semibold uppercase tracking-[0.07em] ${treeId ? 'text-ink-muted hover:text-ink' : 'text-accent'}`}>
+      <button type="button" onClick={onOpenClan} className={`mt-4 min-h-11 cursor-pointer rounded-lg px-2 text-left text-xs font-semibold uppercase tracking-[0.07em] ${treeId || membersOpen ? 'text-ink-muted hover:text-ink' : 'text-accent'}`}>
         Cuốn gia phả
       </button>
       <ul className="mt-1 space-y-0.5">
@@ -81,6 +85,24 @@ export function AppRail({
           </li>
         )}
       </ul>
+
+      {clan?.role === 'admin' && (
+        <>
+          <p className="mt-5 px-2 text-xs font-semibold uppercase tracking-[0.07em] text-ink-muted">Dòng họ</p>
+          <button
+            type="button"
+            aria-current={membersOpen ? 'page' : undefined}
+            onClick={onOpenMembers}
+            className={`mt-1 flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left text-[15px] transition-colors duration-100 ${
+              membersOpen ? 'bg-surface font-medium text-ink shadow-1' : 'text-ink-muted hover:bg-surface/60 hover:text-ink'
+            }`}
+          >
+            <Users aria-hidden size={17} strokeWidth={1.9} className={membersOpen ? 'text-accent' : ''} />
+            <span className="min-w-0 flex-1">Thành viên</span>
+            {clan.memberCount !== undefined && <span className="tabular text-xs text-ink-muted">{clan.memberCount}</span>}
+          </button>
+        </>
+      )}
 
       <div className="mt-auto flex items-center gap-2 rounded-xl px-1 pt-3">
         <Avatar name={email} size={32} />

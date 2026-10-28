@@ -2,18 +2,17 @@ import type { Region } from '@kintree/core'
 import { useRef, useState } from 'react'
 import type { CloudStore, TreeInfo } from '../lib/cloudStore.ts'
 import { messageFor } from '../lib/messages.ts'
-import { Button, Dialog, SelectField, TextAreaField, TextField, useToast } from '../ui/index.ts'
+import { Button, ChoiceField, Dialog, TextAreaField, TextField, useToast } from '../ui/index.ts'
 
 export const REGION_LABEL: Record<Region, string> = { north: 'Miền Bắc', central: 'Miền Trung', south: 'Miền Nam' }
 
 const RegionSelect = ({ value, onChange }: { value: Region; onChange: (r: Region) => void }) => (
-  <SelectField label="Vùng miền (quyết định cách xưng hô)" value={value} onChange={(e) => onChange(e.target.value as Region)}>
-    {Object.entries(REGION_LABEL).map(([v, l]) => (
-      <option key={v} value={v}>
-        {l}
-      </option>
-    ))}
-  </SelectField>
+  <ChoiceField
+    label="Vùng miền (quyết định cách xưng hô)"
+    value={value}
+    onChange={(v) => onChange(v as Region)}
+    options={Object.entries(REGION_LABEL).map(([v, l]) => ({ value: v, label: l }))}
+  />
 )
 
 /** Tạo cuốn trong một dòng họ (chỉ quản trị dòng họ; cơ sở dữ liệu cưỡng chế). */

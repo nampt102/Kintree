@@ -15,7 +15,7 @@ async function addChild(page: Page, parent: string, name: string) {
   await card(page, parent).click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   await page.getByLabel('Họ tên').fill(name)
-  await page.getByLabel('Giới tính').selectOption('male')
+  await page.getByRole('radio', { name: 'Nam' }).click()
   await page.getByRole('button', { name: 'Thêm con' }).last().click()
 }
 
@@ -88,7 +88,7 @@ test.describe('lưu trên máy chủ', () => {
     // Người mới được chọn ngay: thêm con cho chính họ mà không chờ lần ghi đầu xong.
     await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
     await page.getByLabel('Họ tên').fill('Cháu Một')
-    await page.getByLabel('Giới tính').selectOption('male')
+    await page.getByRole('radio', { name: 'Nam' }).click()
     await page.getByRole('button', { name: 'Thêm con' }).last().click()
     await expect.poll(() => n).toBe(2)
     const [con] = await personsNamed(world.treeId!, 'Con Một')
@@ -138,7 +138,8 @@ test.describe('ghi lỗi thì hoàn lại', () => {
 
   test('Bị từ chối vì quyền: sửa bị hoàn lại và có thông báo không đủ quyền', async ({ page, world }) => {
     await openSampleTree(page, world)
-    // Quyền của người dùng bị hạ xuống chỉ xem trong lúc đang mở cuốn.
+    // Quyền của người dùng bị hạ xuống chỉ xem trong lúc đang mở cuốn (cần quản trị khác trước: dòng họ luôn còn một quản trị).
+    must(await admin().from('memberships').update({ role: 'admin' }).eq('user_id', world.viewer.id))
     must(await admin().from('memberships').update({ role: 'viewer' }).eq('user_id', world.admin.id))
     await addChild(page, 'Nguyễn Văn An', 'Người Bị Chặn')
     await expect(page.getByRole('alert').filter({ hasText: 'không có quyền' })).toBeVisible()

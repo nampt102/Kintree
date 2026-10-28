@@ -1,6 +1,7 @@
 import type { Session, User } from '@supabase/supabase-js'
-import { Mail, TreeDeciduous } from 'lucide-react'
+import { Mail, MailOpen, TreeDeciduous } from 'lucide-react'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { pendingInvite } from './lib/memberStore.ts'
 import { googleEnabled, supabase } from './lib/supabase.ts'
 import { Button, Skeleton, TextField } from './ui/index.ts'
 
@@ -61,6 +62,7 @@ function otpMessage(error: { message: string; status?: number }): string {
 
 function LoginScreen() {
   const [step, setStep] = useState<'email' | 'code'>('email')
+  const [hasInvite] = useState(() => pendingInvite(sessionStorage) !== null)
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -161,6 +163,14 @@ function LoginScreen() {
           </p>
           <p className="text-ink-muted">Đăng nhập để xem và cùng gìn giữ gia phả.</p>
         </div>
+
+        {/* Có link mời đang chờ: nhắc đăng nhập; không có tên dòng họ vì xem trước link cần đã đăng nhập (design D6). */}
+        {hasInvite && (
+          <p data-testid="invite-hint" className="flex items-start gap-3 rounded-2xl bg-accent-soft p-4 font-medium text-accent">
+            <MailOpen aria-hidden size={20} strokeWidth={1.85} className="mt-0.5 shrink-0" />
+            Bạn có lời mời vào một dòng họ. Đăng nhập để nhận lời mời.
+          </p>
+        )}
 
         <div className="rounded-2xl bg-surface p-5 shadow-2 ring-1 ring-line/60">
           {step === 'email' ? (

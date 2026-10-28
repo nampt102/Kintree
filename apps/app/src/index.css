@@ -120,6 +120,11 @@ label {
   width: calc(44px / var(--kt-zoom, 1)) !important;
   height: calc(44px / var(--kt-zoom, 1)) !important;
 }
+/* Khung đang trỏ/được chọn bằng bàn phím nổi lên trên khung bên cạnh, để nút quanh khung (vd. Thêm vợ/chồng nằm giữa hai vợ chồng) không bị khung kế bên che. */
+.react-flow__node:hover,
+.react-flow__node:focus-within {
+  z-index: 1000 !important;
+}
 .kt-zoomed-out .kt-node-btn {
   display: none !important;
 }
@@ -152,6 +157,19 @@ label {
 .kt-glow {
   box-shadow: 0 0 0 4px rgb(164 47 40 / 0.16);
   animation: kt-glow 700ms var(--ease-out) 2;
+}
+
+/* Lớp nổi (ô chọn, menu, hộp thoại) hiện ra: mờ → rõ, hơi phóng to (vào 160 ms). */
+@keyframes kt-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@keyframes kt-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

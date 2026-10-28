@@ -43,6 +43,40 @@ for (const size of SIZES) {
       await expectNoHorizontalScroll(page)
       await expectTouchTargets(page)
     })
+
+    test('màn Thành viên, hộp mời, hộp tạo link, màn nhận lời mời (clan-invites)', async ({ page, world }) => {
+      await openClan(page, world)
+      await page.getByRole('button', { name: 'Xem danh sách thành viên' }).click()
+      await expect(page.getByTestId('member-row').first()).toBeVisible()
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+
+      await page.getByRole('button', { name: 'Mời người' }).click()
+      await expect(page.getByRole('dialog')).toBeVisible()
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+      await page.keyboard.press('Escape')
+
+      await page.getByRole('button', { name: /Link mời/ }).click()
+      await page.getByRole('button', { name: 'Tạo link mời' }).click()
+      await page.getByRole('switch').check({ force: true })
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+      await page.getByRole('textbox', { name: 'Mã mời' }).fill('1945')
+      await page.getByRole('button', { name: 'Tạo link', exact: true }).click()
+      const url = new URL((await page.getByTestId('invite-url').textContent())!)
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+      await page.getByRole('button', { name: 'Xong' }).click()
+      await expect(page.getByTestId('link-card')).toBeVisible()
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+
+      await page.goto(url.pathname + url.hash)
+      await expect(page.getByRole('button', { name: 'Nhận lời mời' })).toBeVisible()
+      await expectNoHorizontalScroll(page)
+      await expectTouchTargets(page)
+    })
   })
 }
 

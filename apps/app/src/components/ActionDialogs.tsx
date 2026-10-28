@@ -19,10 +19,10 @@ import {
   type TreeDoc,
   type TreePerson,
 } from '@kintree/core'
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, Mars, Trash2, Venus } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react'
 import { messageFor } from '../lib/messages.ts'
-import { Button, Dialog, ErrorText, IconButton, SelectField, TextAreaField, TextField, useToast } from '../ui/index.ts'
+import { Button, ChoiceField, Dialog, ErrorText, IconButton, SelectField, TextAreaField, TextField, useToast } from '../ui/index.ts'
 import { DateInput } from './DateInput.tsx'
 
 export type EditFn = <T extends object>(op: (doc: TreeDoc) => Result<T>) => Result<T>
@@ -36,6 +36,12 @@ type Common = {
 }
 
 const newId = () => crypto.randomUUID()
+
+const GENDER_CHILD = [
+  { value: 'male', label: 'Nam', icon: Mars },
+  { value: 'female', label: 'Nữ', icon: Venus },
+]
+const GENDER_ALL = [...GENDER_CHILD, { value: 'unknown', label: 'Chưa rõ' }]
 
 /**
  * Lỗi gắn với ô nhập: hiện ngay dưới ô và chuyển con trỏ tới ô ấy (design D6).
@@ -68,9 +74,19 @@ function Actions({ submitLabel, form, onCancel }: { submitLabel: string; form: s
   )
 }
 
-function Form({ id, onSubmit, general, children }: { id: string; onSubmit: (e: FormEvent) => void; general: string | null; children: ReactNode }) {
+/** Nhóm ô có tiêu đề nhỏ (spec "Form dài chia nhóm"). */
+function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <form id={id} onSubmit={onSubmit} className="space-y-4" noValidate>
+    <section aria-label={title} className="space-y-4">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.07em] text-ink-muted">{title}</h3>
+      {children}
+    </section>
+  )
+}
+
+function Form({ id, onSubmit, general, children, groups = false }: { id: string; onSubmit: (e: FormEvent) => void; general: string | null; children: ReactNode; groups?: boolean }) {
+  return (
+    <form id={id} onSubmit={onSubmit} className={groups ? 'space-y-7' : 'space-y-4'} noValidate>
       {general && <ErrorText>{general}</ErrorText>}
       {children}
     </form>
@@ -84,7 +100,7 @@ export function AddChildDialog({ doc, edit, person, onClose }: Common) {
   const [kind, setKind] = useState<ChildKind>('biological')
   const [other, setOther] = useState(spouses.length === 1 ? spouses[0]!.id : '')
   const [role, setRole] = useState<ParentRole | ''>('')
-  const refs = { name: useRef<HTMLInputElement>(null), gender: useRef<HTMLSelectElement>(null), other: useRef<HTMLSelectElement>(null), role: useRef<HTMLSelectElement>(null) }
+  const refs = { name: useRef<HTMLInputElement>(null), gender: useRef<HTMLDivElement>(null), other: useRef<HTMLButtonElement>(null), role: useRef<HTMLDivElement>(null) }
   const f = useFieldErrors({ MISSING_NAME: 'name', MISSING_GENDER: 'gender', OTHER_PARENT_REQUIRED: 'other', NOT_SPOUSE: 'other', MISSING_ROLE: 'role' }, refs)
   const toast = useToast()
 
@@ -112,40 +128,42 @@ export function AddChildDialog({ doc, edit, person, onClose }: Common) {
     <Dialog title={`Thêm con cho ${person.fullName}`} onClose={() => onClose()} dirty={name.trim() !== ''} footer={<Actions form="add-child" submitLabel="Thêm con" onCancel={() => onClose()} />}>
       <Form id="add-child" onSubmit={submit} general={f.general}>
         <TextField ref={refs.name} label="Họ tên" value={name} onChange={(e) => setName(e.target.value)} error={f.on('name')} autoFocus autoComplete="off" />
-        <SelectField ref={refs.gender} label="Giới tính" value={gender} onChange={(e) => setGender(e.target.value as Gender | '')} error={f.on('gender')}>
-          <option value="">— Chọn —</option>
-          <option value="male">Nam</option>
-          <option value="female">Nữ</option>
-        </SelectField>
-        <SelectField label="Loại quan hệ" value={kind} onChange={(e) => setKind(e.target.value as ChildKind)}>
-          <option value="biological">Con ruột</option>
-          <option value="adopted">Con nuôi</option>
-          <option value="step">Con riêng của vợ/chồng</option>
-        </SelectField>
+        <ChoiceField ref={refs.gender} label="Giới tính" value={gender} onChange={(v) => setGender(v as Gender | '')} error={f.on('gender')} options={GENDER_CHILD} />
+        <ChoiceField
+          label="Loại quan hệ"
+          value={kind}
+          onChange={(v) => setKind(v as ChildKind)}
+          hint={kind === 'step' ? 'Con riêng của vợ/chồng, không phải con ruột của người này.' : undefined}
+          options={[
+            { value: 'biological', label: 'Con ruột' },
+            { value: 'adopted', label: 'Con nuôi' },
+            { value: 'step', label: 'Con riêng' },
+          ]}
+        />
         {spouses.length > 0 && (
           <SelectField
             ref={refs.other}
             label="Con chung với"
             hint={spouses.length > 1 ? 'Người này có nhiều vợ/chồng, hãy chọn một người.' : undefined}
             value={other}
-            onChange={(e) => setOther(e.target.value)}
+            onChange={setOther}
             error={f.on('other')}
-          >
-            {spouses.length > 1 && <option value="">— Chọn —</option>}
-            {spouses.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.fullName}
-              </option>
-            ))}
-            {kind !== 'step' && <option value="none">Không ghi (chưa rõ)</option>}
-          </SelectField>
+            placeholder="— Chọn —"
+            options={[...spouses.map((s) => ({ value: s.id, label: s.fullName })), ...(kind !== 'step' ? [{ value: 'none', label: 'Không ghi (chưa rõ)' }] : [])]}
+          />
         )}
         {person.gender === 'unknown' && (
-          <SelectField ref={refs.role} label={`${person.fullName} là cha hay mẹ của người con?`} value={role} onChange={(e) => setRole(e.target.value as ParentRole | '')} error={f.on('role')}>
-            <option value="">— Chọn —</option>
-            <option value="father">Cha</option>
-            <option value="mother">Mẹ</option>
-          </SelectField>
+          <ChoiceField
+            ref={refs.role}
+            label={`${person.fullName} là cha hay mẹ của người con?`}
+            value={role}
+            onChange={(v) => setRole(v as ParentRole | '')}
+            error={f.on('role')}
+            options={[
+              { value: 'father', label: 'Cha' },
+              { value: 'mother', label: 'Mẹ' },
+            ]}
+          />
         )}
       </Form>
     </Dialog>
@@ -313,7 +331,7 @@ export function ProfileDialog({ edit, person, onClose }: Common) {
   const [burialPlace, setBurialPlace] = useState(person.burialPlace ?? '')
   const [biography, setBiography] = useState(person.biography ?? '')
   const [note, setNote] = useState(person.note ?? '')
-  const refs = { name: useRef<HTMLInputElement>(null), gender: useRef<HTMLSelectElement>(null), birth: useRef<HTMLInputElement>(null), death: useRef<HTMLInputElement>(null) }
+  const refs = { name: useRef<HTMLInputElement>(null), gender: useRef<HTMLDivElement>(null), birth: useRef<HTMLInputElement>(null), death: useRef<HTMLInputElement>(null) }
   const f = useFieldErrors<'name' | 'gender' | 'birth' | 'death'>({ MISSING_NAME: 'name', ROLE_GENDER_MISMATCH: 'gender' }, refs)
   const [dateError, setDateError] = useState<'birth' | 'death' | null>(null)
   const toast = useToast()
@@ -343,21 +361,34 @@ export function ProfileDialog({ edit, person, onClose }: Common) {
   }
 
   return (
-    <Dialog title={`Hồ sơ: ${person.fullName}`} onClose={() => onClose()} dirty={dirty} footer={<Actions form="profile" submitLabel="Lưu hồ sơ" onCancel={() => onClose()} />}>
-      <Form id="profile" onSubmit={submit} general={f.general}>
-        <TextField ref={refs.name} label="Họ tên" value={fullName} onChange={(e) => setFullName(e.target.value)} error={f.on('name')} autoComplete="off" />
-        <SelectField ref={refs.gender} label="Giới tính" value={gender} onChange={(e) => setGender(e.target.value as Gender)} error={f.on('gender')}>
-          <option value="male">Nam</option>
-          <option value="female">Nữ</option>
-          <option value="unknown">Chưa rõ</option>
-        </SelectField>
-        <DateInput label="Ngày sinh" value={person.birth} onChange={setBirth} inputRef={refs.birth} />
-        <DateInput label="Ngày mất" value={person.death} onChange={setDeath} inputRef={refs.death} />
-        {dateError && <span className="sr-only">Ngày {dateError === 'birth' ? 'sinh' : 'mất'} không hợp lệ.</span>}
-        <TextField label="Nơi sinh" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} />
-        <TextField label="Nơi an táng" value={burialPlace} onChange={(e) => setBurialPlace(e.target.value)} />
-        <TextAreaField label="Tiểu sử" hint="Chép thành câu đầy đủ: sau này sẽ in vào sách gia phả." value={biography} onChange={(e) => setBiography(e.target.value)} />
-        <TextAreaField label="Ghi chú riêng" hint="Chỉ để nhớ, không in vào sách." value={note} onChange={(e) => setNote(e.target.value)} />
+    <Dialog
+      title="Hồ sơ"
+      subtitle={`${person.fullName}${person.isOutsider ? (person.gender === 'male' ? ' · Rể' : ' · Dâu') : ''}`}
+      wide
+      onClose={() => onClose()}
+      dirty={dirty}
+      footer={<Actions form="profile" submitLabel="Lưu hồ sơ" onCancel={() => onClose()} />}
+    >
+      <Form id="profile" onSubmit={submit} general={f.general} groups>
+        <Group title="Thông tin chung">
+          <TextField ref={refs.name} label="Họ tên" value={fullName} onChange={(e) => setFullName(e.target.value)} error={f.on('name')} autoComplete="off" />
+          <ChoiceField ref={refs.gender} label="Giới tính" value={gender} onChange={(v) => setGender(v as Gender)} error={f.on('gender')} options={GENDER_ALL} />
+        </Group>
+        <Group title="Ngày sinh – ngày mất">
+          <DateInput label="Ngày sinh" value={person.birth} onChange={setBirth} inputRef={refs.birth} />
+          <DateInput label="Ngày mất (ngày giỗ)" value={person.death} onChange={setDeath} inputRef={refs.death} />
+          {dateError && <span className="sr-only">Ngày {dateError === 'birth' ? 'sinh' : 'mất'} không hợp lệ.</span>}
+        </Group>
+        <Group title="Nơi chốn">
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Nơi sinh" value={birthPlace} onChange={(e) => setBirthPlace(e.target.value)} placeholder="Ví dụ: Hành Thiện, Nam Định" />
+            <TextField label="Nơi an táng" value={burialPlace} onChange={(e) => setBurialPlace(e.target.value)} />
+          </div>
+        </Group>
+        <Group title="Tiểu sử">
+          <TextAreaField label="Tiểu sử" hint="Chép thành câu đầy đủ: sau này sẽ in vào sách gia phả." value={biography} onChange={(e) => setBiography(e.target.value)} />
+          <TextAreaField label="Ghi chú riêng" hint="Chỉ để nhớ, không in vào sách." value={note} onChange={(e) => setNote(e.target.value)} />
+        </Group>
       </Form>
     </Dialog>
   )

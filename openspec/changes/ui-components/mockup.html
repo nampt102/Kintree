@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree bộ component</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FAF8F5', muted: '#F3EFEA', line: '#ECE7E1', edge: '#DDD5CB', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', hover: '#8C2721', soft: '#F8ECEA' }, danger: { DEFAULT: '#B42318', soft: '#FBEDEB' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)', pill: '0 8px 18px -6px rgb(164 47 40/.55)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; flex-shrink: 0; }
+  .i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i20{width:20px!important;height:20px!important}
+  /* Kiểu shadcn/ui theo token đỏ trầm */
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; font-weight:600; font-size:15px; white-space:nowrap; transition: all .15s; }
+  .btn-primary { background:#A42F28; color:#fff; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55); }
+  .btn-primary.hover { background:#8C2721; }
+  .btn-secondary { background:#fff; color:#1F1A17; box-shadow: 0 0 0 1px #DDD5CB, 0 1px 2px rgb(31 26 23/.05); }
+  .btn-secondary.hover { background:#F3EFEA; }
+  .btn-ghost { color:#1F1A17; font-weight:500; }
+  .btn-ghost.hover { background:#F3EFEA; }
+  .btn-danger { color:#B42318; font-weight:500; }
+  .btn-danger.hover { background:#FBEDEB; }
+  .btn-disabled { opacity:.45; }
+  .focus { outline: 3px solid #1D4ED8; outline-offset: 2px; }
+  .icb { display:grid; place-items:center; width:44px; height:44px; border-radius:9999px; }
+  .label { display:block; font-size:14px; font-weight:500; margin-bottom:6px; color:#1F1A17 }
+  .hint { margin-top:6px; font-size:13px; color:#6B635A }
+  .input { display:flex; align-items:center; gap:8px; height:44px; padding:0 14px; border-radius:12px; background:#fff; border:1px solid #8F877C; font-size:16px; color:#1F1A17; box-shadow: 0 1px 2px rgb(31 26 23/.04); }
+  .input.ph { color:#8F877C }
+  .input.focus-ring { border-color:#A42F28; box-shadow: 0 0 0 4px rgb(164 47 40/.15); outline:none }
+  .input.err { border:2px solid #B42318; }
+  .textarea { height:auto; min-height:96px; align-items:flex-start; padding-top:10px; line-height:1.5 }
+  .toggle { display:flex; gap:4px; padding:4px; border-radius:9999px; background:#F3EFEA; }
+  .toggle > span { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:0 14px; border-radius:9999px; font-size:15px; font-weight:500; color:#6B635A }
+  .toggle > span.on { background:#fff; color:#1F1A17; font-weight:600; box-shadow: 0 1px 2px rgb(31 26 23/.08), 0 0 0 1px rgb(31 26 23/.04) }
+  .switch { position:relative; width:44px; height:26px; border-radius:9999px; background:#C9C0B5; flex-shrink:0 }
+  .switch.on { background:#A42F28 }
+  .switch::after { content:''; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:9999px; background:#fff; box-shadow: 0 1px 2px rgb(0 0 0/.2) }
+  .switch.on::after { left:21px }
+  .pop { border-radius:14px; background:#fff; padding:6px; box-shadow: 0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06), 0 0 0 1px #ECE7E1; }
+  .item { display:flex; align-items:center; gap:10px; min-height:44px; padding:0 10px; border-radius:10px; font-size:15px }
+  .item.hl { background:#F3EFEA }
+  .sec { font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:#6B635A; margin-bottom:10px }
+  .card { border-radius:16px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07); }
+  .phone { width:375px; height:812px; border-radius:44px; overflow:hidden; position:relative; background:#FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink:0 }
+  .scrim { position:absolute; inset:0; background: rgb(31 26 23/.38) }
+  .tag { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.06em; color:#A42F28; background:#F8ECEA; border-radius:9999px; padding:2px 10px }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1360px] space-y-16 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · ui-components · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Bộ component mới (shadcn/ui, tông đỏ trầm)</h1>
+    <p class="max-w-3xl text-sub">Thành phần dựa trên shadcn/ui (Radix): ô chọn tự vẽ thay danh sách nền xanh của hệ điều hành, nhóm nút cho lựa chọn ít mục, công tắc, menu, thông báo ngắn. Giữ nút viên thuốc và màu đã duyệt ở <code>ui-polish</code>. Có 5 phần: A. Nút · B. Ô nhập · C. Form hồ sơ máy tính · D. Form hồ sơ điện thoại (2 phương án) · E. Form thêm con, menu, thông báo.</p>
+  </header>
+
+  <!-- A. NÚT -->
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">A · Nút</h2>
+    <div class="card grid grid-cols-[160px_repeat(4,1fr)] items-center gap-y-5 p-6 text-sm">
+      <span></span><span class="text-sub">Thường</span><span class="text-sub">Trỏ chuột</span><span class="text-sub">Focus bàn phím</span><span class="text-sub">Tắt / đang lưu</span>
+      <span class="font-medium">Chính (1 mỗi màn)</span>
+      <span><span class="btn btn-primary"><i data-lucide="check"></i>Lưu hồ sơ</span></span>
+      <span><span class="btn btn-primary hover"><i data-lucide="check"></i>Lưu hồ sơ</span></span>
+      <span><span class="btn btn-primary focus"><i data-lucide="check"></i>Lưu hồ sơ</span></span>
+      <span><span class="btn btn-primary btn-disabled"><i data-lucide="loader-circle" class="animate-spin"></i>Đang lưu…</span></span>
+      <span class="font-medium">Phụ</span>
+      <span><span class="btn btn-secondary"><i data-lucide="network"></i>Xem toàn bộ cây</span></span>
+      <span><span class="btn btn-secondary hover"><i data-lucide="network"></i>Xem toàn bộ cây</span></span>
+      <span><span class="btn btn-secondary focus"><i data-lucide="network"></i>Xem toàn bộ cây</span></span>
+      <span><span class="btn btn-secondary btn-disabled">Huỷ</span></span>
+      <span class="font-medium">Chữ (ghost)</span>
+      <span><span class="btn btn-ghost">Đổi email</span></span>
+      <span><span class="btn btn-ghost hover">Đổi email</span></span>
+      <span><span class="btn btn-ghost focus">Đổi email</span></span>
+      <span><span class="btn btn-ghost btn-disabled">Gửi lại mã (42s)</span></span>
+      <span class="font-medium">Nguy hiểm</span>
+      <span><span class="btn btn-danger"><i data-lucide="trash-2"></i>Gỡ người này</span></span>
+      <span><span class="btn btn-danger hover"><i data-lucide="trash-2"></i>Gỡ người này</span></span>
+      <span><span class="btn btn-danger focus"><i data-lucide="trash-2"></i>Gỡ người này</span></span>
+      <span><span class="btn btn-danger btn-disabled"><i data-lucide="trash-2"></i>Gỡ</span></span>
+      <span class="font-medium">Nút tròn (biểu tượng)</span>
+      <span class="flex gap-2"><span class="icb bg-muted"><i data-lucide="user-plus"></i></span><span class="icb bg-accent text-white shadow-pill"><i data-lucide="plus"></i></span><span class="icb bg-white shadow-2 ring-1 ring-line"><i data-lucide="heart"></i></span></span>
+      <span class="flex gap-2"><span class="icb bg-line"><i data-lucide="user-plus"></i></span></span>
+      <span class="flex gap-2"><span class="icb bg-muted focus"><i data-lucide="user-plus"></i></span></span>
+      <span class="flex items-center gap-2 text-xs text-sub"><span class="rounded-md bg-ink px-2 py-1 text-white">Thêm con</span>chú thích khi trỏ</span>
+    </div>
+  </section>
+
+  <!-- B. Ô NHẬP -->
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">B · Ô nhập</h2>
+    <div class="grid grid-cols-3 gap-6">
+      <div class="card space-y-5 p-6">
+        <div><label class="label">Họ tên</label><div class="input">Nguyễn Văn An</div></div>
+        <div><label class="label">Nơi sinh</label><div class="input input focus-ring">Làng Hành Thiện<span class="ml-px h-5 w-px animate-pulse bg-ink"></span></div><p class="hint">Đang nhập: viền đỏ trầm + quầng nhạt.</p></div>
+        <div><label class="label">Email</label><div class="input err">khong-phai-email</div><p class="mt-1.5 flex items-center gap-1.5 text-sm text-danger"><i data-lucide="circle-alert" class="i16"></i>Email chưa đúng. Ví dụ: ten@gmail.com</p></div>
+        <div><label class="label">Tiểu sử</label><div class="input textarea ph">Chép thành câu đầy đủ…</div></div>
+      </div>
+      <div class="card space-y-5 p-6">
+        <div><label class="label">Phạm vi (ô chọn, đang đóng)</label><div class="input justify-between">Cả dòng họ (mọi cuốn)<i data-lucide="chevrons-up-down" class="i16 text-sub"></i></div></div>
+        <div class="relative"><label class="label">Phạm vi (đang mở)</label><div class="input input focus-ring justify-between">Chi trưởng họ Nguyễn Văn<i data-lucide="chevrons-up-down" class="i16 text-sub"></i></div>
+          <div class="pop absolute inset-x-0 top-[78px] z-10">
+            <div class="item"><span class="w-4"></span>Cả dòng họ (mọi cuốn)</div>
+            <div class="item hl font-medium text-accent"><i data-lucide="check" class="i16"></i>Chi trưởng họ Nguyễn Văn</div>
+            <div class="item"><span class="w-4"></span>Chi thứ hai</div>
+          </div>
+        </div>
+        <div class="pt-28 text-sm text-sub">Danh sách tự vẽ: nền trắng, bo 14, mục chọn có dấu tích đỏ; mũi tên/Enter/Esc dùng được. Trên điện thoại mở thành danh sách dưới đáy màn.</div>
+      </div>
+      <div class="card space-y-5 p-6">
+        <div><span class="label">Giới tính (nhóm nút)</span><div class="toggle"><span class="on"><i data-lucide="mars" class="i16 text-male"></i>Nam</span><span><i data-lucide="venus" class="i16"></i>Nữ</span><span>Chưa rõ</span></div></div>
+        <div><span class="label">Lịch</span><div class="toggle w-60"><span>Dương lịch</span><span class="on">Âm lịch</span></div></div>
+        <div class="flex min-h-11 items-center justify-between"><div><p class="font-medium">Tháng nhuận</p><p class="text-sm text-sub">Chỉ hiện khi chọn âm lịch</p></div><span class="switch on"></span></div>
+        <div class="flex min-h-11 items-center justify-between"><div><p class="font-medium">Đặt mã mời</p><p class="text-sm text-sub">Công tắc tắt</p></div><span class="switch"></span></div>
+        <div><span class="label">Loại quan hệ (nút chọn một có mô tả)</span>
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 rounded-xl p-3 shadow-[inset_0_0_0_2px_#A42F28] bg-accent-soft/40"><span class="grid size-5 place-items-center rounded-full border-[6px] border-accent bg-white"></span><span><b>Con ruột</b></span></div>
+            <div class="flex items-center gap-3 rounded-xl p-3 shadow-[inset_0_0_0_1px_#DDD5CB]"><span class="size-5 rounded-full border border-input"></span><span>Con nuôi</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C. FORM HỒ SƠ MÁY TÍNH -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Form hồ sơ trên máy tính</h2><p class="text-sm text-sub">Hộp thoại rộng 640 px, bốn nhóm có tiêu đề, giới tính bằng nhóm nút, mỗi ngày một hàng (ngày · tháng · năm · Dương/Âm), nơi chốn hai cột, chân dính đáy luôn thấy nút "Lưu hồ sơ".</p></div>
+    <div class="relative flex h-[900px] items-center justify-center overflow-hidden rounded-2xl bg-[#d9d2c9]">
+      <div class="flex max-h-[860px] w-[640px] flex-col overflow-hidden rounded-[22px] bg-white shadow-3">
+        <div class="flex items-start gap-3 px-6 pb-3 pt-5">
+          <span class="grid size-12 place-items-center rounded-full bg-female-soft text-lg font-semibold text-female">B</span>
+          <div class="flex-1"><h3 class="text-xl font-semibold leading-tight">Hồ sơ</h3><p class="text-sub">Trần Thị Bình · Dâu</p></div>
+          <span class="icb bg-muted"><i data-lucide="x"></i></span>
+        </div>
+        <div class="space-y-7 overflow-hidden px-6 py-3">
+          <div>
+            <p class="sec">Thông tin chung</p>
+            <div class="space-y-4">
+              <div><label class="label">Họ tên</label><div class="input">Trần Thị Bình</div></div>
+              <div><span class="label">Giới tính</span><div class="toggle"><span><i data-lucide="mars" class="i16"></i>Nam</span><span class="on"><i data-lucide="venus" class="i16 text-female"></i>Nữ</span><span>Chưa rõ</span></div></div>
+            </div>
+          </div>
+          <div>
+            <p class="sec">Ngày sinh – ngày mất</p>
+            <div class="space-y-4">
+              <div><span class="label">Ngày sinh</span>
+                <div class="flex gap-2"><div class="input w-20 ph">Ngày</div><div class="input w-24 ph">Tháng</div><div class="input w-28">1894</div><div class="toggle flex-1"><span class="on">Dương lịch</span><span>Âm lịch</span></div></div>
+              </div>
+              <div><span class="label">Ngày mất (ngày giỗ)</span>
+                <div class="flex gap-2"><div class="input w-20">12</div><div class="input w-24">3</div><div class="input w-28">1975</div><div class="toggle flex-1"><span>Dương lịch</span><span class="on">Âm lịch</span></div></div>
+                <div class="mt-2 flex items-center justify-between rounded-xl bg-muted px-3.5 py-2"><span class="text-sm text-sub">Tức ngày 23/4/1975 dương lịch</span><span class="flex items-center gap-2 text-sm font-medium">Tháng nhuận<span class="switch"></span></span></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="sec">Nơi chốn</p>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="label">Nơi sinh</label><div class="input ph">Ví dụ: Hành Thiện, Nam Định</div></div>
+              <div><label class="label">Nơi an táng</label><div class="input">Nghĩa trang làng</div></div>
+            </div>
+          </div>
+          <div>
+            <p class="sec">Tiểu sử</p>
+            <div class="space-y-4">
+              <div><label class="label">Tiểu sử</label><div class="input textarea">Bà quê ở làng Cổ Lễ, về làm dâu họ Nguyễn năm 1912…</div><p class="hint">Chép thành câu đầy đủ: sau này in vào sách gia phả.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-auto flex items-center justify-between gap-3 px-6 py-4 shadow-[0_-1px_0_#ECE7E1]">
+          <span class="text-sm text-sub">Chưa lưu thay đổi</span>
+          <div class="flex gap-2"><span class="btn btn-secondary">Huỷ</span><span class="btn btn-primary"><i data-lucide="check"></i>Lưu hồ sơ</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- D. ĐIỆN THOẠI -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Form hồ sơ trên điện thoại: chọn một phương án</h2><p class="text-sm text-sub"><b>D1 Toàn màn</b> (như hiện tại): nhiều chỗ, dễ nhập dài. <b>D2 Tấm trượt</b>: kéo từ dưới lên, vuốt xuống để đóng (có hỏi nếu chưa lưu), thấy mép sơ đồ phía sau. Ô chọn mở thành danh sách dưới đáy (hình thứ 3).</p></div>
+    <div class="flex items-start gap-10 overflow-x-auto pb-4">
+      <div class="space-y-3"><span class="tag">D1 · Toàn màn</span>
+        <div class="phone">
+          <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+          <div class="flex h-14 items-center gap-2 bg-white px-3 shadow-[0_1px_0_#ECE7E1]"><span class="icb"><i data-lucide="x" class="i20"></i></span><div class="flex-1"><p class="font-semibold leading-tight">Hồ sơ</p><p class="text-xs text-sub">Trần Thị Bình · Dâu</p></div></div>
+          <div class="space-y-6 bg-white px-4 py-4">
+            <div><p class="sec">Thông tin chung</p><label class="label">Họ tên</label><div class="input">Trần Thị Bình</div>
+              <span class="label mt-4">Giới tính</span><div class="toggle"><span>Nam</span><span class="on">Nữ</span><span>Chưa rõ</span></div></div>
+            <div><p class="sec">Ngày sinh – ngày mất</p><span class="label">Ngày sinh</span>
+              <div class="grid grid-cols-[1fr_1fr_1.4fr] gap-2"><div class="input ph">Ngày</div><div class="input ph">Tháng</div><div class="input">1894</div></div>
+              <div class="toggle mt-2"><span class="on">Dương lịch</span><span>Âm lịch</span></div>
+              <span class="label mt-4">Ngày mất</span>
+              <div class="grid grid-cols-[1fr_1fr_1.4fr] gap-2"><div class="input">12</div><div class="input">3</div><div class="input">1975</div></div>
+            </div>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 flex gap-2 bg-white px-4 pb-8 pt-3 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-secondary flex-1">Huỷ</span><span class="btn btn-primary flex-[2]">Lưu hồ sơ</span></div>
+        </div>
+      </div>
+      <div class="space-y-3"><span class="tag">D2 · Tấm trượt</span>
+        <div class="phone">
+          <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+          <div class="p-4 opacity-60"><div class="h-12 rounded-full bg-white shadow-1"></div></div>
+          <div class="scrim"></div>
+          <div class="absolute inset-x-0 bottom-0 top-16 flex flex-col rounded-t-[26px] bg-white shadow-3">
+            <div class="mx-auto mt-2 h-1.5 w-10 rounded-full bg-line"></div>
+            <div class="flex items-center gap-3 px-4 pb-2 pt-3"><span class="grid size-10 place-items-center rounded-full bg-female-soft font-semibold text-female">B</span><div class="flex-1"><p class="font-semibold leading-tight">Hồ sơ</p><p class="text-xs text-sub">Trần Thị Bình · Dâu</p></div><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+            <div class="space-y-6 px-4 py-3">
+              <div><p class="sec">Thông tin chung</p><label class="label">Họ tên</label><div class="input">Trần Thị Bình</div>
+                <span class="label mt-4">Giới tính</span><div class="toggle"><span>Nam</span><span class="on">Nữ</span><span>Chưa rõ</span></div></div>
+              <div><p class="sec">Ngày sinh – ngày mất</p><span class="label">Ngày sinh</span>
+                <div class="grid grid-cols-[1fr_1fr_1.4fr] gap-2"><div class="input ph">Ngày</div><div class="input ph">Tháng</div><div class="input">1894</div></div></div>
+            </div>
+            <div class="mt-auto flex gap-2 px-4 pb-8 pt-3 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-secondary flex-1">Huỷ</span><span class="btn btn-primary flex-[2]">Lưu hồ sơ</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3"><span class="tag">Ô chọn trên điện thoại</span>
+        <div class="phone">
+          <div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div>
+          <div class="space-y-4 bg-white px-4 py-4"><p class="font-semibold">Mời người</p><div><label class="label">Phạm vi</label><div class="input focus-ring justify-between">Cả dòng họ<i data-lucide="chevrons-up-down" class="i16 text-sub"></i></div></div></div>
+          <div class="scrim"></div>
+          <div class="absolute inset-x-0 bottom-0 rounded-t-[26px] bg-white px-3 pb-8 pt-2 shadow-3">
+            <div class="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line"></div>
+            <p class="px-3 pb-2 font-semibold">Phạm vi</p>
+            <div class="item hl min-h-12 font-medium text-accent"><i data-lucide="check" class="i16"></i>Cả dòng họ (mọi cuốn)</div>
+            <div class="item min-h-12"><span class="w-4"></span>Chi trưởng họ Nguyễn Văn</div>
+            <div class="item min-h-12"><span class="w-4"></span>Chi thứ hai</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E. THÊM CON, MENU, THÔNG BÁO -->
+  <section class="space-y-4">
+    <h2 class="text-xl font-semibold">E · Form thêm con, menu "⋯", thông báo ngắn</h2>
+    <div class="flex items-start gap-10">
+      <div class="w-[480px] overflow-hidden rounded-[22px] bg-white shadow-3">
+        <div class="flex items-start gap-3 px-6 pb-2 pt-5"><div class="flex-1"><h3 class="text-xl font-semibold">Thêm con</h3><p class="text-sub">cho Nguyễn Văn An</p></div><span class="icb bg-muted"><i data-lucide="x"></i></span></div>
+        <div class="space-y-5 px-6 py-3">
+          <div><label class="label">Họ tên</label><div class="input focus-ring">Nguyễn Văn Cường</div></div>
+          <div><span class="label">Giới tính</span><div class="toggle"><span class="on"><i data-lucide="mars" class="i16 text-male"></i>Nam</span><span><i data-lucide="venus" class="i16"></i>Nữ</span><span>Chưa rõ</span></div></div>
+          <div><span class="label">Loại quan hệ</span><div class="toggle"><span class="on">Con ruột</span><span>Con nuôi</span><span>Con riêng</span></div></div>
+          <div><label class="label">Con chung với</label><div class="input justify-between">Lê Thị Dâu (vợ)<i data-lucide="chevrons-up-down" class="i16 text-sub"></i></div></div>
+        </div>
+        <div class="flex justify-end gap-2 px-6 py-4 shadow-[0_-1px_0_#ECE7E1]"><span class="btn btn-secondary">Huỷ</span><span class="btn btn-primary">Thêm con</span></div>
+      </div>
+      <div class="space-y-8">
+        <div class="relative h-[220px] w-[300px]">
+          <span class="icb absolute right-0 top-0 bg-muted"><i data-lucide="more-horizontal"></i></span>
+          <div class="pop absolute right-0 top-14 w-64">
+            <div class="item"><i data-lucide="pencil" class="i16 text-sub"></i>Sửa thông tin cuốn</div>
+            <div class="item hl"><i data-lucide="download" class="i16 text-sub"></i>Tải bản sao lưu</div>
+            <div class="my-1 h-px bg-line"></div>
+            <div class="item text-danger"><i data-lucide="trash-2" class="i16"></i>Xoá cuốn</div>
+          </div>
+        </div>
+        <div class="flex w-[360px] items-center gap-3 rounded-2xl bg-white p-4 shadow-3 ring-1 ring-line">
+          <span class="grid size-8 place-items-center rounded-full bg-[#E8F3EC] text-[#1F7A45]"><i data-lucide="check" class="i16"></i></span>
+          <div class="flex-1"><p class="font-medium">Đã thêm Nguyễn Văn Cường</p><p class="text-sm text-sub">vào Chi trưởng họ Nguyễn Văn</p></div>
+          <span class="btn btn-ghost h-9 px-3 text-sm">Hoàn tác</span>
+        </div>
+        <p class="max-w-[360px] text-sm text-sub">Thông báo ngắn kiểu Sonner: góc dưới trên máy tính, trên đầu màn trên điện thoại; tự ẩn sau 4 giây, không cướp focus. Nút "Hoàn tác" chỉ khi thao tác có thể hoàn tác.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần anh chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Hộp thoại trên điện thoại: <b>D1 toàn màn</b> hay <b>D2 tấm trượt</b>?</li>
+      <li>Thông báo ngắn: giữ viên thuốc đen như hiện tại, hay đổi sang thẻ trắng kiểu Sonner như mục E?</li>
+      <li>Nút "Hoàn tác" trên thông báo: muốn có ngay (cần thêm việc), hay để sau?</li>
+    </ul>
+  </section>
+</div>
+<script>lucide.createIcons()</script>
+</body>
+</html>

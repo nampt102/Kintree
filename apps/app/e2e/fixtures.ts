@@ -87,13 +87,15 @@ export async function expectNoHorizontalScroll(page: Page) {
 /** Mọi phần tử bấm được đang hiện có vùng chạm ≥ 44 × 44 px. */
 export async function expectTouchTargets(page: Page) {
   const small = await page.evaluate(() => {
-    const sel = 'button, input:not([type=checkbox]):not([type=hidden]), select, textarea, a[href], [role="button"], [role="menuitem"]'
+    const sel = 'button, input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea, a[href], [role="button"], [role="menuitem"]'
     return [...document.querySelectorAll<HTMLElement>(sel)]
       .filter((el) => {
         const r = el.getBoundingClientRect()
         const cs = getComputedStyle(el)
         if (r.width === 0 || r.height === 0 || cs.visibility === 'hidden' || cs.display === 'none') return false
         if (el.closest('.react-flow__minimap')) return false
+        // Ô <select> ẩn mà Radix Select giữ để gửi form: không ai bấm vào.
+        if (el.getAttribute('aria-hidden') === 'true') return false
         return r.width < 43.5 || r.height < 43.5
       })
       .map((el) => `${el.tagName} "${(el.getAttribute('aria-label') ?? el.textContent ?? '').trim().slice(0, 40)}" ${Math.round(el.getBoundingClientRect().width)}x${Math.round(el.getBoundingClientRect().height)}`)

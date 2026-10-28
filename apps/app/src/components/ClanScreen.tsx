@@ -39,6 +39,7 @@ export function ClanScreen({
   hideBack = false,
   onBack,
   onOpenTree,
+  onOpenMembers,
   reload,
 }: {
   cloud: CloudStore
@@ -49,6 +50,7 @@ export function ClanScreen({
   hideBack?: boolean
   onBack: () => void
   onOpenTree: (treeId: string) => void
+  onOpenMembers: () => void
   reload: () => void
 }) {
   const clan = dir.clans.find((c) => c.id === clanId)
@@ -61,10 +63,10 @@ export function ClanScreen({
     reload()
   }
 
-  const stats = [
+  const stats: { value: number; label: string; onClick?: () => void }[] = [
     { value: people, label: 'người' },
     { value: trees.length, label: 'cuốn gia phả' },
-    ...(clan?.memberCount !== undefined ? [{ value: clan.memberCount, label: 'thành viên' }] : []),
+    ...(clan?.memberCount !== undefined ? [{ value: clan.memberCount, label: 'thành viên', onClick: onOpenMembers }] : []),
   ]
 
   return (
@@ -101,9 +103,13 @@ export function ClanScreen({
           </div>
           <dl className="relative mt-6 grid grid-cols-3 gap-2.5 md:grid-cols-4 md:gap-3">
             {stats.map((s) => (
-              <div key={s.label} className="flex flex-col-reverse rounded-2xl bg-white/10 px-3 py-3 md:px-5 md:py-4">
+              <div key={s.label} className="relative flex flex-col-reverse rounded-2xl bg-white/10 px-3 py-3 transition-colors duration-150 has-[button:hover]:bg-white/20 md:px-5 md:py-4">
                 <dd className="tabular text-2xl font-semibold md:text-3xl">{s.value}</dd>
                 <dt className="text-xs text-white/75 md:text-sm">{s.label}</dt>
+                {s.onClick && (
+                  // Cả ô là lối vào màn Thành viên của quản trị (vùng chạm = cả ô).
+                  <button type="button" aria-label="Xem danh sách thành viên" onClick={s.onClick} className="absolute inset-0 cursor-pointer rounded-2xl" />
+                )}
               </div>
             ))}
           </dl>
@@ -141,7 +147,7 @@ export function ClanScreen({
                         trigger={(p) => <IconButton icon={MoreHorizontal} label={`Thêm cho cuốn ${t.name}`} {...p} />}
                         items={[
                           { label: 'Sửa thông tin cuốn', icon: Pencil, onSelect: () => setDialog({ kind: 'edit', tree: t }) },
-                          { label: 'Xoá cuốn', icon: Trash2, onSelect: () => setDialog({ kind: 'delete', tree: t }) },
+                          { label: 'Xoá cuốn', icon: Trash2, danger: true, onSelect: () => setDialog({ kind: 'delete', tree: t }) },
                         ]}
                       />
                     </div>

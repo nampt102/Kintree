@@ -94,6 +94,31 @@ test.describe('quản trị nền tảng', () => {
     await Promise.all([ops, other].map((u) => admin().auth.admin.deleteUser(u.id)))
   })
 
+  test('Chi tiết dòng họ: thấy quản trị (không thấy người xem), thêm quản trị, không gỡ được quản trị cuối', async ({ page, world }) => {
+    const ops = await makePlatformAdmin()
+    await login(page, ops)
+    await page.goto('/')
+    await page.getByRole('button', { name: /Quản trị nền tảng/ }).click()
+    await page.getByTestId('platform-clans').getByRole('button', { name: new RegExp(world.clanName) }).click()
+    const dialog = page.getByRole('dialog', { name: world.clanName })
+    const rows = dialog.getByTestId('admin-row')
+    await expect(rows).toHaveCount(1)
+    await expect(rows.first()).toContainText(world.admin.email)
+    await expect(dialog).not.toContainText(world.viewer.email)
+    await expect(dialog.getByRole('button', { name: `Gỡ ${world.admin.email}` })).toBeDisabled()
+
+    await dialog.getByLabel('Thêm quản trị bằng email').fill(world.viewer.email)
+    await dialog.getByRole('button', { name: 'Thêm quản trị' }).click()
+    await expect(rows).toHaveCount(2)
+    const them = await clientAs(world.viewer)
+    expect(must(await them.rpc('clan_role', { c: world.clanId }))).toBe('admin')
+
+    page.on('dialog', (d) => void d.accept())
+    await dialog.getByRole('button', { name: `Gỡ ${world.viewer.email}` }).click()
+    await expect(rows).toHaveCount(1)
+    await admin().auth.admin.deleteUser(ops.id)
+  })
+
   test('Quản trị nền tảng không đọc được dữ liệu gia phả của khách', async ({ world }) => {
     const ops = await makePlatformAdmin()
     const c = await clientAs(ops)

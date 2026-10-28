@@ -1,6 +1,20 @@
 import type { EditError } from '@kintree/core'
 
-export type StoreError = 'NOT_SIGNED_IN' | 'FORBIDDEN' | 'OFFLINE' | 'LOAD_FAILED' | 'SAVE_FAILED' | 'TREE_NOT_FOUND'
+export type StoreError =
+  | 'NOT_SIGNED_IN'
+  | 'FORBIDDEN'
+  | 'OFFLINE'
+  | 'LOAD_FAILED'
+  | 'SAVE_FAILED'
+  | 'TREE_NOT_FOUND'
+  | 'EMAIL_INVALID'
+  | 'LAST_ADMIN'
+  | 'CODE_TOO_SHORT'
+  | 'LINK_INVALID'
+  | 'LINK_EXPIRED'
+  | 'LINK_REVOKED'
+  | 'LINK_LOCKED'
+  | 'WRONG_CODE'
 export type AppError = EditError | StoreError
 
 /** Bảng dịch mã lỗi duy nhất của giao diện; kiểu `Record` buộc phải có câu cho mọi mã. */
@@ -35,6 +49,14 @@ export const MESSAGES: Record<AppError, string> = {
   LOAD_FAILED: 'Không tải được dữ liệu. Hãy thử lại.',
   SAVE_FAILED: 'Không lưu được. Thay đổi vừa rồi đã được hoàn lại; hãy thử lại.',
   TREE_NOT_FOUND: 'Không tìm thấy cuốn gia phả này (có thể đã bị xoá).',
+  EMAIL_INVALID: 'Email không hợp lệ.',
+  LAST_ADMIN: 'Dòng họ phải còn ít nhất một quản trị. Hãy thêm quản trị khác trước.',
+  CODE_TOO_SHORT: 'Mã mời cần ít nhất 4 ký tự.',
+  LINK_INVALID: 'Link mời không hợp lệ. Hãy kiểm tra lại link hoặc xin quản trị dòng họ link mới.',
+  LINK_EXPIRED: 'Link đã hết hạn, hãy xin quản trị dòng họ link mới.',
+  LINK_REVOKED: 'Link đã bị quản trị thu hồi, hãy xin link mới.',
+  LINK_LOCKED: 'Link đang tạm khoá vì nhập sai mã mời nhiều lần. Thử lại sau 15 phút.',
+  WRONG_CODE: 'Mã mời không đúng.',
 }
 
 export const messageFor = (error: AppError): string => MESSAGES[error]

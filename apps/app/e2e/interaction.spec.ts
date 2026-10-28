@@ -51,7 +51,7 @@ test('Thêm con thành công: thông báo rồi tự ẩn, khung mới được 
   await card(page, 'Nguyễn Văn An').click()
   await page.getByRole('button', { name: 'Thêm con', exact: true }).click()
   await page.getByLabel('Họ tên').fill('Nguyễn Văn Bình')
-  await page.getByLabel('Giới tính').selectOption('male')
+  await page.getByRole('radio', { name: 'Nam' }).click()
   await page.getByRole('button', { name: 'Thêm con' }).last().click()
   const toast = page.getByTestId('toast').filter({ hasText: 'Đã thêm Nguyễn Văn Bình' })
   await expect(toast).toBeVisible()
@@ -66,7 +66,8 @@ test('Thêm bị từ chối: lỗi dưới ô giới tính, con trỏ tới đ�
   await page.getByLabel('Họ tên').fill('Nguyễn Văn Bình')
   await page.getByRole('button', { name: 'Thêm con' }).last().click()
   const gender = page.getByLabel('Giới tính')
-  await expect(gender).toBeFocused()
+  // Nhóm nút chọn một: con trỏ vào nút đầu của nhóm.
+  await expect(gender.getByRole('radio').first()).toBeFocused()
   await expect(gender).toHaveAttribute('aria-invalid', 'true')
   await expect(page.getByRole('alert')).toContainText('Vui lòng chọn giới tính')
   await expect(page.getByLabel('Họ tên')).toHaveValue('Nguyễn Văn Bình')
