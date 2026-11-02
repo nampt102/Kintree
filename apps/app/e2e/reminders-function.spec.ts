@@ -29,6 +29,12 @@ const mine = (r: { preview: Preview[] }, userId: string) => r.preview.filter((p)
 test.describe.configure({ mode: 'serial' })
 
 test.describe('send-reminders (mock)', () => {
+  // Khi supabase/.env đặt PUSH_PROVIDER=webpush (thử thật) function gửi thật và bỏ qua `now`: các ca giả lập không chạy được.
+  test.beforeEach(async () => {
+    const r = await fetch(`${process.env.KT_API_URL}/functions/v1/send-reminders`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
+    test.skip(r.status === 401 || r.status === 500, 'function đang ở chế độ webpush')
+  })
+
   test('nhắc 7 ngày, 1 ngày, đúng ngày; chạy lại không gửi trùng', async ({ world }) => {
     await subscribe(world, world.viewer.id)
 

@@ -10,6 +10,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "db:start": "supabase start -x realtime,imgproxy,postgres-meta,studio,logflare,vector,supavisor",
+    "reminders:run": "node scripts/run-reminders.mjs",
     "reminders:schedule": "node scripts/schedule-reminders.mjs",
     "vapid:gen": "node scripts/gen-vapid.mjs",
     "sync:core": "node scripts/sync-core.mjs",

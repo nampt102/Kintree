@@ -1,5 +1,6 @@
 // Edge Function: gửi nhắc giỗ qua Web Push (change anniversary-push, design D2–D3). Lịch (pg_cron) gọi mỗi ngày 7:00 giờ Việt Nam.
 // PUSH_PROVIDER = webpush | mock; trống = mock (không gọi mạng, trả danh sách thông báo; cho phép đặt `now` để e2e cố định ngày).
+// Mock chỉ ghi reminder_log khi có `now` (chế độ thử); chạy tay không `now` là xem thử, không ghi.
 // Bản webpush đòi REMINDER_CRON_KEY ở header x-cron-key; bản mock không gửi gì ra ngoài nên không đòi.
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import webpush from 'web-push'
@@ -63,10 +64,14 @@ async function load(db: Db, targets: Target[], today: ReturnType<typeof vnToday>
 }
 
 type Outcome = 'ok' | 'gone' | 'error'
+/** Lý do gửi lỗi (mã HTTP và đầu lời nhắn của dịch vụ push, hoặc lỗi mạng/ký); không chứa dữ liệu người dùng. */
+const problems: string[] = []
 
 function makeSender(provider: string): (sub: Message['subscriptions'][number], payload: Message['payload']) => Promise<Outcome> {
   if (provider !== 'webpush') return async () => 'ok'
-  const subject = Deno.env.get('VAPID_SUBJECT')!
+  // VAPID_SUBJECT phải là `mailto:` hoặc https; điền email trần thì tự thêm `mailto:`.
+  const rawSubject = (Deno.env.get('VAPID_SUBJECT') ?? '').trim()
+  const subject = /^(mailto:|https?:)/i.test(rawSubject) ? rawSubject : `mailto:${rawSubject}`
   const publicKey = Deno.env.get('VAPID_PUBLIC_KEY')!
   const privateKey = Deno.env.get('VAPID_PRIVATE_KEY')!
   return async (sub, payload) => {
@@ -75,10 +80,15 @@ function makeSender(provider: string): (sub: Message['subscriptions'][number], p
         vapidDetails: { subject, publicKey, privateKey },
         TTL: 86400,
       })
-      const res = await fetch(d.endpoint, { method: d.method, headers: d.headers as Record<string, string>, body: d.body as Uint8Array })
+      const init = { method: d.method, headers: d.headers as Record<string, string>, body: d.body as Uint8Array }
+      const res = await fetch(d.endpoint, init)
       if (res.ok) return 'ok'
+      problems.push(`${new URL(sub.endpoint).host} ${res.status} ${(await res.text()).slice(0, 160)}`)
       return res.status === 404 || res.status === 410 ? 'gone' : 'error'
-    } catch {
+    } catch (e) {
+      const cause = e instanceof Error ? `${e.message} ${String((e as { cause?: unknown }).cause ?? '')}` : 'lỗi mạng'
+      // Bỏ địa chỉ endpoint (có mã riêng của thiết bị) khỏi lời báo.
+      problems.push(`${new URL(sub.endpoint).host} ${cause.replace(/https?:\/\/\S+/g, '<url>').slice(0, 300)}`)
       return 'error'
     }
   }
@@ -102,6 +112,7 @@ Deno.serve(async (req) => {
   const now = provider === 'mock' && body.now ? new Date(body.now) : new Date()
   if (Number.isNaN(now.getTime())) return reply(400, { error: 'BAD_REQUEST' })
 
+  problems.length = 0
   const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
   try {
     const rpc = await db.rpc('reminder_targets')
@@ -127,6 +138,8 @@ Deno.serve(async (req) => {
       results.forEach((r, i) => r === 'gone' && gone.add(m.subscriptions[i]!.subscriptionId))
       if (results.includes('ok')) {
         delivered++
+        // Bản mock chạy tay (không đặt `now`) chỉ xem thử: không ghi nhật ký, kẻo lần chạy thật bị coi là gửi trùng.
+        if (provider === 'mock' && !body.now) continue
         // Ghi nhật ký sau khi gửi được; gửi lỗi thì để trống để lần chạy sau thử lại.
         const rows = m.items.map((i) => ({ user_id: m.userId, person_id: i.personId, event_date: logKey(m.userId, i.personId, i.date, m.leadDays).split('|')[2], lead_days: m.leadDays }))
         const { error } = await db.from('reminder_log').upsert(rows, { onConflict: 'user_id,person_id,event_date,lead_days', ignoreDuplicates: true })
@@ -141,6 +154,7 @@ Deno.serve(async (req) => {
       delivered,
       removed: gone.size,
       failed,
+      problems: [...new Set(problems)],
       // Bản mock trả nội dung để e2e kiểm; bản thật không trả (tránh lộ tên người).
       preview: provider === 'mock' ? messages.map((m) => ({ userId: m.userId, clanId: m.clanId, leadDays: m.leadDays, devices: m.subscriptions.length, ...m.payload })) : [],
     })

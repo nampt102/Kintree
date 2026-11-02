@@ -416,6 +416,8 @@ VAPID_PRIVATE_KEY = "env(VAPID_PRIVATE_KEY)"
 VAPID_SUBJECT = "env(VAPID_SUBJECT)"
 PUSH_PROVIDER = "env(PUSH_PROVIDER)"
 REMINDER_CRON_KEY = "env(REMINDER_CRON_KEY)"
+# Mạng có tường lửa giải mã SSL: dùng kho chứng chỉ của container (đã thêm CA bằng `pnpm db:trust-ca`) thay vì bộ có sẵn của Deno.
+DENO_TLS_CA_STORE = "system"
 
 [analytics]
 enabled = true
