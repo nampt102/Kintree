@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree nhắc ngày giỗ</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FFFFFF', muted: '#F4F4F5', rail: '#F7F7F8', line: '#ECECEE', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', hover: '#8C2721', soft: '#FCEEEC' }, danger: { DEFAULT: '#B42318', soft: '#FBEDEB' }, ok: { DEFAULT: '#1F7A45', soft: '#E8F3EC' }, warn: { DEFAULT: '#7A4B00', soft: '#FFF7E6' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background:#EDEDEF; color:#1F1A17 }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; flex-shrink: 0; }
+  .i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i20{width:20px!important;height:20px!important}
+  .desk { width: 1280px; border-radius: 14px; overflow: hidden; background:#fff; box-shadow: 0 0 0 1px #d8d8dc, 0 30px 60px rgb(0 0 0/.14) }
+  .phone { width: 375px; height: 760px; border-radius: 44px; overflow: hidden; background:#fff; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0 }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; font-weight:600; font-size:15px; white-space:nowrap }
+  .btn-primary { background:#A42F28; color:#fff; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55) }
+  .btn-secondary { background:#fff; color:#1F1A17; box-shadow: 0 0 0 1px #DDD5CB, 0 1px 2px rgb(31 26 23/.05) }
+  .card { border-radius:16px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07), 0 0 0 1px #ECECEE }
+  .sec { font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:#6B635A }
+  .sw { position:relative; width:52px; height:32px; border-radius:9999px; background:#CFC9C2; flex-shrink:0 }
+  .sw::after { content:''; position:absolute; top:3px; left:3px; width:26px; height:26px; border-radius:9999px; background:#fff; box-shadow:0 1px 3px rgb(0 0 0/.3) }
+  .sw.on { background:#A42F28 }
+  .sw.on::after { left:23px }
+  .sw.dis { opacity:.45 }
+  .tag { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.06em; color:#A42F28; background:#FCEEEC; border-radius:9999px; padding:2px 10px }
+  .push { width:360px; border-radius:16px; background:#fff; box-shadow: 0 12px 32px rgb(31 26 23/.2), 0 0 0 1px #E4E4E7; padding:14px 16px }
+</style>
+</head>
+<body>
+<div class="mx-auto max-w-[1360px] space-y-14 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · anniversary-push · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Nhắc ngày giỗ: bật nhắc, thiết bị, thông báo</h1>
+    <p class="max-w-3xl text-sub">Theo nền trắng (ADR 0012) và thành phần đã duyệt. Công tắc "Nhắc ngày giỗ" nằm trong màn Ngày giỗ, tắt mặc định, bật riêng cho từng dòng họ. Tên người là hư cấu. Có 4 phần: A. Màn Ngày giỗ trên máy tính · B. Các trạng thái của thẻ nhắc · C. Điện thoại · D. Mẫu thông báo.</p>
+  </header>
+
+  <!-- A -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">A · Màn "Ngày giỗ" trên máy tính</h2><p class="text-sm text-sub">Thẻ "Nhắc ngày giỗ" đặt ở cột phải, trên "Sắp tới". Đang tắt: một dòng giải thích và công tắc. Bật xong: thấy trạng thái, thiết bị này và các thiết bị khác.</p></div>
+    <div class="desk flex">
+      <aside class="flex w-[248px] shrink-0 flex-col bg-rail px-3 py-4">
+        <div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i16"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div>
+        <p class="mt-8 px-2 sec">Dòng họ</p>
+        <div class="mt-2 flex min-h-11 items-center gap-2.5 rounded-lg bg-white px-2.5 font-medium shadow-1"><i data-lucide="calendar-heart" class="text-accent"></i>Ngày giỗ<span class="ml-auto rounded-full bg-accent-soft px-1.5 text-xs font-semibold text-accent">3</span></div>
+        <div class="mt-0.5 flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 text-sub"><i data-lucide="users"></i>Thành viên</div>
+      </aside>
+      <main class="flex min-w-0 flex-1 gap-6 px-8 py-7">
+        <div class="min-w-0 flex-1">
+          <h3 class="flex items-center gap-2 text-[28px] font-semibold tracking-tight"><i data-lucide="calendar-heart" class="i20 text-accent"></i>Ngày giỗ</h3>
+          <p class="mt-1 text-sub">Họ Nguyễn Văn · 2 cuốn</p>
+          <div class="card mt-5 grid h-[330px] place-items-center text-sub">Lịch tháng (như đã duyệt ở lunar-calendar-view)</div>
+        </div>
+        <aside class="w-[320px] shrink-0 space-y-4">
+          <div class="card p-4" id="card-off"></div>
+          <div><h3 class="mb-3 text-lg font-semibold">Sắp tới <span class="text-sm font-normal text-sub">30 ngày</span></h3><div class="card p-4 text-sm text-sub">Danh sách sắp tới (như đã duyệt)</div></div>
+        </aside>
+      </main>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">B · Các trạng thái của thẻ</h2><p class="text-sm text-sub">Bật cần quyền thông báo của trình duyệt; từ chối thì công tắc bị khoá kèm hướng dẫn cấp lại; iPhone chưa thêm vào Màn hình chính thì hướng dẫn thay cho công tắc.</p></div>
+    <div class="grid grid-cols-3 gap-6" id="states"></div>
+  </section>
+
+  <!-- C -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Điện thoại 375 px</h2><p class="text-sm text-sub">Thẻ nằm dưới lịch, trên "Sắp tới". Vùng chạm ≥ 44 px; công tắc cao 32 px nằm trong một dòng bấm được cao ≥ 56 px.</p></div>
+    <div class="flex items-start gap-10 overflow-x-auto pb-4" id="phones"></div>
+  </section>
+
+  <!-- D -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Mẫu thông báo</h2><p class="text-sm text-sub">Tiêu đề nói rõ mốc; nội dung liệt kê tên người, kỳ giỗ, ngày dương và ngày âm (kèm cuốn khi dòng họ có từ hai cuốn). Nhiều giỗ cùng mốc gộp một thông báo. Bấm mở màn Ngày giỗ của đúng dòng họ.</p></div>
+    <div class="flex flex-wrap items-start gap-6">
+      <div class="push"><div class="flex items-center gap-2 text-xs text-sub"><span class="grid size-5 place-items-center rounded bg-accent text-white"><i data-lucide="tree-deciduous" class="i14"></i></span>Kintree · Họ Nguyễn Văn</div><p class="mt-2 font-semibold">Giỗ sau 7 ngày nữa</p><p class="text-sm text-sub">Nguyễn Văn Cả · Giỗ thường · 21/4 (âm 5/3) · Chi trưởng</p></div>
+      <div class="push"><div class="flex items-center gap-2 text-xs text-sub"><span class="grid size-5 place-items-center rounded bg-accent text-white"><i data-lucide="tree-deciduous" class="i14"></i></span>Kintree · Họ Nguyễn Văn</div><p class="mt-2 font-semibold">Giỗ ngày mai</p><p class="text-sm text-sub">Phạm Thị Lan · Giỗ đầu · 22/4 (âm 6/3) · Chi thứ hai</p></div>
+      <div class="push"><div class="flex items-center gap-2 text-xs text-sub"><span class="grid size-5 place-items-center rounded bg-accent text-white"><i data-lucide="tree-deciduous" class="i14"></i></span>Kintree · Họ Nguyễn Văn</div><p class="mt-2 font-semibold">2 ngày giỗ hôm nay</p><p class="whitespace-pre-line text-sm text-sub">Lê Thị Dâu · Giỗ hết · 19/3 (âm 1/2) · Chi trưởng
+Nguyễn Văn Bảo · Giỗ thường · 19/3 (âm 1/2) · Chi trưởng</p></div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần anh chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Thẻ "Nhắc ngày giỗ" ở cột phải màn Ngày giỗ (mục A): được chưa, hay muốn đặt ở đầu trang?</li>
+      <li>Danh sách thiết bị có nút "Gỡ" từng thiết bị (mục B): giữ, hay chỉ cần công tắc?</li>
+      <li>Hướng dẫn iPhone "thêm vào Màn hình chính" (mục B): đủ rõ chưa?</li>
+      <li>Nội dung thông báo (mục D): đồng ý cách viết?</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  const sw = (on, dis) => `<span class="sw ${on ? 'on' : ''} ${dis ? 'dis' : ''}"></span>`
+  const head = (on, dis, sub) => `<div class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-full ${on ? 'bg-accent-soft text-accent' : 'bg-muted text-sub'}"><i data-lucide="${on ? 'bell-ring' : 'bell'}"></i></span><div class="min-w-0 flex-1"><p class="font-semibold">Nhắc ngày giỗ</p><p class="text-sm text-sub">${sub}</p></div>${sw(on, dis)}</div>`
+  const dev = (name, sub, me) => `<li class="flex min-h-14 items-center gap-3 px-3"><i data-lucide="${/iPhone|Android/.test(name) ? 'smartphone' : 'monitor'}" class="text-sub"></i><div class="min-w-0 flex-1"><p class="truncate text-sm font-medium">${name}${me ? ' <span class="font-normal text-sub">(thiết bị này)</span>' : ''}</p><p class="text-xs text-sub">${sub}</p></div>${me ? '' : '<span class="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-accent">Gỡ</span>'}</li>`
+  const devices = `<ul class="mt-3 divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">${dev('Chrome · Windows', 'Bật 2/11/2026', true)}${dev('Safari · iPhone', 'Bật 28/10/2026', false)}</ul>`
+  const when = '<p class="mt-3 text-xs text-sub">Nhắc trước 7 ngày, 1 ngày và đúng ngày, lúc 7:00 giờ Việt Nam. Chỉ nhắc giỗ.</p>'
+  const states = {
+    off: head(false, false, 'Đang tắt cho dòng họ này') + '<p class="mt-3 text-sm text-sub">Nhận thông báo trên thiết bị này trước ngày giỗ 7 ngày, 1 ngày và đúng ngày.</p>',
+    on: head(true, false, 'Đang bật · 2 thiết bị') + devices + when,
+    denied: head(false, true, 'Trình duyệt đang chặn thông báo') + '<p class="mt-3 flex gap-2 rounded-xl bg-warn-soft p-3 text-sm text-warn"><i data-lucide="triangle-alert" class="i16 mt-0.5"></i><span>Hãy cho phép thông báo cho trang này: bấm biểu tượng ổ khoá cạnh địa chỉ, chọn Thông báo, chọn Cho phép, rồi bật lại.</span></p>',
+    ios: head(false, true, 'iPhone cần thêm app vào Màn hình chính') + '<ol class="mt-3 space-y-2 rounded-xl bg-muted p-3 text-sm"><li class="flex gap-2"><b class="text-accent">1.</b>Mở trang này bằng Safari, bấm <i data-lucide="share" class="i16 inline"></i> Chia sẻ.</li><li class="flex gap-2"><b class="text-accent">2.</b>Chọn "Thêm vào Màn hình chính".</li><li class="flex gap-2"><b class="text-accent">3.</b>Mở Kintree từ biểu tượng mới rồi bật nhắc ở đây.</li></ol>',
+    unsupported: head(false, true, 'Trình duyệt này không hỗ trợ thông báo') + '<p class="mt-3 text-sm text-sub">Hãy dùng Chrome, Edge, Firefox hoặc Safari bản mới.</p>',
+    err: head(false, false, 'Chưa bật được') + '<p class="mt-3 flex gap-2 rounded-xl bg-danger-soft p-3 text-sm text-danger"><i data-lucide="circle-alert" class="i16 mt-0.5"></i><span>Không đăng ký được thiết bị. Kiểm tra mạng rồi thử lại.</span></p><div class="mt-3"><span class="btn btn-secondary h-11">Thử lại</span></div>',
+  }
+  document.getElementById('card-off').innerHTML = states.off
+  const label = { on: 'Đang bật', denied: 'Bị từ chối quyền', ios: 'iPhone chưa thêm vào Màn hình chính', unsupported: 'Không hỗ trợ', err: 'Lỗi đăng ký' }
+  document.getElementById('states').innerHTML = Object.keys(label).map((k) => `<div><p class="sec mb-2">${label[k]}</p><div class="card p-4">${states[k]}</div></div>`).join('')
+  const phoneTop = (t) => `<div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div><div class="flex h-14 items-center gap-1 px-2"><span class="grid size-11 place-items-center"><i data-lucide="arrow-left" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">${t}</p></div>`
+  const cal = '<div class="mx-4 grid h-[200px] place-items-center rounded-2xl bg-muted text-sm text-sub">Lịch tháng</div>'
+  document.getElementById('phones').innerHTML = [states.off, states.on + '', states.ios].map((s, i) => `<div class="phone">${phoneTop('Ngày giỗ')}${cal}<div class="mx-4 mt-4"><div class="card p-4">${s}</div></div></div>`).join('')
+  lucide.createIcons()
+</script>
+</body>
+</html>

@@ -12,12 +12,16 @@ import { CreateTreeDialog } from './components/TreeManage.tsx'
 import { TreeScreen } from './components/TreeScreen.tsx'
 import { upcomingEvents } from '@kintree/core'
 import { calendarStore, todaySolar } from './lib/calendarStore.ts'
+import { reminderStore } from './lib/reminderStore.ts'
 import { cloudStore, platformStore, type Directory } from './lib/cloudStore.ts'
 import { captureInvite, clearInvite, memberStore, pendingInvite } from './lib/memberStore.ts'
 import { sourceStore } from './lib/sourceStore.ts'
 import { messageFor } from './lib/messages.ts'
 import { supabase } from './lib/supabase.ts'
 import { ToastProvider, useBackToClose, useMinWidth, useToast } from './ui/index.ts'
+
+/** Thông báo nhắc giỗ mở app ở `#calendar/<mã dòng họ>`. */
+const calendarHash = (hash: string) => /^#calendar\/([0-9a-f-]{36})$/i.exec(hash)?.[1] ?? null
 
 /** Ba tầng: danh sách dòng họ → các cuốn của dòng họ → một cuốn; thêm màn thành viên, quản trị nền tảng và nhận lời mời. */
 function Home({ user }: { user: User }) {
@@ -27,6 +31,7 @@ function Home({ user }: { user: User }) {
   const members = useMemo(() => memberStore(supabase!), [])
   const sources = useMemo(() => sourceStore(supabase!, user.id), [user.id])
   const calendar = useMemo(() => calendarStore(supabase!), [])
+  const reminders = useMemo(() => reminderStore(supabase!, user.id), [user.id])
   const toast = useToast()
   // Mã link mời cất từ lúc mở app (main.tsx), còn qua bước đăng nhập.
   const [invite, setInvite] = useState(() => pendingInvite(sessionStorage))
@@ -40,6 +45,12 @@ function Home({ user }: { user: User }) {
       captureInvite(location, sessionStorage, history)
       setInvite(pendingInvite(sessionStorage))
     }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  const [calHash, setCalHash] = useState(() => calendarHash(location.hash))
+  useEffect(() => {
+    const onHash = () => setCalHash(calendarHash(location.hash))
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
@@ -82,6 +93,18 @@ function Home({ user }: { user: User }) {
     }
   }, [calendar, clanTreeKey, dir, calTick])
   const weekCount = useMemo(() => (cal?.ok ? upcomingEvents(cal.value, todaySolar(), 7).length : 0), [cal])
+
+  // Mở màn Ngày giỗ từ thông báo (khi danh mục dòng họ đã tải).
+  useEffect(() => {
+    if (!calHash || !dir) return
+    history.replaceState(null, '', location.pathname + location.search)
+    setCalHash(null)
+    if (!dir.clans.some((c) => c.id === calHash)) return
+    setTreeId(null)
+    setShowMembers(false)
+    setClanId(calHash)
+    setShowCalendar(true)
+  }, [calHash, dir])
 
   const closeTree = useCallback(() => {
     setTreeId(null)
@@ -200,7 +223,7 @@ function Home({ user }: { user: User }) {
   }
   if (showCalendar && clanId && dir) {
     return withRail(
-      <CalendarScreen data={cal} dir={dir} clanId={clanId} email={email} hideBack={!!rail} onBack={() => setShowCalendar(false)} onRetry={() => setCalTick((n) => n + 1)} onOpenPerson={openPerson} />,
+      <CalendarScreen data={cal} dir={dir} clanId={clanId} email={email} hideBack={!!rail} onBack={() => setShowCalendar(false)} onRetry={() => setCalTick((n) => n + 1)} onOpenPerson={openPerson} reminders={reminders} />,
     )
   }
   if (clanId && dir) {

@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. Chủ dự án xem lịch giỗ chạy thật (`lunar-calendar-view`), rồi commit và `/opsx:archive`; sau đó `anniversary-push`.
+2. Chủ dự án thử nhắc giỗ thật: `pnpm vapid:gen`, đặt `PUSH_PROVIDER=webpush` trong `supabase/.env`, `db:stop`/`db:start`, bật nhắc trong màn Ngày giỗ; rồi commit và `/opsx:archive anniversary-push`.
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -28,8 +28,8 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 3b | Lời mời (email + link xem), quản lý thành viên (E3) | done | `clan-invites` | "Tôi là ai" dời sang `kinship-terms` |
 | 3c | Bộ component shadcn/ui, làm lại form | done | `ui-components` | archive 2026-10-28; 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | done | `ai-image-proposals` | ghi âm làm `ai-audio-proposals` sau; điểm khác biệt |
-| 5a | Lịch tháng âm–dương, giỗ, sinh nhật, sắp tới (E5, F8) | in-progress 8/9 | `lunar-calendar-view` | giao diện + e2e xong; chờ chủ dự án duyệt app chạy thật, commit, archive |
-| 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | todo | `anniversary-push` | Web Push + FCM, sau 5a |
+| 5a | Lịch tháng âm–dương, giỗ, sinh nhật, sắp tới (E5, F8) | done | `lunar-calendar-view` | archive 2026-11-02; 8/8 task; spec `family-calendar` |
+| 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | in-progress 10/10 | `anniversary-push` | xong code + test; chờ chủ dự án thử thật (`pnpm vapid:gen`, `PUSH_PROVIDER=webpush`), commit, archive; FCM chờ Capacitor |
 | 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
 | 7 | Nhật ký thay đổi (E7, F12) | todo | `audit-log` | |
 | 8 | Poster PDF, GEDCOM (E8, F13) | todo | `export-poster-gedcom` | |
@@ -66,6 +66,9 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-11-02: `anniversary-push` xong giao diện (thẻ Nhắc ngày giỗ, service worker, manifest, mở từ thông báo `#calendar/<dòng họ>`, `pnpm vapid:gen`); ADR 0013; Vitest 127, pgTAP 189, Playwright 129 qua (4 ca lỗi do tải ở lần chạy đầy đủ, qua khi chạy riêng). Gửi Web Push thật chưa thử.
+- 2026-11-02: `anniversary-push` xong DB (migration + pgTAP 189), bộ gửi `send-reminders` (mock, e2e 3 ca; Web Push `web-push` chạy trong Deno, gửi thật chưa thử), lịch pg_cron 7:00 giờ VN (`pnpm reminders:schedule`); bản mẫu giao diện chờ duyệt. Mã lịch sao vào function bằng `pnpm sync:core`.
+- 2026-11-02: Archive `lunar-calendar-view` (tạo spec `family-calendar`); mở change `anniversary-push` với `proposal.md` (Web Push trước, FCM sau Capacitor), chờ chốt câu hỏi mở.
 - 2026-11-02: `lunar-calendar-view` xong giao diện (màn Ngày giỗ, mục thanh bên, thẻ sắp tới, mở người từ lịch); e2e `calendar.spec.ts`, Playwright 123 qua (2 worker). Windows khoá cổng 54238–54337 nên đổi cổng Supabase local sang 553xx (`config.toml`); nếu dùng Google đăng nhập, đổi Redirect URI sang `http://127.0.0.1:55321/auth/v1/callback`.
 - 2026-11-02: Đổi nền app sang trắng tinh (ADR 0012) theo ý chủ dự án; bản mẫu lịch đã duyệt, kế tiếp làm giao diện lịch (nhóm 4).
 - 2026-11-02: `lunar-calendar-view` xong lõi lịch (`core/calendar.ts`: lưới tháng, giỗ, sinh nhật, sắp tới; 22 test mới, core 357) và `calendarStore` (6 test); bản mẫu giao diện chờ duyệt.

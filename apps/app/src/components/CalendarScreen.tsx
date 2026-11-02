@@ -6,8 +6,10 @@ import type { Directory, Outcome } from '../lib/cloudStore.ts'
 import { formatPartialDate } from '../lib/format.ts'
 import { messageFor } from '../lib/messages.ts'
 import { Button, cn, ErrorText, IconButton, Segmented, Skeleton, TopBar } from '../ui/index.ts'
+import type { ReminderStore } from '../lib/reminderStore.ts'
 import { AccountMenu } from './AccountMenu.tsx'
 import { pagePad } from './ClanList.tsx'
+import { ReminderCard } from './ReminderCard.tsx'
 
 // Màn "Ngày giỗ" cấp dòng họ: lịch tháng âm–dương, sắp tới 30 ngày, chưa tính được giỗ (change lunar-calendar-view, bản mẫu `mockup.html`).
 
@@ -120,6 +122,7 @@ export function CalendarScreen({
   onBack,
   onRetry,
   onOpenPerson,
+  reminders,
 }: {
   data: CalendarData
   dir: Directory
@@ -129,6 +132,7 @@ export function CalendarScreen({
   onBack: () => void
   onRetry: () => void
   onOpenPerson: OpenPerson
+  reminders: ReminderStore
 }) {
   const [today] = useState(todaySolar)
   const [view, setView] = useState({ year: today.year, month: today.month })
@@ -289,7 +293,8 @@ export function CalendarScreen({
         )}
       </div>
 
-      <aside className="mt-6 shrink-0 space-y-3 lg:mt-0 lg:w-[320px]">
+      <aside className="mt-6 shrink-0 space-y-4 lg:mt-0 lg:w-[320px]">
+        <ReminderCard store={reminders} clanId={clanId} />
         <h2 className="text-lg font-semibold">
           Sắp tới <span className="text-sm font-normal text-ink-muted">30 ngày</span>
         </h2>

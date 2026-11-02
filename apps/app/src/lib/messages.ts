@@ -21,6 +21,10 @@ export type StoreError =
   | 'NEEDS_ATTACH'
   | 'NEEDS_PERSON'
   | 'UNSUPPORTED_RELATION'
+  | 'PUSH_DENIED'
+  | 'PUSH_UNSUPPORTED'
+  | 'PUSH_NOT_CONFIGURED'
+  | 'PUSH_FAILED'
 export type AppError = EditError | StoreError
 
 /** Bảng dịch mã lỗi duy nhất của giao diện; kiểu `Record` buộc phải có câu cho mọi mã. */
@@ -69,6 +73,10 @@ export const MESSAGES: Record<AppError, string> = {
   NEEDS_ATTACH: 'Người này chưa gắn được vào cây. Hãy dùng "Sửa rồi nhận" để chọn cha mẹ hoặc vợ/chồng.',
   NEEDS_PERSON: 'Cần nhận người liên quan trước.',
   UNSUPPORTED_RELATION: 'Chưa nối được kiểu quan hệ này từ đề xuất; hãy bỏ hoặc thêm bằng tay.',
+  PUSH_DENIED: 'Trình duyệt đang chặn thông báo của trang này. Hãy cho phép thông báo rồi bật lại.',
+  PUSH_UNSUPPORTED: 'Trình duyệt này không hỗ trợ thông báo. Hãy dùng Chrome, Edge, Firefox hoặc Safari bản mới.',
+  PUSH_NOT_CONFIGURED: 'Máy chủ chưa cấu hình thông báo (thiếu khoá VAPID). Hãy báo người quản trị hệ thống.',
+  PUSH_FAILED: 'Không đăng ký được thiết bị. Kiểm tra mạng rồi thử lại.',
 }
 
 export const messageFor = (error: AppError): string => MESSAGES[error]

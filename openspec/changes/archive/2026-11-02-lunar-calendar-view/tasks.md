@@ -21,7 +21,7 @@
 
 ## 5. Hoàn tất
 
-- [ ] 5.1 Cập nhật KB `design-system.md`, `tech-stack.md`, `status.md` (tách `anniversary-push` thành bước riêng). Kiểm: Vitest, Playwright, build, `openspec validate --strict` qua.
+- [x] 5.1 Cập nhật KB `design-system.md`, `tech-stack.md`, `status.md` (tách `anniversary-push` thành bước riêng). Kiểm: Vitest, Playwright, build, `openspec validate --strict` qua.
 
 ## Workflow follow-up
 

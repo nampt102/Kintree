@@ -403,9 +403,19 @@ inspector_port = 8083
 deno_version = 2
 
 # Biến cho Edge Function, lấy từ supabase/.env (cùng tệp với Google, SMTP). Trống = AI giả lập (ADR 0011).
+# Lịch (pg_cron) gọi bằng khoá riêng ở header x-cron-key, không có JWT của người dùng (design D3).
+[functions.send-reminders]
+verify_jwt = false
+
 [edge_runtime.secrets]
 AI_IMAGE_MODEL = "env(AI_IMAGE_MODEL)"
 ANTHROPIC_API_KEY = "env(ANTHROPIC_API_KEY)"
+# Nhắc giỗ (change anniversary-push): khoá VAPID, bộ gửi (webpush | mock) và khoá cho lịch gọi function.
+VAPID_PUBLIC_KEY = "env(VAPID_PUBLIC_KEY)"
+VAPID_PRIVATE_KEY = "env(VAPID_PRIVATE_KEY)"
+VAPID_SUBJECT = "env(VAPID_SUBJECT)"
+PUSH_PROVIDER = "env(PUSH_PROVIDER)"
+REMINDER_CRON_KEY = "env(REMINDER_CRON_KEY)"
 
 [analytics]
 enabled = true
