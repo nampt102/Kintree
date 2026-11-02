@@ -42,7 +42,7 @@ export type Changes = { tree: TreeRow | null; persons: PersonRow[]; parents: Par
 
 const orUndef = <T>(v: T | null | undefined): T | undefined => v ?? undefined
 
-function dateFrom(year: number | null, month: number | null, day: number | null, lunar: boolean, leap: boolean): PartialDate | undefined {
+export function dateFrom(year: number | null, month: number | null, day: number | null, lunar: boolean, leap: boolean): PartialDate | undefined {
   if (year === null) return undefined
   const d: PartialDate = { year, lunar }
   if (month !== null) d.month = month
@@ -191,7 +191,7 @@ const PAGE = 1000
 const higher = (a: Role | undefined, b: Role | undefined): Role | undefined => (a === 'admin' || b === 'admin' ? 'admin' : (a ?? b))
 
 /** Đọc hết một bảng, từng trang 1.000 dòng (PostgREST giới hạn `max_rows`). */
-async function fetchAll<T>(page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: DbError }>): Promise<{ data: T[] } | { error: NonNullable<DbError> }> {
+export async function fetchAll<T>(page: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: DbError }>): Promise<{ data: T[] } | { error: NonNullable<DbError> }> {
   const out: T[] = []
   for (let from = 0; ; from += PAGE) {
     const { data, error } = await page(from, from + PAGE - 1)

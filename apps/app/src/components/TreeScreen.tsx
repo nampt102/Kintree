@@ -50,7 +50,24 @@ import { CARD, TreeDiagram, type NodeAction } from './TreeDiagram.tsx'
 type DialogKind = 'addChild' | 'addSpouse' | 'addParent' | 'profile' | 'remove' | 'removeBranch' | 'reorderChildren' | 'reorderSpouses' | 'reorderSiblings'
 type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } | { kind: 'editTree' } | { kind: 'deleteTree' } | null
 
-export function TreeScreen({ cloud, sources, clanId, treeId, onBack, hideBack = false }: { cloud: CloudStore; sources: SourceStore; clanId: string; treeId: string; onBack: () => void; hideBack?: boolean }) {
+export function TreeScreen({
+  cloud,
+  sources,
+  clanId,
+  treeId,
+  onBack,
+  hideBack = false,
+  focusPersonId,
+}: {
+  cloud: CloudStore
+  sources: SourceStore
+  clanId: string
+  treeId: string
+  onBack: () => void
+  hideBack?: boolean
+  /** Người cần chọn sẵn khi cuốn tải xong (mở từ lịch giỗ). */
+  focusPersonId?: string | null
+}) {
   const { state, edit, saveError, reload } = useTreeDoc(cloud, treeId)
 
   const back = <IconButton icon={ArrowLeft} label="Về danh sách cuốn" onClick={onBack} />
@@ -76,13 +93,13 @@ export function TreeScreen({ cloud, sources, clanId, treeId, onBack, hideBack = 
       </>
     )
   }
-  return <Loaded doc={state.doc} role={state.role} cloud={cloud} sources={sources} clanId={clanId} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} />
+  return <Loaded doc={state.doc} role={state.role} cloud={cloud} sources={sources} clanId={clanId} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} focusPersonId={focusPersonId} />
 }
 
 /** Người xem: chỉ giữ thao tác không ghi (thu gọn nhánh, xem riêng nhánh); quyền thật do RLS cưỡng chế. */
 const READ_ONLY_FLAGS = { canAddChild: false, canAddSpouse: false, canAddParent: false, canRemove: false, canRemoveBranch: false, canReorderChildren: false, canReorderSpouses: false, canReorderSiblings: false }
 
-function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, reload, hideBack }: { doc: TreeDoc; role: Role; cloud: CloudStore; sources: SourceStore; clanId: string; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean }) {
+function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, reload, hideBack, focusPersonId }: { doc: TreeDoc; role: Role; cloud: CloudStore; sources: SourceStore; clanId: string; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean; focusPersonId?: string | null }) {
   const readOnly = role !== 'admin'
   // Tư liệu và đề xuất chỉ quản trị của cuốn đọc được (RLS); người xem chỉ xem nguồn của từng trường.
   const src = useSources(sources, doc.meta.id, !readOnly)
@@ -145,6 +162,14 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
     },
     [doc, collapsed, focusId],
   )
+
+  // Mở từ lịch giỗ: chọn sẵn người một lần khi cuốn vừa tải.
+  const focused = useRef(false)
+  useEffect(() => {
+    if (focused.current || !focusPersonId || !findPerson(doc, focusPersonId)) return
+    focused.current = true
+    goTo(focusPersonId)
+  }, [doc, focusPersonId, goTo])
 
   const onNodeAction = useCallback(
     (id: string, action: NodeAction) => {

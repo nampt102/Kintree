@@ -3,12 +3,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthGate, AuthProvider } from './auth.tsx'
 import { AcceptInvite } from './components/AcceptInvite.tsx'
 import { AppRail } from './components/AppRail.tsx'
+import { CalendarScreen, type CalendarData } from './components/CalendarScreen.tsx'
 import { ClanList } from './components/ClanList.tsx'
 import { ClanScreen } from './components/ClanScreen.tsx'
 import { MembersScreen } from './components/Members.tsx'
 import { PlatformScreen } from './components/PlatformScreen.tsx'
 import { CreateTreeDialog } from './components/TreeManage.tsx'
 import { TreeScreen } from './components/TreeScreen.tsx'
+import { upcomingEvents } from '@kintree/core'
+import { calendarStore, todaySolar } from './lib/calendarStore.ts'
 import { cloudStore, platformStore, type Directory } from './lib/cloudStore.ts'
 import { captureInvite, clearInvite, memberStore, pendingInvite } from './lib/memberStore.ts'
 import { sourceStore } from './lib/sourceStore.ts'
@@ -23,10 +26,14 @@ function Home({ user }: { user: User }) {
   const platform = useMemo(() => platformStore(supabase!), [])
   const members = useMemo(() => memberStore(supabase!), [])
   const sources = useMemo(() => sourceStore(supabase!, user.id), [user.id])
+  const calendar = useMemo(() => calendarStore(supabase!), [])
   const toast = useToast()
   // Mã link mời cất từ lúc mở app (main.tsx), còn qua bước đăng nhập.
   const [invite, setInvite] = useState(() => pendingInvite(sessionStorage))
   const [showMembers, setShowMembers] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false)
+  // Người cần chọn sẵn khi mở cuốn từ lịch giỗ.
+  const [focusPersonId, setFocusPersonId] = useState<string | null>(null)
   // Dán link mời vào thẻ đang mở app: chỉ đổi hash, trang không tải lại nên main.tsx không chạy lại.
   useEffect(() => {
     const onHash = () => {
@@ -59,14 +66,37 @@ function Home({ user }: { user: User }) {
     void platform.isPlatformAdmin().then(setIsPlatformAdmin)
   }, [reload, platform])
 
+  // Người có ngày của mọi cuốn trong dòng họ đang mở, cho lịch giỗ, thẻ sắp tới và số ở thanh bên; đọc lại khi danh mục đổi (vd. rời một cuốn).
+  const [calState, setCalState] = useState<{ key: string; data: CalendarData }>({ key: '', data: null })
+  const [calTick, setCalTick] = useState(0)
+  const clanTreeKey = dir && clanId ? `${clanId}:${dir.trees.filter((t) => t.clanId === clanId).map((t) => t.id).join(',')}` : undefined
+  // Kết quả của dòng họ khác (vừa đổi) thì coi như đang tải.
+  const cal = calState.key === clanTreeKey ? calState.data : null
+  useEffect(() => {
+    if (clanTreeKey === undefined) return
+    let alive = true
+    const ids = clanTreeKey.split(':')[1]
+    void calendar.people(ids ? ids.split(',') : []).then((data) => alive && setCalState({ key: clanTreeKey, data }))
+    return () => {
+      alive = false
+    }
+  }, [calendar, clanTreeKey, dir, calTick])
+  const weekCount = useMemo(() => (cal?.ok ? upcomingEvents(cal.value, todaySolar(), 7).length : 0), [cal])
+
   const closeTree = useCallback(() => {
     setTreeId(null)
+    setFocusPersonId(null)
     void reload()
   }, [reload])
+  const openPerson = (tree: string, person: string) => {
+    setFocusPersonId(person)
+    setTreeId(tree)
+  }
   // Back của trình duyệt / Android, vuốt quay lại trên iOS: đóng từng tầng một.
   useBackToClose(showPlatform, () => setShowPlatform(false))
   useBackToClose(clanId !== null, () => setClanId(null))
   useBackToClose(showMembers, () => setShowMembers(false))
+  useBackToClose(showCalendar, () => setShowCalendar(false))
   useBackToClose(treeId !== null, closeTree)
 
   const rail = wide && clanId && dir && !showPlatform
@@ -79,21 +109,33 @@ function Home({ user }: { user: User }) {
           clanId={clanId}
           treeId={treeId}
           membersOpen={showMembers && !treeId}
+          calendarOpen={showCalendar && !treeId}
+          calendarCount={weekCount}
           onSwitchClan={() => {
             setTreeId(null)
             setShowMembers(false)
+            setShowCalendar(false)
             setClanId(null)
           }}
           onOpenClan={() => {
             setShowMembers(false)
+            setShowCalendar(false)
             closeTree()
           }}
           onOpenMembers={() => {
             setTreeId(null)
+            setShowCalendar(false)
             setShowMembers(true)
+          }}
+          onOpenCalendar={() => {
+            setTreeId(null)
+            setShowMembers(false)
+            setShowCalendar(true)
           }}
           onOpenTree={(id) => {
             setShowMembers(false)
+            setShowCalendar(false)
+            setFocusPersonId(null)
             setTreeId(id)
           }}
           onCreateTree={() => setCreating(true)}
@@ -139,7 +181,7 @@ function Home({ user }: { user: User }) {
       />
     )
   }
-  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} sources={sources} clanId={dir?.trees.find((t) => t.id === treeId)?.clanId ?? ''} treeId={treeId} onBack={closeTree} hideBack={!!rail} />)
+  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} sources={sources} clanId={dir?.trees.find((t) => t.id === treeId)?.clanId ?? ''} treeId={treeId} onBack={closeTree} hideBack={!!rail} focusPersonId={focusPersonId} />)
   if (showPlatform) return <PlatformScreen platform={platform} email={email} onBack={() => setShowPlatform(false)} />
   const clan = dir?.clans.find((c) => c.id === clanId)
   if (showMembers && clanId && dir && clan?.role === 'admin') {
@@ -156,9 +198,14 @@ function Home({ user }: { user: User }) {
       />,
     )
   }
+  if (showCalendar && clanId && dir) {
+    return withRail(
+      <CalendarScreen data={cal} dir={dir} clanId={clanId} email={email} hideBack={!!rail} onBack={() => setShowCalendar(false)} onRetry={() => setCalTick((n) => n + 1)} onOpenPerson={openPerson} />,
+    )
+  }
   if (clanId && dir) {
     return withRail(
-      <ClanScreen cloud={cloud} email={email} dir={dir} clanId={clanId} hideBack={!!rail} onBack={() => setClanId(null)} onOpenTree={setTreeId} onOpenMembers={() => setShowMembers(true)} reload={() => void reload()} />,
+      <ClanScreen cloud={cloud} email={email} dir={dir} clanId={clanId} hideBack={!!rail} onBack={() => setClanId(null)} onOpenTree={setTreeId} onOpenMembers={() => setShowMembers(true)} reload={() => void reload()} calendar={cal} onOpenCalendar={() => setShowCalendar(true)} onOpenPerson={openPerson} />,
     )
   }
   return (

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree lịch ngày giỗ</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FAF8F5', muted: '#F3EFEA', rail: '#F5F1EC', line: '#ECE7E1', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', hover: '#8C2721', soft: '#F8ECEA' }, danger: { DEFAULT: '#B42318', soft: '#FBEDEB' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' }, ok: { DEFAULT: '#1F7A45', soft: '#E8F3EC' }, warn: { DEFAULT: '#7A4B00', soft: '#FFF7E6' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)', pill: '0 8px 18px -6px rgb(164 47 40/.55)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; flex-shrink: 0; }
+  .i12{width:12px!important;height:12px!important}.i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i20{width:20px!important;height:20px!important}
+  .desk { width: 1280px; height: 800px; border-radius: 14px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 1px #d8d0c4, 0 30px 60px rgb(0 0 0/.16); flex-shrink: 0 }
+  .phone { width: 375px; height: 812px; border-radius: 44px; overflow: hidden; position: relative; background: #FAF8F5; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0 }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; font-weight:600; font-size:15px; white-space:nowrap }
+  .btn-primary { background:#A42F28; color:#fff; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55) }
+  .btn-secondary { background:#fff; color:#1F1A17; box-shadow: 0 0 0 1px #DDD5CB, 0 1px 2px rgb(31 26 23/.05) }
+  .icb { display:grid; place-items:center; width:44px; height:44px; border-radius:9999px }
+  .toggle { display:inline-flex; gap:4px; padding:4px; border-radius:9999px; background:#F3EFEA }
+  .toggle > span { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:40px; padding:0 14px; border-radius:9999px; font-size:15px; font-weight:500; color:#6B635A; white-space:nowrap }
+  .toggle > span.on { background:#fff; color:#1F1A17; font-weight:600; box-shadow: 0 1px 2px rgb(31 26 23/.08), 0 0 0 1px rgb(31 26 23/.04) }
+  .badge { display:inline-flex; align-items:center; gap:4px; border-radius:9999px; padding:1px 9px; font-size:12.5px; font-weight:600; line-height:22px }
+  .card { border-radius:16px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07) }
+  .sec { font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:#6B635A }
+  .tag { display:inline-block; font-size:12px; font-weight:700; letter-spacing:.06em; color:#A42F28; background:#F8ECEA; border-radius:9999px; padding:2px 10px }
+  .scrim { position:absolute; inset:0; background: rgb(31 26 23/.38) }
+  /* lịch */
+  .cal { display:grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .cell { min-height:104px; padding:8px 8px 6px; box-shadow: inset 1px 0 0 #ECE7E1, inset 0 1px 0 #ECE7E1; position:relative; }
+  .cell.out { background:#FAF8F5 }
+  .cell.out .sd { color:#BDB4AA }
+  .sd { font-size:17px; font-weight:600; line-height:1 }
+  .ld { font-size:12px; color:#6B635A; margin-left:6px }
+  .ld.m1 { color:#A42F28; font-weight:600 }
+  .today .sd { display:inline-grid; place-items:center; width:30px; height:30px; margin:-5px 0 0 -6px; border-radius:9999px; background:#A42F28; color:#fff }
+  .ev { display:flex; align-items:center; gap:4px; margin-top:4px; padding:2px 6px; border-radius:8px; font-size:12px; font-weight:500; line-height:18px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis }
+  .ev.d { background:#F8ECEA; color:#8C2721 }
+  .ev.b { background:#E8F3EC; color:#1F7A45 }
+  .ev.more { background:transparent; color:#6B635A; padding-left:2px }
+  .dot { width:6px; height:6px; border-radius:9999px; display:inline-block }
+</style>
+</head>
+<body class="bg-[#EEE9E2] text-ink">
+<div class="mx-auto max-w-[1420px] space-y-16 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · lunar-calendar-view · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Lịch ngày giỗ: lịch tháng âm–dương, giỗ và sinh nhật</h1>
+    <p class="max-w-3xl text-sub">Giữ hệ đỏ trầm và thành phần shadcn đã duyệt. Số ngày âm trong lịch là số thật (tháng 3/2026; Tết Bính Ngọ 17/2/2026 nên mùng 1 tháng 2 âm là 19/3). Tên người là hư cấu. Có 5 phần: A. Màn Ngày giỗ trên máy tính · B. Ô lịch và chú giải · C. Điện thoại · D. Lối vào (thanh bên, trang nhà dòng họ) · E. Trạng thái.</p>
+  </header>
+
+  <!-- A. MÁY TÍNH -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">A · Màn "Ngày giỗ" trên máy tính</h2><p class="text-sm text-sub">Lịch tháng (trái) và "Sắp tới 30 ngày" (phải 340 px). Hôm nay là thứ Ba 3/3/2026. Chip lọc theo cuốn; người xem thấy y hệt (không có nút sửa). Bấm một sự kiện hoặc một dòng "Sắp tới" thì mở người ấy trong cây.</p></div>
+    <div class="desk flex" id="desk"></div>
+  </section>
+
+  <!-- B. Ô LỊCH -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">B · Ô lịch và chú giải</h2><p class="text-sm text-sub">Ngày dương lớn, ngày âm nhỏ; mùng 1 âm ghi "1/tháng" (đỏ); tháng nhuận ghi "nhuận". Giỗ là chip đỏ nhạt có biểu tượng nến và kỳ giỗ bằng chữ, sinh nhật là chip xanh lá có biểu tượng bánh; không chỉ dựa vào màu. Ô có hơn 2 sự kiện hiện "+N", bấm mở danh sách của ngày.</p></div>
+    <div class="grid max-w-5xl grid-cols-4 gap-4">
+      <div class="card overflow-hidden"><div class="cal"><div class="cell today"><span class="sd">3</span><span class="ld">16</span><div class="ev d"><i data-lucide="flame" class="i12"></i>Cả</div></div></div><p class="px-3 py-2 text-xs text-sub">Hôm nay: vòng đỏ đặc + chữ "Hôm nay" cho trình đọc màn hình</p></div>
+      <div class="card overflow-hidden"><div class="cal"><div class="cell"><span class="sd">19</span><span class="ld m1">1/2</span><div class="ev d"><i data-lucide="flame" class="i12"></i>Dâu · hết</div><div class="ev d"><i data-lucide="flame" class="i12"></i>Bảo</div><div class="ev more">+1 nữa</div></div></div><p class="px-3 py-2 text-xs text-sub">Mùng 1 âm + nhiều sự kiện</p></div>
+      <div class="card overflow-hidden"><div class="cal"><div class="cell"><span class="sd">25</span><span class="ld m1">1/6 nhuận</span><div class="ev b"><i data-lucide="cake" class="i12"></i>Hoa · 51</div></div></div><p class="px-3 py-2 text-xs text-sub">Tháng nhuận và sinh nhật (kèm tuổi)</p></div>
+      <div class="card p-4 text-sm"><p class="sec mb-2">Chú giải</p><p class="flex items-center gap-2"><span class="ev d !mt-0"><i data-lucide="flame" class="i12"></i>Giỗ</span> Giỗ đầu · Giỗ hết · Giỗ thường (chữ trong chip)</p><p class="mt-2 flex items-center gap-2"><span class="ev b !mt-0"><i data-lucide="cake" class="i12"></i>Sinh nhật</span> kèm tuổi</p><p class="mt-2 text-xs text-sub">Trong ô: tên gọi (từ cuối của họ tên), giỗ đầu và giỗ hết có chữ "đầu", "hết". Bấm sự kiện hoặc ngày để xem đủ tên và kỳ giỗ.</p></div>
+    </div>
+  </section>
+
+  <!-- C. ĐIỆN THOẠI -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Điện thoại 375 px</h2><p class="text-sm text-sub">Lưới gọn: mỗi ô chỉ ngày dương, ngày âm và chấm sự kiện (đỏ = giỗ, xanh = sinh nhật; số khi nhiều). Chạm một ngày thì sự kiện của ngày hiện ngay dưới lưới; "Sắp tới" xếp dưới cùng. Mỗi ô cao ≥ 44 px.</p></div>
+    <div class="flex items-start gap-10 overflow-x-auto pb-4" id="phones"></div>
+  </section>
+
+  <!-- D. LỐI VÀO -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Lối vào</h2><p class="text-sm text-sub">Mục "Ngày giỗ" ở thanh bên (số trong ngoặc = sự kiện 7 ngày tới) và thẻ "Ngày giỗ sắp tới" trên trang nhà dòng họ (3 dòng gần nhất + "Xem lịch"). Cả hai chỉ hiện khi có vai trò trong dòng họ.</p></div>
+    <div class="flex items-start gap-10">
+      <div class="w-[248px] rounded-2xl bg-rail px-3 py-4">
+        <div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div>
+        <p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Cuốn gia phả</p>
+        <div class="mt-2 space-y-0.5 text-[15px] text-sub"><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi trưởng<span class="ml-auto text-xs">182</span></div><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi thứ hai<span class="ml-auto text-xs">51</span></div></div>
+        <p class="mt-5 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Dòng họ</p>
+        <div class="mt-2 space-y-0.5 text-[15px]"><div class="flex min-h-11 items-center gap-2.5 rounded-lg bg-white px-2.5 font-medium shadow-1"><i data-lucide="calendar-heart" class="i18 text-accent"></i>Ngày giỗ<span class="ml-auto rounded-full bg-accent-soft px-1.5 text-xs font-semibold text-accent">3</span></div><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 text-sub"><i data-lucide="users" class="i18"></i>Thành viên<span class="ml-auto text-xs">12</span></div></div>
+      </div>
+      <div class="w-[460px] space-y-3">
+        <div class="flex items-center justify-between"><h3 class="text-xl font-semibold">Ngày giỗ sắp tới</h3><span class="inline-flex min-h-11 items-center gap-1 font-semibold text-accent">Xem lịch<i data-lucide="arrow-right" class="i16"></i></span></div>
+        <div class="card divide-y divide-line" id="clan-card"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E. TRẠNG THÁI -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">E · Trạng thái</h2></div>
+    <div class="grid max-w-5xl grid-cols-3 gap-6">
+      <div class="card p-5"><p class="font-semibold">Chưa tính được giỗ <span class="badge bg-warn-soft text-warn">2</span></p><p class="mt-1 text-sm text-sub">Người đã mất nhưng thiếu ngày hoặc tháng mất.</p>
+        <ul class="mt-3 divide-y divide-line rounded-xl ring-1 ring-line">
+          <li class="flex min-h-14 items-center gap-3 px-3"><span class="grid size-9 place-items-center rounded-full bg-muted font-semibold text-sub">K</span><div class="min-w-0 flex-1"><p class="truncate font-medium">Nguyễn Văn Khoa</p><p class="text-sm text-sub">mất 1950 · thiếu ngày/tháng mất</p></div><span class="btn btn-secondary h-10">Bổ sung</span></li>
+          <li class="flex min-h-14 items-center gap-3 px-3"><span class="grid size-9 place-items-center rounded-full bg-muted font-semibold text-sub">M</span><div class="min-w-0 flex-1"><p class="truncate font-medium">Trần Thị Mai</p><p class="text-sm text-sub">mất 12/1962 · thiếu ngày mất</p></div><span class="btn btn-secondary h-10">Bổ sung</span></li>
+        </ul><p class="mt-2 text-xs text-sub">Người xem: danh sách như trên nhưng không có nút "Bổ sung".</p></div>
+      <div class="card grid place-items-center p-5 text-center"><div><span class="mx-auto grid size-12 place-items-center rounded-full bg-muted text-sub"><i data-lucide="calendar-x"></i></span><p class="mt-2 font-semibold">Tháng này không có giỗ hay sinh nhật</p><p class="text-sm text-sub">Chuyển tháng khác hoặc xem "Sắp tới".</p></div></div>
+      <div class="card p-5"><p class="font-semibold">Đang tải / lỗi</p><div class="mt-3 space-y-2"><div class="h-9 animate-pulse rounded-lg bg-muted"></div><div class="h-9 animate-pulse rounded-lg bg-muted"></div></div><p class="mt-4 flex items-start gap-2 rounded-xl bg-danger-soft p-3 text-sm text-danger"><i data-lucide="circle-alert" class="i16 mt-0.5"></i>Không tải được dữ liệu. Hãy thử lại.</p><span class="btn btn-secondary mt-3 h-10">Thử lại</span></div>
+    </div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần anh chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Bố cục máy tính: lịch trái + "Sắp tới" phải (mục A): được chưa?</li>
+      <li>Ô lịch hiện tối đa 2 chip rồi "+N": đồng ý, hay muốn ô cao hơn hiện hết?</li>
+      <li>Thẻ "Ngày giỗ sắp tới" trên trang nhà dòng họ (mục D): giữ hay chỉ để mục ở thanh bên?</li>
+      <li>Điện thoại chạm ngày xem sự kiện dưới lưới (mục C): đồng ý?</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  // Lưới tháng 3/2026 thật: [ngày dương, tháng dương, trong tháng, ngày âm, tháng âm, nhuận]
+  const G = [[23,2,0,7,1,0],[24,2,0,8,1,0],[25,2,0,9,1,0],[26,2,0,10,1,0],[27,2,0,11,1,0],[28,2,0,12,1,0],[1,3,1,13,1,0],[2,3,1,14,1,0],[3,3,1,15,1,0],[4,3,1,16,1,0],[5,3,1,17,1,0],[6,3,1,18,1,0],[7,3,1,19,1,0],[8,3,1,20,1,0],[9,3,1,21,1,0],[10,3,1,22,1,0],[11,3,1,23,1,0],[12,3,1,24,1,0],[13,3,1,25,1,0],[14,3,1,26,1,0],[15,3,1,27,1,0],[16,3,1,28,1,0],[17,3,1,29,1,0],[18,3,1,30,1,0],[19,3,1,1,2,0],[20,3,1,2,2,0],[21,3,1,3,2,0],[22,3,1,4,2,0],[23,3,1,5,2,0],[24,3,1,6,2,0],[25,3,1,7,2,0],[26,3,1,8,2,0],[27,3,1,9,2,0],[28,3,1,10,2,0],[29,3,1,11,2,0],[30,3,1,12,2,0],[31,3,1,13,2,0],[1,4,0,14,2,0],[2,4,0,15,2,0],[3,4,0,16,2,0],[4,4,0,17,2,0],[5,4,0,18,2,0]]
+  const EV = {
+    5: [['d', 'Nguyễn Văn Cả', 'Giỗ thường', 'Chi trưởng']],
+    9: [['b', 'Nguyễn Thị Hoa', '51 tuổi', 'Chi trưởng']],
+    14: [['d', 'Trần Văn Hai', 'Giỗ đầu', 'Chi thứ hai']],
+    19: [['d', 'Lê Thị Dâu', 'Giỗ hết', 'Chi trưởng'], ['d', 'Nguyễn Văn Bảo', 'Giỗ thường', 'Chi trưởng'], ['d', 'Phạm Thị Lan', 'Giỗ thường', 'Chi thứ hai']],
+    22: [['b', 'Nguyễn Văn Em', '74 tuổi', 'Chi trưởng']],
+    28: [['d', 'Trần Thị Bình', 'Giỗ thường', 'Chi thứ hai']],
+  }
+  const TODAY = 3
+  // Trong ô lịch chỉ đủ chỗ cho tên gọi (tên gọi = từ cuối); kỳ giỗ đầu/hết có chữ, giỗ thường bỏ chữ; đủ tên và kỳ giỗ ở danh sách ngày và "Sắp tới".
+  const shortName = (n) => n.split(' ').slice(-1)[0]
+  const chipText = (e) => (e[0] === 'd' ? shortName(e[1]) + (e[2] === 'Giỗ thường' ? '' : ' · ' + e[2].replace('Giỗ ', '')) : shortName(e[1]) + ' · ' + e[2].replace(' tuổi', ''))
+  const ico = (k) => `<i data-lucide="${k === 'd' ? 'flame' : 'cake'}" class="i12"></i>`
+  const ld = (c) => (c[3] === 1 ? `<span class="ld m1">1/${c[4]}${c[5] ? ' nhuận' : ''}</span>` : `<span class="ld">${c[3]}</span>`)
+  const head = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
+  const cell = (c) => {
+    const ev = c[2] ? EV[c[0]] || [] : []
+    const shown = ev.slice(0, 2).map((e) => `<div class="ev ${e[0]}">${ico(e[0])}${chipText(e)}</div>`).join('')
+    const more = ev.length > 2 ? `<div class="ev more">+${ev.length - 2} nữa</div>` : ''
+    return `<div class="cell ${c[2] ? '' : 'out'} ${c[2] && c[0] === TODAY ? 'today' : ''}"><span class="sd">${c[0]}</span>${ld(c)}${c[2] && c[0] === TODAY ? '<span class="sr-only">Hôm nay</span>' : ''}${shown}${more}</div>`
+  }
+  const upcoming = Object.entries(EV).flatMap(([d, list]) => list.map((e) => ({ d: +d, e }))).filter((x) => x.d >= TODAY).sort((a, b) => a.d - b.d)
+  const lunarOf = (d) => G.find((c) => c[0] === d && c[2])
+  const when = (d) => (d === TODAY ? 'hôm nay' : d === TODAY + 1 ? 'ngày mai' : `còn ${d - TODAY} ngày`)
+  const upRow = (x) => {
+    const c = lunarOf(x.d)
+    return `<div class="flex min-h-16 items-center gap-3 px-4 py-2"><div class="w-12 shrink-0 rounded-xl ${x.e[0] === 'd' ? 'bg-accent-soft text-accent' : 'bg-ok-soft text-ok'} py-1 text-center"><p class="text-lg font-semibold leading-tight">${String(x.d).padStart(2, '0')}</p><p class="text-[10px] font-semibold uppercase">tháng 3</p></div><div class="min-w-0 flex-1"><p class="truncate font-medium">${x.e[1]}</p><p class="truncate text-xs text-sub">${x.e[2]} · âm ${c[3]}/${c[4]} · ${x.e[3]}</p></div><span class="shrink-0 text-xs font-medium ${x.d - TODAY <= 7 ? 'text-accent' : 'text-sub'}">${when(x.d)}</span></div>`
+  }
+  const rail = `<aside class="flex w-[248px] shrink-0 flex-col bg-rail px-3 py-4"><div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i18"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div><div class="mt-5 flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 shadow-1"><span class="grid size-8 place-items-center rounded-lg bg-accent-soft text-accent"><i data-lucide="landmark" class="i18"></i></span><span class="flex-1"><span class="block text-sm font-semibold leading-tight">Họ Nguyễn Văn</span><span class="block text-xs text-sub">Quản trị</span></span></div><p class="mt-6 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Cuốn gia phả</p><div class="mt-2 space-y-0.5 text-[15px] text-sub"><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi trưởng<span class="ml-auto text-xs">182</span></div><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5"><i data-lucide="network" class="i18"></i>Chi thứ hai<span class="ml-auto text-xs">51</span></div></div><p class="mt-5 px-2 text-[11px] font-semibold uppercase tracking-[.08em] text-sub">Dòng họ</p><div class="mt-2 space-y-0.5 text-[15px]"><div class="flex min-h-11 items-center gap-2.5 rounded-lg bg-white px-2.5 font-medium shadow-1"><i data-lucide="calendar-heart" class="i18 text-accent"></i>Ngày giỗ<span class="ml-auto rounded-full bg-accent-soft px-1.5 text-xs font-semibold text-accent">3</span></div><div class="flex min-h-11 items-center gap-2.5 rounded-lg px-2.5 text-sub"><i data-lucide="users" class="i18"></i>Thành viên<span class="ml-auto text-xs">12</span></div></div></aside>`
+  document.getElementById('desk').innerHTML = `${rail}<main class="flex min-w-0 flex-1 gap-6 overflow-hidden px-8 py-7"><div class="min-w-0 flex-1"><div class="flex items-end justify-between"><div><h3 class="text-[28px] font-semibold tracking-tight">Ngày giỗ</h3><p class="mt-1 text-sub">Họ Nguyễn Văn · 2 cuốn · tháng 3/2026</p></div><div class="flex items-center gap-2"><span class="btn btn-secondary">Hôm nay</span><span class="icb bg-white shadow-1"><i data-lucide="chevron-left"></i></span><span class="min-w-32 text-center font-semibold">Tháng 3, 2026</span><span class="icb bg-white shadow-1"><i data-lucide="chevron-right"></i></span></div></div><p class="mt-1 text-right text-sm text-sub">Tháng 1 – 2 âm lịch · năm Bính Ngọ</p><div class="mt-3"><div class="toggle"><span class="on">Tất cả</span><span>Chi trưởng</span><span>Chi thứ hai</span></div></div><div class="card mt-4 overflow-hidden"><div class="cal bg-muted/60 text-center text-xs font-semibold uppercase tracking-wide text-sub">${head.map((h) => `<div class="py-2">${h}</div>`).join('')}</div><div class="cal">${G.slice(0, 35).map(cell).join('')}</div></div><p class="mt-3 flex items-center gap-2 text-sm text-sub"><i data-lucide="triangle-alert" class="i16"></i>2 người đã mất chưa tính được giỗ (thiếu ngày/tháng mất). <span class="font-semibold text-accent">Xem</span></p></div><aside class="flex w-[300px] shrink-0 flex-col"><h3 class="mb-3 text-lg font-semibold">Sắp tới <span class="text-sm font-normal text-sub">30 ngày</span></h3><div class="card divide-y divide-line overflow-hidden">${upcoming.slice(0, 6).map(upRow).join('')}</div></aside></main>`
+  const phoneCells = G.slice(0, 35).map((c) => {
+    const ev = c[2] ? EV[c[0]] || [] : []
+    const dots = ev.slice(0, 3).map((e) => `<span class="dot" style="background:${e[0] === 'd' ? '#A42F28' : '#1F7A45'}"></span>`).join('')
+    return `<div class="relative grid min-h-12 place-items-center py-1 ${c[2] ? '' : 'opacity-40'} ${c[2] && c[0] === 19 ? 'rounded-xl bg-accent-soft' : ''}"><span class="${c[2] && c[0] === TODAY ? 'grid size-7 place-items-center rounded-full bg-accent text-white' : ''} text-[15px] font-semibold leading-none">${c[0]}</span><span class="text-[10px] ${c[3] === 1 ? 'font-semibold text-accent' : 'text-sub'}">${c[3] === 1 ? `1/${c[4]}` : c[3]}</span><span class="flex h-1.5 gap-0.5">${dots}</span></div>`
+  }).join('')
+  const phoneTop = `<div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div><div class="flex h-14 items-center gap-1 px-2"><span class="icb"><i data-lucide="arrow-left" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">Ngày giỗ</p><span class="icb"><i data-lucide="chevron-left"></i></span><span class="text-sm font-semibold">3/2026</span><span class="icb"><i data-lucide="chevron-right"></i></span></div>`
+  const grid = `<div class="grid grid-cols-7 px-2 text-center text-[11px] font-semibold text-sub">${head.map((h) => `<div class="py-1">${h}</div>`).join('')}</div><div class="grid grid-cols-7 px-2">${phoneCells}</div>`
+  const dayList = `<div class="mt-3 px-4"><p class="sec mb-2">19/3 · mùng 1 tháng 2 âm · 3 sự kiện</p><div class="card divide-y divide-line overflow-hidden">${EV[19].map((e) => `<div class="flex min-h-14 items-center gap-3 px-3"><span class="grid size-8 place-items-center rounded-full bg-accent-soft text-accent"><i data-lucide="flame" class="i16"></i></span><div class="min-w-0 flex-1"><p class="truncate font-medium">${e[1]}</p><p class="text-xs text-sub">${e[2]} · ${e[3]}</p></div><i data-lucide="chevron-right" class="text-sub"></i></div>`).join('')}</div></div>`
+  document.getElementById('phones').innerHTML = `<div class="phone">${phoneTop}${grid}${dayList}</div><div class="phone">${phoneTop}<div class="mt-2 px-4"><div class="toggle w-full overflow-hidden"><span class="on">Tất cả</span><span>Chi trưởng</span><span>Chi thứ hai</span></div></div><div class="mt-3 px-4"><p class="sec mb-2">Sắp tới · 30 ngày</p><div class="card divide-y divide-line overflow-hidden">${upcoming.slice(0, 5).map(upRow).join('')}</div></div></div>`
+  document.getElementById('clan-card').innerHTML = upcoming.slice(0, 3).map(upRow).join('')
+  lucide.createIcons()
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Landmark, LogOut, Network, Plus, Users } from 'lucide-react'
+import { CalendarHeart, ChevronsUpDown, Landmark, LogOut, Network, Plus, Users } from 'lucide-react'
 import { useAuth } from '../auth.tsx'
 import type { Directory } from '../lib/cloudStore.ts'
 import { Avatar } from '../ui/index.ts'
@@ -14,9 +14,12 @@ export function AppRail({
   clanId,
   treeId,
   membersOpen,
+  calendarOpen,
+  calendarCount,
   onSwitchClan,
   onOpenClan,
   onOpenMembers,
+  onOpenCalendar,
   onOpenTree,
   onCreateTree,
 }: {
@@ -25,9 +28,13 @@ export function AppRail({
   clanId: string
   treeId: string | null
   membersOpen: boolean
+  calendarOpen: boolean
+  /** Số giỗ và sinh nhật trong 7 ngày tới. */
+  calendarCount: number
   onSwitchClan: () => void
   onOpenClan: () => void
   onOpenMembers: () => void
+  onOpenCalendar: () => void
   onOpenTree: (id: string) => void
   onCreateTree: () => void
 }) {
@@ -53,7 +60,7 @@ export function AppRail({
         <ChevronsUpDown aria-hidden size={16} className="shrink-0 text-ink-muted" />
       </button>
 
-      <button type="button" onClick={onOpenClan} className={`mt-4 min-h-11 cursor-pointer rounded-lg px-2 text-left text-xs font-semibold uppercase tracking-[0.07em] ${treeId || membersOpen ? 'text-ink-muted hover:text-ink' : 'text-accent'}`}>
+      <button type="button" onClick={onOpenClan} className={`mt-4 min-h-11 cursor-pointer rounded-lg px-2 text-left text-xs font-semibold uppercase tracking-[0.07em] ${treeId || membersOpen || calendarOpen ? 'text-ink-muted hover:text-ink' : 'text-accent'}`}>
         Cuốn gia phả
       </button>
       <ul className="mt-1 space-y-0.5">
@@ -86,9 +93,25 @@ export function AppRail({
         )}
       </ul>
 
+      <p className="mt-5 px-2 text-xs font-semibold uppercase tracking-[0.07em] text-ink-muted">Dòng họ</p>
+      <button
+        type="button"
+        aria-current={calendarOpen ? 'page' : undefined}
+        onClick={onOpenCalendar}
+        className={`mt-1 flex min-h-11 w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-left text-[15px] transition-colors duration-100 ${
+          calendarOpen ? 'bg-surface font-medium text-ink shadow-1' : 'text-ink-muted hover:bg-surface/60 hover:text-ink'
+        }`}
+      >
+        <CalendarHeart aria-hidden size={17} strokeWidth={1.9} className={calendarOpen ? 'text-accent' : ''} />
+        <span className="min-w-0 flex-1">Ngày giỗ</span>
+        {calendarCount > 0 && (
+          <span title="Giỗ và sinh nhật trong 7 ngày tới" className="tabular rounded-full bg-accent-soft px-1.5 text-xs font-semibold text-accent">
+            {calendarCount}
+          </span>
+        )}
+      </button>
       {clan?.role === 'admin' && (
         <>
-          <p className="mt-5 px-2 text-xs font-semibold uppercase tracking-[0.07em] text-ink-muted">Dòng họ</p>
           <button
             type="button"
             aria-current={membersOpen ? 'page' : undefined}

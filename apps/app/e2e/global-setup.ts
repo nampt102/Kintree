@@ -23,5 +23,5 @@ export default async function globalSetup() {
   process.env.KT_API_URL = url
   process.env.KT_ANON_KEY = anon
   process.env.KT_SERVICE_KEY = service
-  process.env.KT_MAIL_URL = (get('MAILPIT_URL') ?? get('INBUCKET_URL')) || 'http://127.0.0.1:54324'
+  process.env.KT_MAIL_URL = (get('MAILPIT_URL') ?? get('INBUCKET_URL')) || 'http://127.0.0.1:55324'
 }

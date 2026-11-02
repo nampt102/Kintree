@@ -13,10 +13,10 @@ Quy tắc: màn hình chỉ dùng token và thành phần dưới đây, không 
 ## Token (`apps/app/src/index.css`, khối `@theme`)
 | Nhóm | Token | Ghi chú |
 |---|---|---|
-| Nền | `canvas` `#FAF8F5`, `surface` `#FFFFFF`, `surface-muted` `#F3EFEA`, `rail` `#F5F1EC` | trang / thẻ / nền nhạt, người đã mất / thanh bên |
+| Nền | `canvas` `#FFFFFF`, `surface` `#FFFFFF`, `surface-muted` `#F4F4F5`, `rail` `#F7F7F8` (ADR 0012) | trang / thẻ / nền nhạt, người đã mất / thanh bên |
 | Chữ | `ink` `#1F1A17`, `ink-muted` `#6B635A` | chữ phụ ≥ 4,5:1 trên mọi nền |
-| Viền | `line` `#ECE7E1` (trang trí), `line-input` `#8F877C` (viền ô nhập, ≥ 3:1), `connector` `#BDB4AA` (đường nối cây, mũi tên) | |
-| Nhấn | `accent` `#A42F28`, `accent-hover` `#8C2721`, `accent-soft` `#F8ECEA` | nút chính, người đang chọn, thuỷ tổ |
+| Viền | `line` `#ECECEE` (trang trí), `line-input` `#8F877C` (viền ô nhập, ≥ 3:1), `connector` `#BDB4AA` (đường nối cây, mũi tên) | |
+| Nhấn | `accent` `#A42F28`, `accent-hover` `#8C2721`, `accent-soft` `#FCEEEC`, `ok` `#1F7A45` / `ok-soft` `#E8F3EC` (sinh nhật) | nút chính, người đang chọn, thuỷ tổ |
 | Giới tính | `male` `#2F5E8C` / `male-soft`, `female` `#A23F6B` / `female-soft` | chỉ ở khung người và ảnh chữ cái; luôn kèm biểu tượng ♂/♀ và chữ cho trình đọc màn hình |
 | Trạng thái | `danger` `#B42318`, `danger-soft`, `focus` `#1D4ED8` | gỡ / xoá / lỗi; vòng focus 3 px |
 | Bóng | `shadow-1` (thẻ, khung người), `shadow-2` (thanh nổi, đang chọn, hover), `shadow-3` (menu, hộp thoại, ngăn nổi, toast), `shadow-pill` (nút chính), `shadow-sheet` | không đặt bóng tuỳ chỗ |

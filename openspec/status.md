@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. Chọn model AI đọc ảnh (gợi ý `anthropic:claude-sonnet-5-5`) và thử trên ảnh bia mộ thật; làm bộ đánh giá (Phase 0); lọc người có thể còn sống trước khi gửi cho AI (chờ chủ dự án chọn mốc năm sinh, gợi ý 1940). Sau đó `/opsx:propose` change `ai-audio-proposals` (ghi âm).
+2. Chủ dự án xem lịch giỗ chạy thật (`lunar-calendar-view`), rồi commit và `/opsx:archive`; sau đó `anniversary-push`.
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -28,7 +28,8 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 3b | Lời mời (email + link xem), quản lý thành viên (E3) | done | `clan-invites` | "Tôi là ai" dời sang `kinship-terms` |
 | 3c | Bộ component shadcn/ui, làm lại form | done | `ui-components` | archive 2026-10-28; 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | done | `ai-image-proposals` | ghi âm làm `ai-audio-proposals` sau; điểm khác biệt |
-| 5 | Lịch tháng + nhắc giỗ (E5, F8, F11) | todo | `lunar-calendar-reminders` | |
+| 5a | Lịch tháng âm–dương, giỗ, sinh nhật, sắp tới (E5, F8) | in-progress 8/9 | `lunar-calendar-view` | giao diện + e2e xong; chờ chủ dự án duyệt app chạy thật, commit, archive |
+| 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | todo | `anniversary-push` | Web Push + FCM, sau 5a |
 | 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
 | 7 | Nhật ký thay đổi (E7, F12) | todo | `audit-log` | |
 | 8 | Poster PDF, GEDCOM (E8, F13) | todo | `export-poster-gedcom` | |
@@ -65,6 +66,10 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-11-02: `lunar-calendar-view` xong giao diện (màn Ngày giỗ, mục thanh bên, thẻ sắp tới, mở người từ lịch); e2e `calendar.spec.ts`, Playwright 123 qua (2 worker). Windows khoá cổng 54238–54337 nên đổi cổng Supabase local sang 553xx (`config.toml`); nếu dùng Google đăng nhập, đổi Redirect URI sang `http://127.0.0.1:55321/auth/v1/callback`.
+- 2026-11-02: Đổi nền app sang trắng tinh (ADR 0012) theo ý chủ dự án; bản mẫu lịch đã duyệt, kế tiếp làm giao diện lịch (nhóm 4).
+- 2026-11-02: `lunar-calendar-view` xong lõi lịch (`core/calendar.ts`: lưới tháng, giỗ, sinh nhật, sắp tới; 22 test mới, core 357) và `calendarStore` (6 test); bản mẫu giao diện chờ duyệt.
+- 2026-10-28: Đề xuất `lunar-calendar-view` (lịch tháng âm–dương cấp dòng họ, giỗ + sinh nhật mọi cuốn, sắp tới 30 ngày, lọc cuốn; push để `anniversary-push` sau); chủ dự án bỏ qua ghi âm và lọc người còn sống để làm bước kế.
 - 2026-10-28: Archive `ai-image-proposals` (tạo `ai-sources`, `proposal-review`); chủ dự án đã thử đọc ảnh bằng Anthropic thật; gom khoá về `supabase/.env`, sửa `db:env`, sửa schema rỗng bị Anthropic từ chối.
 - 2026-10-28: `ai-image-proposals` xong giao diện (16/16): đưa ảnh vào, ngăn Tư liệu, hàng chờ duyệt cạnh ảnh (nhận người kèm quan hệ, sửa rồi nhận, gộp người trùng, bỏ kèm lý do), dấu và hộp nguồn; ADR 0011; pgTAP 168, Vitest core 335 + app 101, Playwright 120 qua ×2 (1 bỏ qua). Nhà cung cấp AI thật chưa thử (chưa có khoá).
 - 2026-10-28: `ai-image-proposals` xong hạ tầng + DB + Edge Function + lớp dữ liệu (8/16): Storage và edge-runtime bật trong `db:start` (thêm function mới phải `db:stop` rồi `db:start`), migration `ai_image_proposals`, function `extract-image` với AI giả lập, `core` thêm `findSimilarPersons`/`linkParent`, thông dịch đề xuất; pgTAP 168, Vitest core 335 + app 101, e2e function 5; bản mẫu giao diện chờ duyệt.

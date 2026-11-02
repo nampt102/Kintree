@@ -49,6 +49,8 @@ const PAIRS: [string, string, number][] = [
   ['female', 'female-soft', 4.5],
   ['ink-muted', 'rail', 4.5],
   ['ink', 'rail', 4.5],
+  ['ok', 'ok-soft', 4.5],
+  ['accent-hover', 'accent-soft', 4.5],
 ]
 
 test.each(PAIRS)('%s trên %s ≥ %d:1', (fg, bg, min) => {

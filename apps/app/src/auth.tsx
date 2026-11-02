@@ -125,13 +125,6 @@ function LoginScreen() {
     <div className="relative min-h-dvh overflow-hidden bg-canvas">
       {/* Hoạ tiết cây nhạt phía trên (trang trí). */}
       <svg aria-hidden className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-[340px] w-full max-w-xl" viewBox="0 0 390 340" fill="none" preserveAspectRatio="xMidYMin slice">
-        <defs>
-          <linearGradient id="kt-login-bg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#f3ece6" />
-            <stop offset="1" stopColor="#faf8f5" />
-          </linearGradient>
-        </defs>
-        <rect width="390" height="340" fill="url(#kt-login-bg)" />
         <g stroke="#e0d3c9" strokeWidth="1.2">
           <path d="M195 290 V200 M195 200 C195 170 150 160 120 140 M195 200 C195 170 240 160 270 140 M120 140 C110 120 90 110 70 100 M120 140 C125 118 135 105 150 90 M270 140 C260 118 250 105 240 90 M270 140 C285 120 305 110 325 102" />
         </g>

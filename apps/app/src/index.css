@@ -15,19 +15,19 @@
   --color-transparent: transparent;
   --color-white: #ffffff;
   --color-black: #000000;
-  /* Tông "đỏ trầm" (change ui-polish, design D1): nền trắng ấm, đỏ son là màu nhấn duy nhất. */
-  --color-canvas: #faf8f5;
+  /* Nền trắng tinh, thanh bên xám rất nhạt (ADR 0012); đỏ son là màu nhấn duy nhất. */
+  --color-canvas: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-muted: #f3efea;
-  --color-rail: #f5f1ec;
-  --color-line: #ece7e1;
+  --color-surface-muted: #f4f4f5;
+  --color-rail: #f7f7f8;
+  --color-line: #ececee;
   --color-line-input: #8f877c;
   --color-connector: #bdb4aa;
   --color-ink: #1f1a17;
   --color-ink-muted: #6b635a;
   --color-accent: #a42f28;
   --color-accent-hover: #8c2721;
-  --color-accent-soft: #f8ecea;
+  --color-accent-soft: #fceeec;
   --color-male: #2f5e8c;
   --color-male-soft: #e8eff6;
   --color-female: #a23f6b;
@@ -35,6 +35,8 @@
   --color-focus: #1d4ed8;
   --color-danger: #b42318;
   --color-danger-soft: #fbedeb;
+  --color-ok: #1f7a45;
+  --color-ok-soft: #e8f3ec;
   --color-scrim: rgb(31 26 23 / 0.45);
 
   /* Thang chữ (rem theo cỡ gốc 112.5% = 18 px nhưng vẫn phóng theo cài đặt của người dùng). */

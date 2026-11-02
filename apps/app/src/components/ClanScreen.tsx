@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { CloudStore, Directory, TreeInfo } from '../lib/cloudStore.ts'
 import { Badge, EmptyState, IconButton, OverflowMenu, TopBar } from '../ui/index.ts'
 import { AccountMenu } from './AccountMenu.tsx'
+import { UpcomingCard, type CalendarData } from './CalendarScreen.tsx'
 import { pageClass, pagePad, ROLE_LABEL } from './ClanList.tsx'
 import { CreateTreeDialog, DeleteTreeDialog, EditTreeInfoDialog, REGION_LABEL } from './TreeManage.tsx'
 
@@ -41,6 +42,9 @@ export function ClanScreen({
   onOpenTree,
   onOpenMembers,
   reload,
+  calendar,
+  onOpenCalendar,
+  onOpenPerson,
 }: {
   cloud: CloudStore
   email: string
@@ -52,6 +56,9 @@ export function ClanScreen({
   onOpenTree: (treeId: string) => void
   onOpenMembers: () => void
   reload: () => void
+  calendar: CalendarData
+  onOpenCalendar: () => void
+  onOpenPerson: (treeId: string, personId: string) => void
 }) {
   const clan = dir.clans.find((c) => c.id === clanId)
   const trees = dir.trees.filter((t) => t.clanId === clanId)
@@ -114,6 +121,8 @@ export function ClanScreen({
             ))}
           </dl>
         </section>
+
+        {trees.length > 0 && <UpcomingCard data={calendar} dir={dir} clanId={clanId} onOpenCalendar={onOpenCalendar} onOpenPerson={onOpenPerson} />}
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold tracking-[-0.01em]">Các cuốn gia phả</h2>

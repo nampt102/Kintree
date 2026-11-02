@@ -63,6 +63,13 @@ for (const [size, viewport] of [
       await page.waitForTimeout(300)
       await page.screenshot({ path: out(`${size}-9-link`) })
 
+      // Lịch ngày giỗ (giữ ở cuối: sau đó ta rời app sang link mời).
+      await page.goto('/')
+      await page.getByRole('button', { name: new RegExp(world.clanName) }).click()
+      await page.getByRole('button', { name: 'Xem lịch' }).click()
+      await expect(page.getByRole('heading', { name: 'Ngày giỗ' })).toBeVisible()
+      await page.screenshot({ path: out(`${size}-11-lich`) })
+
       await page.goto(url.pathname + url.hash)
       await expect(page.getByRole('button', { name: 'Nhận lời mời' })).toBeVisible()
       await page.screenshot({ path: out(`${size}-10-nhan-loi-moi`) })
