@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. Chủ dự án thử nhắc giỗ thật: `pnpm vapid:gen`, đặt `PUSH_PROVIDER=webpush` trong `supabase/.env`, `db:stop`/`db:start`, bật nhắc trong màn Ngày giỗ; rồi commit và `/opsx:archive anniversary-push`.
+2. Chọn change kế: `kinship-terms` (xưng hô ba miền, bước 6) hoặc `ai-audio-proposals` / `audit-log`; kiểm tay Web Push trên iPhone và Android khi có HTTPS.
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -29,7 +29,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 3c | Bộ component shadcn/ui, làm lại form | done | `ui-components` | archive 2026-10-28; 15/15 task; ADR 0010; bản mẫu đã duyệt (D1 toàn màn) |
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | done | `ai-image-proposals` | ghi âm làm `ai-audio-proposals` sau; điểm khác biệt |
 | 5a | Lịch tháng âm–dương, giỗ, sinh nhật, sắp tới (E5, F8) | done | `lunar-calendar-view` | archive 2026-11-02; 8/8 task; spec `family-calendar` |
-| 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | in-progress 10/10 | `anniversary-push` | xong code + test; chờ chủ dự án thử thật (`pnpm vapid:gen`, `PUSH_PROVIDER=webpush`), commit, archive; FCM chờ Capacitor |
+| 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | done | `anniversary-push` | archive 2026-11-03; 10/10 task; ADR 0013; Web Push đã thử thật trên Chrome máy tính; FCM chờ Capacitor; chưa thử iPhone/Android và lịch trên Supabase thật |
 | 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
 | 7 | Nhật ký thay đổi (E7, F12) | todo | `audit-log` | |
 | 8 | Poster PDF, GEDCOM (E8, F13) | todo | `export-poster-gedcom` | |
@@ -66,6 +66,7 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-11-03: Archive `anniversary-push` (tạo spec `anniversary-reminders`); chủ dự án đã thử gửi Web Push thật trên Chrome (cần CA mạng công ty trong container function, `VAPID_SUBJECT` tự thêm `mailto:`).
 - 2026-11-02: `anniversary-push` xong giao diện (thẻ Nhắc ngày giỗ, service worker, manifest, mở từ thông báo `#calendar/<dòng họ>`, `pnpm vapid:gen`); ADR 0013; Vitest 127, pgTAP 189, Playwright 129 qua (4 ca lỗi do tải ở lần chạy đầy đủ, qua khi chạy riêng). Gửi Web Push thật chưa thử.
 - 2026-11-02: `anniversary-push` xong DB (migration + pgTAP 189), bộ gửi `send-reminders` (mock, e2e 3 ca; Web Push `web-push` chạy trong Deno, gửi thật chưa thử), lịch pg_cron 7:00 giờ VN (`pnpm reminders:schedule`); bản mẫu giao diện chờ duyệt. Mã lịch sao vào function bằng `pnpm sync:core`.
 - 2026-11-02: Archive `lunar-calendar-view` (tạo spec `family-calendar`); mở change `anniversary-push` với `proposal.md` (Web Push trước, FCM sau Capacitor), chờ chốt câu hỏi mở.
