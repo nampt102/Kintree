@@ -15,7 +15,7 @@ const FILTER_LABEL: Record<PersonFilter, string> = {
 }
 
 /** Chế độ danh sách: mọi người của cuốn, có lọc và tìm; chọn một dòng mở hồ sơ. */
-export function PersonList({ doc, onOpen }: { doc: TreeDoc; onOpen: (id: string) => void }) {
+export function PersonList({ doc, onOpen, terms }: { doc: TreeDoc; onOpen: (id: string) => void; terms?: ReadonlyMap<string, string> }) {
   const [filter, setFilter] = useState<PersonFilter>('all')
   const [query, setQuery] = useState('')
   const rows = filterPersons(doc, filter, query)
@@ -41,6 +41,7 @@ export function PersonList({ doc, onOpen }: { doc: TreeDoc; onOpen: (id: string)
                   {[p.gender === 'male' ? 'Nam' : p.gender === 'female' ? 'Nữ' : '', p.isOutsider ? 'Dâu/Rể' : '', lifespan(p)].filter(Boolean).join(' · ')}
                 </span>
               </span>
+              {terms?.get(p.id) && <span className="shrink-0 rounded-full bg-ink px-2 text-xs font-semibold leading-6 text-white">{terms.get(p.id)}</span>}
               <ChevronRight aria-hidden size={18} className="shrink-0 text-connector" />
             </button>
           </li>

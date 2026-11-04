@@ -35,6 +35,9 @@ type PersonData = {
   canAddChild: boolean
   canAddSpouse: boolean
   canRemove: boolean
+  /** Từ người dùng gọi người này (đã chọn "Tôi là ai"); rỗng = không hiện nhãn. */
+  term?: string
+  isSelf?: boolean
   onAction: (id: string, action: NodeAction) => void
 }
 
@@ -86,6 +89,14 @@ const PersonCard = memo(function PersonCard({ data }: NodeProps<PersonNode>) {
           <span className="absolute -top-2.5 left-3 inline-flex items-center gap-1 rounded-full bg-accent-soft px-1.5 text-[11px] font-semibold leading-5 text-accent ring-1 ring-surface">
             <Landmark aria-hidden size={12} strokeWidth={2.2} />
             Thuỷ tổ
+          </span>
+        )}
+        {data.term && (
+          <span
+            data-testid="kin-term"
+            className={`absolute -top-2.5 right-2 max-w-[70%] truncate rounded-full px-2 text-[11.5px] font-semibold leading-5 text-white ring-2 ring-surface ${data.isSelf ? 'bg-accent' : 'bg-ink'}`}
+          >
+            {data.term}
           </span>
         )}
         <Avatar name={name} gender={person.gender} muted={dead} size={34} />
@@ -168,6 +179,9 @@ export type DiagramProps = {
   onSelect: (id: string | null) => void
   onOpenProfile: (id: string) => void
   onAction: (id: string, action: NodeAction) => void
+  /** Từ gọi từng người (từ "Tôi là ai"); không có thì không hiện nhãn. */
+  terms?: ReadonlyMap<string, string>
+  selfId?: string | null
 }
 
 const LABEL_X = -110
@@ -193,7 +207,7 @@ function ZoomControls({ onFit }: { onFit: () => void }) {
   )
 }
 
-function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, compact, topInset = 0, actionsFor, onSelect, onOpenProfile, onAction }: DiagramProps) {
+function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, compact, topInset = 0, actionsFor, onSelect, onOpenProfile, onAction, terms, selfId }: DiagramProps) {
   const rf = useReactFlow()
   const reduced = usePrefersReducedMotion()
   // Nút trong sơ đồ giữ vùng chạm 44 px trên màn hình ở mọi mức phóng; thu dưới 50% thì ẩn (dùng bảng thông tin).
@@ -216,7 +230,7 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
         position: { x: n.x, y: n.y },
         width: n.width,
         height: n.height,
-        data: { person, hiddenCount: n.hiddenCount, collapsed: n.collapsed, selected: false, highlighted: false, onAction, ...actionsFor(person) },
+        data: { person, hiddenCount: n.hiddenCount, collapsed: n.collapsed, selected: false, highlighted: false, onAction, term: terms?.get(n.id), isSelf: n.id === selfId, ...actionsFor(person) },
         draggable: false,
       })
     }
@@ -224,7 +238,7 @@ function Inner({ doc, layout, selectedId, highlightId, focusKey, showMiniMap, co
       nodes.push({ id: j.id, type: 'junction', position: { x: j.x, y: j.y }, data: {}, draggable: false, selectable: false, focusable: false })
     }
     return nodes
-  }, [layout, persons, actionsFor, onAction])
+  }, [layout, persons, actionsFor, onAction, terms, selfId])
 
   const nodes = useMemo(
     () =>

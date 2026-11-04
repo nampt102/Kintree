@@ -1,3 +1,4 @@
+// @ts-expect-error core không cài @types/node; Vitest chạy trên Node nên import vẫn chạy.
 import { readFileSync } from 'node:fs'
 import { expect, test } from 'vitest'
 

@@ -18,6 +18,8 @@ Nguồn: `supabase/migrations/20261026000000_init.sql`, `20261027000000_auth_acc
 | `sources` | tư liệu: ảnh (lát đầu), ghi âm, lời kể, văn bản | thêm `tree_id`, `image_kind` (`grave`/`page`/`altar`/`other`), `status` (`queued`/`processing`/`done`/`failed`), `status_at`, `error`, `proposal_count`; `consent_at` cho ghi âm; ảnh ở bucket `sources` (`<clan>/<tree>/<source>.jpg`) |
 | `proposals` | đề xuất do AI sinh | `op` (`add_person`/`update_field`/`add_relation`), `payload` (jsonb, schema ở `supabase/functions/_shared/schema.ts`), `anchor` (vùng ảnh 0–1), `ref` (mã tạm của người trong lô), `quote` (chữ AI đọc), `provider`/`model`, `status` (`pending`/`accepted`/`rejected`/`superseded`), `edited`, `review_note`, `result_person_id`; chỉ quản trị cuốn đọc |
 | `field_sources` | nguồn của từng trường (kể cả nguồn không chọn) | `person_id`, `field` (`fullName`/`gender`/`birth`/`death`/`birthPlace`/`burialPlace`/`biography`), `source_id`, `proposal_id`, `value`, `anchor`, `accepted`, `note`; mọi người có vai trò ở cuốn đọc được |
+| `tree_self` | "Tôi là ai" của người dùng trong một cuốn (change kinship-terms) | khoá chính (`user_id`, `tree_id`); `person_id` phải thuộc đúng cuốn và chưa gỡ; RLS chỉ dòng của mình và cần quyền xem cuốn; chỉ ảnh hưởng hiển thị xưng hô |
+| `push_subscriptions`, `reminder_prefs`, `reminder_log` | nhắc giỗ qua Web Push (change anniversary-push) | thiết bị của mình (ghi qua `register_push`), bật nhắc theo (người, dòng họ), nhật ký chống gửi trùng (chỉ `service_role`); `reminder_targets()` cho bộ gửi |
 | `audit_log` | nhật ký thay đổi | giá trị `old`/`new` dạng jsonb, `actor` = `auth.uid()` |
 
 ## Ngày không đầy đủ

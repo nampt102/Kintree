@@ -31,6 +31,18 @@ for (const [size, viewport] of [
       await expect(page.locator('.react-flow')).toHaveAttribute('data-fit', 'done')
       await page.screenshot({ path: out(`${size}-4-cay`) })
 
+      // Chọn "Tôi là ai" = Cháu: nhãn xưng hô trên cây và khối Xưng hô trong bảng người.
+      await page.getByRole('button', { name: 'Chọn tên của tôi' }).click()
+      const who = page.getByRole('dialog', { name: 'Bạn là ai?' })
+      await who.getByLabel('Tên của bạn').fill('Cháu')
+      await who.getByRole('button', { name: /Nguyễn Văn Cháu/ }).click()
+      await page.waitForTimeout(200)
+      await page.screenshot({ path: out(`${size}-4b-chon-toi`) })
+      await who.getByRole('button', { name: 'Chọn', exact: true }).click()
+      await expect(who).toBeHidden()
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: out(`${size}-4c-nhan-xung-ho`) })
+
       await card(page, 'Nguyễn Văn An').click()
       await expect(page.getByRole('button', { name: 'Sửa hồ sơ' })).toBeVisible()
       await page.waitForTimeout(400)

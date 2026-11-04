@@ -86,11 +86,11 @@ insert into public.reminder_prefs (user_id, clan_id, enabled) values
   ('00000000-0000-0000-0000-0000000000a3', '00000000-0000-0000-0000-0000000000c1', true);
 delete from public.memberships where user_id = '00000000-0000-0000-0000-0000000000a5';
 set local role service_role;
-select is((select array_agg(distinct user_id::text) from public.reminder_targets()), array['00000000-0000-0000-0000-0000000000a2'], 'chỉ người còn vai trò, đã bật và có thiết bị là người nhận');
+select is((select array_agg(distinct user_id::text) from public.reminder_targets() where clan_id = '00000000-0000-0000-0000-0000000000c1'), array['00000000-0000-0000-0000-0000000000a2'], 'chỉ người còn vai trò, đã bật và có thiết bị là người nhận');
 reset role;
 update public.reminder_prefs set enabled = false where user_id = '00000000-0000-0000-0000-0000000000a2';
 set local role service_role;
-select is((select count(*)::int from public.reminder_targets()), 0, 'tắt nhắc thì không còn là người nhận');
+select is((select count(*)::int from public.reminder_targets() where clan_id = '00000000-0000-0000-0000-0000000000c1'), 0, 'tắt nhắc thì không còn là người nhận');
 reset role;
 
 -- Chống gửi trùng

@@ -1,5 +1,5 @@
-import { findPerson, spouseIdsOf, type TreeDoc, type TreePerson } from '@kintree/core'
-import { ArrowUp, ArrowUpDown, ChevronsDownUp, ChevronsUpDown, Crosshair, Heart, Landmark, Mars, Pencil, Trash2, UserPlus, Venus, X } from 'lucide-react'
+import { findPerson, spouseIdsOf, type Kinship, type TreeDoc, type TreePerson } from '@kintree/core'
+import { ArrowUp, ArrowUpDown, ChevronsDownUp, ChevronsUpDown, Crosshair, Heart, Landmark, Mars, Pencil, Trash2, UserPlus, UserRoundCheck, Venus, X } from 'lucide-react'
 import type { PersonActions } from '../lib/actions.ts'
 import { formatPartialDate, lifespan } from '../lib/format.ts'
 import type { FieldSource } from '../lib/sourceStore.ts'
@@ -30,6 +30,8 @@ type Props = {
   /** Nguồn của các trường (từ ảnh được AI đọc và duyệt); bấm dấu nguồn mở hộp nguồn. */
   fieldSources?: FieldSource[]
   onOpenSource?: (field: string) => void
+  /** Xưng hô của người này với "Tôi" (đã chọn "Tôi là ai"); `kinship` null khi người này chính là mình. */
+  kin?: { kinship: Kinship | null; isSelf: boolean; onSetSelf: () => void; onClearSelf: () => void }
 }
 
 const GENDER_LABEL = { male: 'Nam', female: 'Nữ', unknown: 'Chưa rõ giới tính' } as const
@@ -86,17 +88,18 @@ function QuickRow({ actions, readOnly, onAction }: Pick<Props, 'actions' | 'read
 }
 
 /** Thẻ gọn trên điện thoại (nấc thấp của tấm trượt). */
-export function PersonPeek({ person, actions, readOnly, onAction }: Props) {
+export function PersonPeek({ person, actions, readOnly, onAction, kin }: Props) {
   return (
     <div className="space-y-3">
       <Head person={person} size={48} />
+      {kin?.kinship && <p className="text-sm text-ink-muted">Bạn gọi: <b className="text-accent">{kin.kinship.term.term}</b></p>}
       <QuickRow actions={actions} readOnly={readOnly} onAction={onAction} />
     </div>
   )
 }
 
 /** Nội dung đầy đủ của bảng thông tin một người: dùng chung cho tấm trượt (mở rộng) và ngăn bên. */
-export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction, fieldSources = [], onOpenSource }: Props) {
+export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAction, fieldSources = [], onOpenSource, kin }: Props) {
   const chip = (field: string) => {
     const list = fieldSources.filter((s) => s.field === field)
     return onOpenSource && list.length > 0 ? <SourceChip field={field} sources={list} onOpen={() => onOpenSource(field)} /> : undefined
@@ -107,6 +110,9 @@ export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAct
     .join(', ')
 
   const more: ActionItem[] = [
+    ...(kin
+      ? [kin.isSelf ? { label: 'Bỏ chọn "Tôi là ai"', icon: UserRoundCheck, onSelect: kin.onClearSelf } : { label: 'Đây là tôi', icon: UserRoundCheck, onSelect: kin.onSetSelf }]
+      : []),
     ...(actions.canAddParent ? [{ label: 'Thêm cha/mẹ còn thiếu', icon: ArrowUp, onSelect: () => onAction('addParent') }] : []),
     ...(actions.canReorderChildren ? [{ label: 'Sắp thứ tự các con', icon: ArrowUpDown, onSelect: () => onAction('reorderChildren') }] : []),
     ...(actions.canReorderSiblings ? [{ label: 'Sắp thứ tự anh chị em', icon: ArrowUpDown, onSelect: () => onAction('reorderSiblings') }] : []),
@@ -120,6 +126,27 @@ export function PersonDetails({ doc, person, actions, collapsed, readOnly, onAct
     <div className="space-y-5">
       <Head person={person} size={64} />
       <QuickRow actions={actions} readOnly={readOnly} onAction={onAction} />
+      {kin?.isSelf && <p className="rounded-xl bg-accent-soft px-4 py-2.5 text-sm font-medium text-accent">Đây là bạn trong cuốn này.</p>}
+      {kin?.kinship && (
+        <section aria-label="Xưng hô" className="rounded-xl bg-accent-soft p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.07em] text-accent">Xưng hô</p>
+          {kin.kinship.term.known ? (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-xs text-ink-muted">Bạn gọi</p>
+                <p className="text-xl font-semibold text-accent">{kin.kinship.term.term}</p>
+              </div>
+              <div>
+                <p className="text-xs text-ink-muted">Người ấy gọi bạn</p>
+                <p className="text-xl font-semibold">{kin.kinship.reverse.term}</p>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-2 text-xl font-semibold">Họ hàng xa</p>
+          )}
+          <p className="mt-2 text-sm text-ink-muted">Quan hệ: {kin.kinship.description}</p>
+        </section>
+      )}
       <InfoList
         rows={[
           { label: 'Ngày sinh', value: formatPartialDate(person.birth), extra: chip('birth') },

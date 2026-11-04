@@ -12,7 +12,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 
 ## Bước tiếp theo
 1. Kiểm tay trên iPhone / máy gập thật cho `ui-design-system` và màn đăng nhập mới (song song, không chặn).
-2. Chọn change kế: `kinship-terms` (xưng hô ba miền, bước 6) hoặc `ai-audio-proposals` / `audit-log`; kiểm tay Web Push trên iPhone và Android khi có HTTPS.
+2. Chủ dự án xem xưng hô chạy thật (`kinship-terms`: menu Thêm → Tôi là ai / Tra quan hệ), rồi commit và `/opsx:archive kinship-terms`. Sau đó chọn change kế (`audit-log`, `export-poster-gedcom`, `ai-audio-proposals`). Kiểm tay Web Push trên iPhone/Android khi có HTTPS.
 
 ## Việc bị chặn / chờ quyết định
 - `ui-design-system` — chờ kiểm tay trên máy thật; "iPhone Duo" = iPhone gập của Apple; thông số và việc Safari báo nếp gập chưa xác nhận, kiểm trên máy thật/giả lập khi có (design R3).
@@ -30,7 +30,7 @@ Change `cloud-auth-storage` đã **làm xong 25/25 task** (2026-10-27), đã arc
 | 4 | AI chép phả: nguồn, đề xuất, duyệt (E4, F5–F7) | done | `ai-image-proposals` | ghi âm làm `ai-audio-proposals` sau; điểm khác biệt |
 | 5a | Lịch tháng âm–dương, giỗ, sinh nhật, sắp tới (E5, F8) | done | `lunar-calendar-view` | archive 2026-11-02; 8/8 task; spec `family-calendar` |
 | 5b | Push nhắc giỗ 7 ngày, 1 ngày, đúng ngày (F11) | done | `anniversary-push` | archive 2026-11-03; 10/10 task; ADR 0013; Web Push đã thử thật trên Chrome máy tính; FCM chờ Capacitor; chưa thử iPhone/Android và lịch trên Supabase thật |
-| 6 | Xưng hô ba miền (E6, F9) | todo | `kinship-terms` | |
+| 6 | Xưng hô ba miền (E6, F9) | in-progress 9/9 | `kinship-terms` | xong code + test; chờ chủ dự án xem app chạy thật, commit, archive |
 | 7 | Nhật ký thay đổi (E7, F12) | todo | `audit-log` | |
 | 8 | Poster PDF, GEDCOM (E8, F13) | todo | `export-poster-gedcom` | |
 | 9 | Bọc Capacitor, lên store | todo | | sau khi 1–8 chạy trên web |
@@ -66,6 +66,9 @@ User stories chi tiết: `docs/user-stories.md`.
 - Nghị định 13/2023 khi đặt server ở Singapore — cần tư vấn pháp lý trước khi ra mắt.
 
 ## Gần đây (tối đa ~10 dòng, mới nhất trên cùng)
+- 2026-11-04: `kinship-terms` xong giao diện (chọn "Tôi là ai", nhãn xưng hô trên cây và danh sách, khối Xưng hô trong bảng người, hộp Tra quan hệ); Vitest 131 + core 391, pgTAP 200, Playwright 135 qua (4 bỏ qua). Lưu ý môi trường: sau khi Docker Desktop khởi động lại, container `supabase_edge_runtime_kintree` có thể không tự chạy (`docker start supabase_edge_runtime_kintree` rồi `pnpm db:trust-ca`), và cổng DB/mail đôi khi cần `docker restart` container tương ứng.
+- 2026-11-04: `kinship-terms` duyệt bảng từ gọi; xong lõi `kinship.ts` (core 391 test), bảng `tree_self` + RLS (pgTAP 200 assertion), `selfStore`; bản mẫu giao diện chờ duyệt. Lưu ý: sau khi khởi động lại máy, CLI không nối được DB từ máy chủ (kết nối bị ngắt), nên migration và pgTAP được chạy qua `docker exec`.
+- 2026-11-04: Đề xuất `kinship-terms`: "Tôi là ai" theo cuốn, từ gọi ba miền (bảng chờ duyệt), nhãn trên cây, tra quan hệ hai người.
 - 2026-11-03: Archive `anniversary-push` (tạo spec `anniversary-reminders`); chủ dự án đã thử gửi Web Push thật trên Chrome (cần CA mạng công ty trong container function, `VAPID_SUBJECT` tự thêm `mailto:`).
 - 2026-11-02: `anniversary-push` xong giao diện (thẻ Nhắc ngày giỗ, service worker, manifest, mở từ thông báo `#calendar/<dòng họ>`, `pnpm vapid:gen`); ADR 0013; Vitest 127, pgTAP 189, Playwright 129 qua (4 ca lỗi do tải ở lần chạy đầy đủ, qua khi chạy riêng). Gửi Web Push thật chưa thử.
 - 2026-11-02: `anniversary-push` xong DB (migration + pgTAP 189), bộ gửi `send-reminders` (mock, e2e 3 ca; Web Push `web-push` chạy trong Deno, gửi thật chưa thử), lịch pg_cron 7:00 giờ VN (`pnpm reminders:schedule`); bản mẫu giao diện chờ duyệt. Mã lịch sao vào function bằng `pnpm sync:core`.

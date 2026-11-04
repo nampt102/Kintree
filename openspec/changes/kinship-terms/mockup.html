@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kintree xưng hô</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.511.0/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'] },
+    colors: { canvas: '#FFFFFF', muted: '#F4F4F5', rail: '#F7F7F8', line: '#ECECEE', input: '#8F877C', ink: '#1F1A17', sub: '#6B635A', accent: { DEFAULT: '#A42F28', hover: '#8C2721', soft: '#FCEEEC' }, male: { DEFAULT: '#2F5E8C', soft: '#E8EFF6' }, female: { DEFAULT: '#A23F6B', soft: '#F7E9EF' }, ok: { DEFAULT: '#1F7A45', soft: '#E8F3EC' }, warn: { DEFAULT: '#7A4B00', soft: '#FFF7E6' } },
+    boxShadow: { 1: '0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07)', 2: '0 2px 4px rgb(31 26 23/.05),0 8px 20px rgb(31 26 23/.09)', 3: '0 12px 32px rgb(31 26 23/.14),0 2px 6px rgb(31 26 23/.06)' },
+  } } }
+</script>
+<style>
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background:#EDEDEF; color:#1F1A17 }
+  [data-lucide] { width: 18px; height: 18px; stroke-width: 1.9; flex-shrink: 0 }
+  .i12{width:12px!important;height:12px!important}.i14{width:14px!important;height:14px!important}.i16{width:16px!important;height:16px!important}.i20{width:20px!important;height:20px!important}
+  .desk { width: 1280px; height: 700px; border-radius: 14px; overflow: hidden; position: relative; background:#fff; box-shadow: 0 0 0 1px #d8d8dc, 0 30px 60px rgb(0 0 0/.14); display:flex }
+  .phone { width: 375px; height: 780px; border-radius: 44px; overflow: hidden; position: relative; background:#fff; box-shadow: 0 0 0 10px #1f1a17, 0 30px 60px rgb(0 0 0/.25); flex-shrink: 0 }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; height:44px; padding:0 18px; border-radius:9999px; font-weight:600; font-size:15px; white-space:nowrap }
+  .btn-primary { background:#A42F28; color:#fff; box-shadow: 0 8px 18px -6px rgb(164 47 40/.55) }
+  .btn-secondary { background:#fff; color:#1F1A17; box-shadow: 0 0 0 1px #DDD5CB, 0 1px 2px rgb(31 26 23/.05) }
+  .card { border-radius:16px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07), 0 0 0 1px #ECECEE }
+  .sec { font-size:12px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:#6B635A }
+  .node { position:absolute; width:190px; height:62px; border-radius:12px; background:#fff; box-shadow: 0 1px 2px rgb(31 26 23/.05),0 1px 3px rgb(31 26 23/.07), 0 0 0 1px rgb(236 236 238/.9); display:flex; align-items:center; gap:10px; padding:0 8px 0 11px; overflow:visible }
+  .node.m { border-left:3px solid #2F5E8C } .node.f { border-left:3px solid #A23F6B }
+  .node.dead { background:#F4F4F5; box-shadow:none; border:1px dashed #8F877C }
+  .node.me { box-shadow: 0 0 0 2px #A42F28, 0 8px 20px rgb(31 26 23/.09) }
+  .av { display:grid; place-items:center; width:34px; height:34px; border-radius:9999px; font-size:13px; font-weight:600; flex-shrink:0 }
+  .term { position:absolute; right:-6px; top:-10px; max-width:150px; padding:0 8px; border-radius:9999px; background:#1F1A17; color:#fff; font-size:11.5px; font-weight:600; line-height:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-shadow:0 0 0 2px #fff }
+  .term.me { background:#A42F28 }
+  .line { position:absolute; background:#BDB4AA }
+</style>
+</head>
+<body>
+<div class="mx-auto max-w-[1360px] space-y-14 px-8 py-10">
+  <header class="space-y-2">
+    <p class="text-sm font-semibold uppercase tracking-[.08em] text-accent">Kintree · kinship-terms · bản mẫu chờ duyệt</p>
+    <h1 class="text-3xl font-semibold tracking-tight">Xưng hô: "Tôi là ai", nhãn trên cây, tra quan hệ</h1>
+    <p class="max-w-3xl text-sub">Theo nền trắng (ADR 0012) và thành phần đã duyệt. Từ gọi trong bản mẫu lấy từ bảng ba miền đã duyệt (cuốn miền Bắc ở A, B; miền Nam ở C để so sánh). Tên người là hư cấu. Có 5 phần: A. Cây có nhãn xưng hô · B. Chọn "Tôi là ai" · C. Bảng người và đổi miền · D. Hộp "Tra quan hệ" · E. Điện thoại.</p>
+  </header>
+
+  <!-- A -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">A · Cây có nhãn xưng hô (miền Bắc)</h2><p class="text-sm text-sub">Người dùng là <b>Nguyễn Văn Tôi</b> (viền đỏ, nhãn "Tôi"). Mỗi khung có một nhãn đen nhỏ ở góc trên phải: người dùng gọi người ấy là gì. Công tắc "Hiện cách gọi" trên thanh công cụ ẩn/hiện nhãn. Chưa chọn "Tôi là ai" thì không có nhãn nào.</p></div>
+    <div class="desk">
+      <aside class="flex w-[248px] shrink-0 flex-col bg-rail px-3 py-4">
+        <div class="flex items-center gap-2 px-2"><span class="grid size-8 place-items-center rounded-lg bg-accent text-white"><i data-lucide="tree-deciduous" class="i16"></i></span><span class="text-lg font-semibold text-accent">Kintree</span></div>
+        <p class="mt-8 px-2 sec">Cuốn gia phả</p>
+        <div class="mt-2 flex min-h-11 items-center gap-2.5 rounded-lg bg-white px-2.5 font-medium shadow-1"><i data-lucide="network" class="text-accent"></i>Chi trưởng<span class="ml-auto text-xs text-sub">14</span></div>
+      </aside>
+      <main class="relative min-w-0 flex-1 bg-white">
+        <div class="absolute left-4 top-4 flex items-center gap-2 rounded-2xl bg-white/90 px-3 py-2 shadow-2 ring-1 ring-line"><span class="font-semibold">Chi trưởng họ Nguyễn</span><span class="text-xs text-sub">14 người · Miền Bắc</span></div>
+        <div class="absolute right-4 top-4 flex items-center gap-2 rounded-2xl bg-white/90 px-2 py-1.5 shadow-2 ring-1 ring-line">
+          <span class="inline-flex min-h-11 items-center gap-2 px-2 text-sm font-medium"><span class="relative h-6 w-10 rounded-full bg-accent"><span class="absolute right-0.5 top-0.5 size-5 rounded-full bg-white shadow-1"></span></span>Hiện cách gọi</span>
+          <span class="btn btn-secondary h-11"><i data-lucide="users"></i>Tra quan hệ</span>
+        </div>
+        <div id="tree" class="absolute inset-x-0 bottom-0 top-20"></div>
+      </main>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">B · Chọn "Tôi là ai"</h2><p class="text-sm text-sub">Lần đầu mở một cuốn (hoặc sau khi nhận lời mời) thấy thẻ nhắc ở trên cây; bấm là tìm tên rồi chọn. Có thể bỏ qua, nhắc lại ở thanh công cụ. Cũng chọn được từ nút "Đây là tôi" trong bảng của một người.</p></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div class="space-y-3"><p class="sec">Thẻ nhắc khi chưa chọn</p>
+        <div class="card flex items-start gap-3 p-4"><span class="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft text-accent"><i data-lucide="user-round-check"></i></span><div class="min-w-0 flex-1"><p class="font-semibold">Bạn là ai trong cây này?</p><p class="text-sm text-sub">Chọn tên bạn để thấy bạn gọi mỗi người là gì (bác, chú, cô, cậu…) theo cách gọi miền Bắc.</p><div class="mt-3 flex flex-wrap gap-2"><span class="btn btn-primary h-11">Chọn tên của tôi</span><span class="btn btn-secondary h-11">Để sau</span></div></div></div>
+      </div>
+      <div class="space-y-3"><p class="sec">Hộp chọn (tìm tên)</p>
+        <div class="card p-4"><p class="mb-3 text-lg font-semibold">Bạn là ai?</p>
+          <div class="mb-3 flex h-11 items-center gap-2 rounded-xl px-3 ring-1 ring-input"><i data-lucide="search" class="text-sub"></i><span>tô</span></div>
+          <ul class="divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">
+            <li class="flex min-h-14 items-center gap-3 px-3"><span class="av bg-male-soft text-male">T</span><div class="min-w-0 flex-1"><p class="font-medium">Nguyễn Văn Tôi</p><p class="text-xs text-sub">1990 · con của Nguyễn Văn Cha</p></div><i data-lucide="check" class="text-accent"></i></li>
+            <li class="flex min-h-14 items-center gap-3 px-3"><span class="av bg-female-soft text-female">T</span><div class="min-w-0 flex-1"><p class="font-medium">Nguyễn Thị Tơ</p><p class="text-xs text-sub">1962 · con của Nguyễn Văn Ông</p></div></li>
+          </ul>
+          <div class="mt-3 flex justify-end gap-2"><span class="btn btn-secondary h-11">Huỷ</span><span class="btn btn-primary h-11">Chọn</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">C · Bảng người: hai chiều, đường quan hệ, đổi miền</h2><p class="text-sm text-sub">Bảng thông tin của một người thêm khối "Xưng hô". Cùng một người (chị gái của cha) ở cuốn miền Bắc, Trung, Nam cho ba cách gọi khác nhau.</p></div>
+    <div class="grid grid-cols-3 gap-6" id="panels"></div>
+  </section>
+
+  <!-- D -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">D · Hộp "Tra quan hệ" (hai người bất kỳ)</h2><p class="text-sm text-sub">Mở từ thanh công cụ; không cần đã chọn "Tôi là ai". Chọn hai người, thấy đường quan hệ và cách gọi hai chiều. Ngoài phạm vi thì ghi "Họ hàng xa" kèm đường quan hệ, không đoán từ gọi.</p></div>
+    <div class="grid grid-cols-2 gap-8">
+      <div class="card space-y-3 p-5"><p class="text-lg font-semibold">Tra quan hệ</p>
+        <div class="grid grid-cols-[1fr_auto_1fr] items-end gap-2"><div><p class="text-sm font-medium">Người thứ nhất</p><div class="mt-1 flex h-11 items-center gap-2 rounded-xl px-3 ring-1 ring-input"><span class="av size-6 bg-male-soft text-xs text-male" style="width:24px;height:24px">T</span>Nguyễn Văn Tôi</div></div><span class="mb-2 grid size-8 place-items-center rounded-full bg-muted text-sub"><i data-lucide="arrow-left-right" class="i16"></i></span><div><p class="text-sm font-medium">Người thứ hai</p><div class="mt-1 flex h-11 items-center gap-2 rounded-xl px-3 ring-1 ring-input"><span class="av bg-female-soft text-xs text-female" style="width:24px;height:24px">C</span>Nguyễn Thị Cả</div></div></div>
+        <div class="rounded-xl bg-muted p-4"><p class="text-sm text-sub">Nguyễn Thị Cả là <b class="text-ink">chị gái của cha</b> Nguyễn Văn Tôi</p>
+          <div class="mt-3 grid grid-cols-2 gap-3"><div class="rounded-xl bg-white p-3 shadow-1"><p class="text-xs text-sub">Tôi gọi chị Cả là</p><p class="text-2xl font-semibold text-accent">Bác</p></div><div class="rounded-xl bg-white p-3 shadow-1"><p class="text-xs text-sub">Chị Cả gọi tôi là</p><p class="text-2xl font-semibold text-accent">Cháu</p></div></div></div>
+      </div>
+      <div class="card space-y-3 p-5"><p class="sec">Ngoài phạm vi</p>
+        <div class="rounded-xl bg-muted p-4"><p class="text-sm text-sub">Nguyễn Thị Mơ là <b class="text-ink">vợ của anh trai của vợ của anh</b> của Nguyễn Văn Tôi</p>
+          <div class="mt-3 flex items-center gap-2 rounded-xl bg-white p-3 shadow-1"><i data-lucide="route" class="text-sub"></i><div><p class="text-lg font-semibold">Họ hàng xa</p><p class="text-sm text-sub">Quan hệ này chưa có cách gọi trong bảng, nên không đoán.</p></div></div></div>
+        <p class="sec pt-2">Không tìm thấy quan hệ</p>
+        <div class="rounded-xl bg-muted p-4 text-sm text-sub">Hai người này chưa nối với nhau trong cuốn.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- E -->
+  <section class="space-y-4">
+    <div><h2 class="text-xl font-semibold">E · Điện thoại 375 px</h2><p class="text-sm text-sub">Danh sách người hiện cách gọi ở dòng phụ (cây trên điện thoại giữ nhãn gọn, đủ ở bảng người). Hộp chọn và hộp "Tra quan hệ" toàn màn. Vùng chạm ≥ 44 px.</p></div>
+    <div class="flex items-start gap-10 overflow-x-auto pb-4" id="phones"></div>
+  </section>
+
+  <section class="space-y-2 pb-10 text-sm text-sub">
+    <h2 class="text-xl font-semibold text-ink">Cần anh chọn khi duyệt</h2>
+    <ul class="list-disc space-y-1 pl-5">
+      <li>Nhãn đen nhỏ ở góc khung (mục A): đọc rõ chưa, hay muốn đặt dưới tên người trong khung?</li>
+      <li>Thẻ nhắc "Bạn là ai trong cây này?" (mục B): đồng ý hiện một lần ở đầu cuốn, hay chỉ để nút ở thanh công cụ?</li>
+      <li>Khối "Xưng hô" trong bảng người (mục C): đủ thông tin chưa?</li>
+      <li>Người chưa chọn "Tôi là ai" vẫn dùng được "Tra quan hệ" (mục D): đồng ý?</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  const av = (g, t) => `<span class="av ${g === 'm' ? 'bg-male-soft text-male' : 'bg-female-soft text-female'}">${t}</span>`
+  // Nhãn từ bảng đã duyệt, miền Bắc, người dùng = Nguyễn Văn Tôi (cha: Văn Cha, mẹ: Thị Mẹ).
+  const N = [
+    { x: 460, y: 0, n: 'Nguyễn Văn Ông', g: 'm', y0: '1925 – 2001', t: 'Ông nội', dead: 1 },
+    { x: 140, y: 120, n: 'Nguyễn Văn Bác', g: 'm', y0: '1950 –', t: 'Bác' },
+    { x: 340, y: 120, n: 'Nguyễn Thị Cả', g: 'f', y0: '1953 –', t: 'Bác' },
+    { x: 540, y: 120, n: 'Nguyễn Văn Cha', g: 'm', y0: '1958 –', t: 'Bố' },
+    { x: 740, y: 120, n: 'Nguyễn Văn Út', g: 'm', y0: '1964 –', t: 'Chú' },
+    { x: 440, y: 250, n: 'Nguyễn Văn Tôi', g: 'm', y0: '1990 –', t: 'Tôi', me: 1 },
+    { x: 650, y: 250, n: 'Nguyễn Thị Em', g: 'f', y0: '1993 –', t: 'Em' },
+    { x: 140, y: 250, n: 'Nguyễn Văn Con Bác', g: 'm', y0: '1995 –', t: 'Anh họ' },
+    { x: 840, y: 250, n: 'Nguyễn Thị Cháu Chú', g: 'f', y0: '1985 –', t: 'Em họ' },
+  ]
+  const card = (p, w) => `<div class="node ${p.g} ${p.dead ? 'dead' : ''} ${p.me ? 'me' : ''}" style="left:${p.x}px;top:${p.y + 24}px"><span class="term ${p.me ? 'me' : ''}">${p.t}</span>${av(p.g, p.n.split(' ').pop()[0])}<div class="min-w-0"><div class="text-[13.5px] font-semibold leading-tight">${p.n}</div><div class="mt-0.5 text-xs text-sub">${p.y0}</div></div></div>`
+  const L = [[555, 62, 2, 30], [235, 92, 710, 2], [235, 92, 2, 30], [435, 92, 2, 30], [635, 92, 2, 30], [835, 92, 2, 30], [635, 182, 2, 30], [535, 212, 210, 2], [535, 212, 2, 30], [745, 212, 2, 30]]
+  document.getElementById('tree').innerHTML = `<div class="absolute left-[40px] top-0 h-full w-[1000px]">${L.map(([x, y, w, h]) => `<div class="line" style="left:${x}px;top:${y + 24}px;width:${w}px;height:${h}px"></div>`).join('')}${N.map(card).join('')}</div>`
+
+  const panel = (region, term, rev, rel, extra = '') => `<div class="card p-4"><p class="sec mb-2">${region}</p><div class="flex items-center gap-3">${av('f', 'C')}<div><p class="text-lg font-semibold leading-tight">Nguyễn Thị Cả</p><p class="text-sm text-sub">Nữ · 1953 –</p></div></div>
+    <div class="mt-3 rounded-xl bg-accent-soft p-3"><p class="sec !text-accent">Xưng hô</p>
+      <div class="mt-2 grid grid-cols-2 gap-2"><div><p class="text-xs text-sub">Bạn gọi</p><p class="text-xl font-semibold text-accent">${term}</p></div><div><p class="text-xs text-sub">Người ấy gọi bạn</p><p class="text-xl font-semibold">${rev}</p></div></div>
+      <p class="mt-2 text-sm text-sub">Quan hệ: ${rel}</p>${extra}</div>
+    <div class="mt-3 space-y-2 text-sm"><div class="flex justify-between"><span class="text-sub">Ngày sinh</span><span class="font-medium">1953</span></div><div class="flex justify-between"><span class="text-sub">Vợ/chồng</span><span class="font-medium">Trần Văn Chồng</span></div></div></div>`
+  document.getElementById('panels').innerHTML = [panel('Cuốn miền Bắc', 'Bác', 'Cháu', 'chị gái của cha'), panel('Cuốn miền Trung', 'O', 'Cháu', 'chị gái của cha'), panel('Cuốn miền Nam', 'Cô', 'Cháu', 'chị gái của cha')].join('')
+
+  const phoneTop = (t, back) => `<div class="flex h-12 items-end justify-between px-7 pb-1 text-[13px] font-semibold"><span>9:41</span><span>●●●</span></div><div class="flex h-14 items-center gap-1 px-2"><span class="grid size-11 place-items-center"><i data-lucide="${back ? 'arrow-left' : 'x'}" class="i20"></i></span><p class="flex-1 text-[17px] font-semibold">${t}</p></div>`
+  const row = (g, n, sub, t) => `<li class="flex min-h-14 items-center gap-3 px-4">${av(g, n.split(' ').pop()[0])}<div class="min-w-0 flex-1"><p class="truncate font-medium">${n}</p><p class="truncate text-xs text-sub">${sub}</p></div>${t ? `<span class="shrink-0 rounded-full bg-ink px-2 text-xs font-semibold leading-6 text-white">${t}</span>` : ''}</li>`
+  const list = `<div class="px-4"><div class="mb-3 flex gap-2"><span class="btn btn-secondary h-11 flex-1"><i data-lucide="users"></i>Tra quan hệ</span><span class="btn btn-secondary h-11"><i data-lucide="user-round-check"></i>Tôi: Văn Tôi</span></div><ul class="divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">${row('m', 'Nguyễn Văn Ông', '1925 – 2001 · Thuỷ tổ', 'Ông nội')}${row('m', 'Nguyễn Văn Bác', '1950 –', 'Bác')}${row('f', 'Nguyễn Thị Cả', '1953 –', 'Bác')}${row('m', 'Nguyễn Văn Cha', '1958 –', 'Bố')}${row('m', 'Nguyễn Văn Út', '1964 –', 'Chú')}${row('m', 'Nguyễn Văn Tôi', '1990 –', 'Tôi')}${row('f', 'Nguyễn Thị Em', '1993 –', 'Em')}</ul></div>`
+  const pick = `<div class="px-4"><div class="mb-3 flex h-11 items-center gap-2 rounded-xl px-3 ring-1 ring-input"><i data-lucide="search" class="text-sub"></i>tô</div><ul class="divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">${row('m', 'Nguyễn Văn Tôi', '1990 · con của Nguyễn Văn Cha').replace('</li>', '<i data-lucide="check" class="text-accent"></i></li>')}${row('f', 'Nguyễn Thị Tơ', '1962 · con của Nguyễn Văn Ông')}</ul><div class="mt-4 flex gap-2"><span class="btn btn-secondary h-11 flex-1">Huỷ</span><span class="btn btn-primary h-11 flex-1">Chọn</span></div></div>`
+  const look = `<div class="space-y-3 px-4"><div><p class="text-sm font-medium">Người thứ nhất</p><div class="mt-1 flex h-11 items-center rounded-xl px-3 ring-1 ring-input">Nguyễn Văn Tôi</div></div><div><p class="text-sm font-medium">Người thứ hai</p><div class="mt-1 flex h-11 items-center rounded-xl px-3 ring-1 ring-input">Nguyễn Thị Cả</div></div><div class="rounded-xl bg-muted p-3"><p class="text-sm text-sub">Nguyễn Thị Cả là <b class="text-ink">chị gái của cha</b> Nguyễn Văn Tôi</p><div class="mt-3 grid grid-cols-2 gap-2"><div class="rounded-xl bg-white p-3 shadow-1"><p class="text-xs text-sub">Tôi gọi là</p><p class="text-xl font-semibold text-accent">Bác</p></div><div class="rounded-xl bg-white p-3 shadow-1"><p class="text-xs text-sub">Chị Cả gọi tôi</p><p class="text-xl font-semibold text-accent">Cháu</p></div></div></div></div>`
+  document.getElementById('phones').innerHTML = [['Danh sách người', list, true], ['Bạn là ai?', pick, false], ['Tra quan hệ', look, false]].map(([t, b, back]) => `<div class="phone">${phoneTop(t, back)}${b}</div>`).join('')
+  lucide.createIcons()
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@ import { calendarStore, todaySolar } from './lib/calendarStore.ts'
 import { reminderStore } from './lib/reminderStore.ts'
 import { cloudStore, platformStore, type Directory } from './lib/cloudStore.ts'
 import { captureInvite, clearInvite, memberStore, pendingInvite } from './lib/memberStore.ts'
+import { selfStore } from './lib/selfStore.ts'
 import { sourceStore } from './lib/sourceStore.ts'
 import { messageFor } from './lib/messages.ts'
 import { supabase } from './lib/supabase.ts'
@@ -30,6 +31,7 @@ function Home({ user }: { user: User }) {
   const platform = useMemo(() => platformStore(supabase!), [])
   const members = useMemo(() => memberStore(supabase!), [])
   const sources = useMemo(() => sourceStore(supabase!, user.id), [user.id])
+  const self = useMemo(() => selfStore(supabase!, user.id), [user.id])
   const calendar = useMemo(() => calendarStore(supabase!), [])
   const reminders = useMemo(() => reminderStore(supabase!, user.id), [user.id])
   const toast = useToast()
@@ -204,7 +206,7 @@ function Home({ user }: { user: User }) {
       />
     )
   }
-  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} sources={sources} clanId={dir?.trees.find((t) => t.id === treeId)?.clanId ?? ''} treeId={treeId} onBack={closeTree} hideBack={!!rail} focusPersonId={focusPersonId} />)
+  if (treeId) return withRail(<TreeScreen key={treeId} cloud={cloud} sources={sources} self={self} clanId={dir?.trees.find((t) => t.id === treeId)?.clanId ?? ''} treeId={treeId} onBack={closeTree} hideBack={!!rail} focusPersonId={focusPersonId} />)
   if (showPlatform) return <PlatformScreen platform={platform} email={email} onBack={() => setShowPlatform(false)} />
   const clan = dir?.clans.find((c) => c.id === clanId)
   if (showMembers && clanId && dir && clan?.role === 'admin') {

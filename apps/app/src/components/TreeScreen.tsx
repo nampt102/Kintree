@@ -4,20 +4,23 @@ import {
   childrenOf,
   computeLayout,
   findPerson,
+  kinship,
   reorderSiblings,
   reorderSpouses,
   revealPerson,
   searchPersons,
   spouseIdsOf,
+  termsFrom,
   type Gender,
   type TreeDoc,
   type TreePerson,
 } from '@kintree/core'
-import { ArrowLeft, Download, ImagePlus, Inbox, List, MoreHorizontal, Network, Pencil, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { ArrowLeft, Download, Eye, EyeOff, ImagePlus, Inbox, List, MoreHorizontal, Network, Pencil, Plus, Route, Search, Trash2, UserRound, UserRoundCheck } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { bloodParentOf, buildActions } from '../lib/actions.ts'
 import { messageFor } from '../lib/messages.ts'
 import type { CloudStore, Role } from '../lib/cloudStore.ts'
+import type { SelfStore } from '../lib/selfStore.ts'
 import type { FieldSource, SourceStore } from '../lib/sourceStore.ts'
 import { downloadBackup } from '../lib/store.ts'
 import { useTreeDoc } from '../state/useTreeDoc.ts'
@@ -40,6 +43,7 @@ import {
   useWindowClass,
 } from '../ui/index.ts'
 import { AddChildDialog, AddParentDialog, AddSpouseDialog, ProfileDialog, RemoveDialog, ReorderDialog, type EditFn } from './ActionDialogs.tsx'
+import { LookupDialog, SelfDialog, SelfPrompt } from './Kinship.tsx'
 import { PersonDetails, PersonPeek, PersonSidePane, type PanelAction } from './PersonPanel.tsx'
 import { PersonList } from './PersonList.tsx'
 import { ProposalReview } from './ProposalReview.tsx'
@@ -53,6 +57,7 @@ type DialogState = { kind: DialogKind; personId: string } | { kind: 'addRoot' } 
 export function TreeScreen({
   cloud,
   sources,
+  self,
   clanId,
   treeId,
   onBack,
@@ -61,6 +66,7 @@ export function TreeScreen({
 }: {
   cloud: CloudStore
   sources: SourceStore
+  self: SelfStore
   clanId: string
   treeId: string
   onBack: () => void
@@ -93,13 +99,13 @@ export function TreeScreen({
       </>
     )
   }
-  return <Loaded doc={state.doc} role={state.role} cloud={cloud} sources={sources} clanId={clanId} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} focusPersonId={focusPersonId} />
+  return <Loaded doc={state.doc} role={state.role} cloud={cloud} sources={sources} self={self} clanId={clanId} edit={edit} saveError={saveError} onBack={onBack} reload={reload} hideBack={hideBack} focusPersonId={focusPersonId} />
 }
 
 /** Người xem: chỉ giữ thao tác không ghi (thu gọn nhánh, xem riêng nhánh); quyền thật do RLS cưỡng chế. */
 const READ_ONLY_FLAGS = { canAddChild: false, canAddSpouse: false, canAddParent: false, canRemove: false, canRemoveBranch: false, canReorderChildren: false, canReorderSpouses: false, canReorderSiblings: false }
 
-function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, reload, hideBack, focusPersonId }: { doc: TreeDoc; role: Role; cloud: CloudStore; sources: SourceStore; clanId: string; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean; focusPersonId?: string | null }) {
+function Loaded({ doc, role, cloud, sources, self, clanId, edit, saveError, onBack, reload, hideBack, focusPersonId }: { doc: TreeDoc; role: Role; cloud: CloudStore; sources: SourceStore; self: SelfStore; clanId: string; edit: EditFn; saveError: string | null; onBack: () => void; reload: () => void; hideBack: boolean; focusPersonId?: string | null }) {
   const readOnly = role !== 'admin'
   // Tư liệu và đề xuất chỉ quản trị của cuốn đọc được (RLS); người xem chỉ xem nguồn của từng trường.
   const src = useSources(sources, doc.meta.id, !readOnly)
@@ -119,6 +125,78 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
   const [focusId, setFocusId] = useState<string | null>(null)
   const [dialog, setDialog] = useState<DialogState>(null)
   const [query, setQuery] = useState('')
+
+  // "Tôi là ai" và xưng hô (change kinship-terms): chỉ ảnh hưởng hiển thị của chính người dùng.
+  const toast = useToast()
+  const treeId = doc.meta.id
+  const [selfId, setSelfId] = useState<string | null>(null)
+  const [selfLoaded, setSelfLoaded] = useState(false)
+  const [kinDialog, setKinDialog] = useState<null | 'self' | 'lookup'>(null)
+  const [showTerms, setShowTerms] = useState(() => {
+    try {
+      return localStorage.getItem('kt-terms') !== '0'
+    } catch {
+      return true
+    }
+  })
+  const skipKey = `kt-self-skip:${treeId}`
+  const [skipped, setSkipped] = useState(() => {
+    try {
+      return sessionStorage.getItem(skipKey) === '1'
+    } catch {
+      return false
+    }
+  })
+  useEffect(() => {
+    let alive = true
+    void self.get(treeId).then((r) => {
+      if (!alive) return
+      setSelfId(r.ok ? r.value : null)
+      setSelfLoaded(true)
+    })
+    return () => {
+      alive = false
+    }
+  }, [self, treeId])
+  // Người đã chọn bị gỡ khỏi cây thì coi như chưa chọn.
+  const mineId = selfId && findPerson(view, selfId) ? selfId : null
+  const allTerms = useMemo(() => (mineId ? termsFrom(doc, mineId) : null), [doc, mineId])
+  const termLabels = useMemo(() => {
+    if (!allTerms) return undefined
+    const m = new Map<string, string>()
+    for (const [id, t] of allTerms) if (t.known) m.set(id, t.term)
+    return m
+  }, [allTerms])
+  const chooseSelf = async (id: string) => {
+    const r = await self.set(treeId, id)
+    if (!r.ok) return toast(messageFor(r.error))
+    setSelfId(id)
+    setKinDialog(null)
+  }
+  const clearSelf = async () => {
+    const r = await self.clear(treeId)
+    if (!r.ok) return toast(messageFor(r.error))
+    setSelfId(null)
+    setKinDialog(null)
+  }
+  const toggleTerms = () => {
+    setShowTerms((v) => {
+      try {
+        localStorage.setItem('kt-terms', v ? '0' : '1')
+      } catch {
+        // Không lưu được thì chỉ giữ cho phiên này.
+      }
+      return !v
+    })
+  }
+  const skipPrompt = () => {
+    setSkipped(true)
+    try {
+      sessionStorage.setItem(skipKey, '1')
+    } catch {
+      // Không lưu được thì chỉ ẩn lần này.
+    }
+  }
 
   const layout = useMemo(() => computeLayout(doc, { collapsed, focusId, cardWidth: CARD.width, cardHeight: CARD.height }), [doc, collapsed, focusId])
   const actions = useMemo(() => {
@@ -212,7 +290,22 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
   }, [sources, selectedKey, pendingCount])
 
   const detailsProps = selected
-    ? { doc, person: selected, actions: actions(selected), collapsed: collapsed.has(selected.id), readOnly, onAction: onPanelAction, fieldSources: personSources, onOpenSource: setSourceBox }
+    ? {
+        doc,
+        person: selected,
+        actions: actions(selected),
+        collapsed: collapsed.has(selected.id),
+        readOnly,
+        onAction: onPanelAction,
+        fieldSources: personSources,
+        onOpenSource: setSourceBox,
+        kin: {
+          kinship: mineId && mineId !== selected.id ? kinship(doc, mineId, selected.id) : null,
+          isSelf: mineId === selected.id,
+          onSetSelf: () => void chooseSelf(selected.id),
+          onClearSelf: () => void clearSelf(),
+        },
+      }
     : null
   const paneWidth = windowClass === 'expanded' ? 384 : 340
 
@@ -232,6 +325,10 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
       </Button>
     </div>
   ) : null
+
+  // Thẻ nhắc "Tôi là ai": cỡ gọn đặt phía dưới (cây thường để trống ở đó), máy tính đặt dưới thanh trên; không đè lên thanh thông báo khác.
+  const showSelfPrompt = selfLoaded && !mineId && !skipped && !empty && !banner && mode === 'tree' && !selected
+  const selfPrompt = showSelfPrompt ? <SelfPrompt onChoose={() => setKinDialog('self')} onSkip={skipPrompt} /> : null
 
   return (
     <div className="relative flex h-dvh flex-col overflow-hidden bg-canvas">
@@ -277,6 +374,13 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
         <OverflowMenu
           trigger={(p) => <IconButton icon={MoreHorizontal} label="Thêm" {...p} />}
           items={[
+            ...(empty
+              ? []
+              : [
+                  { label: 'Tra quan hệ', icon: Route, onSelect: () => setKinDialog('lookup') },
+                  { label: mineId ? 'Đổi người "Tôi là ai"' : 'Tôi là ai', icon: UserRoundCheck, onSelect: () => setKinDialog('self') },
+                  ...(mineId ? [{ label: showTerms ? 'Ẩn cách gọi trên cây' : 'Hiện cách gọi trên cây', icon: showTerms ? EyeOff : Eye, onSelect: toggleTerms }] : []),
+                ]),
             { label: 'Tải bản sao', icon: Download, onSelect: () => downloadBackup(doc) },
             ...(readOnly
               ? []
@@ -294,6 +398,15 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
       {compact && !empty && (
         <div className="absolute z-[10]" style={{ right: edgeR, bottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           <IconButton icon={mode === 'tree' ? List : Network} label={mode === 'tree' ? 'Xem dạng danh sách' : 'Xem dạng cây'} variant="raised" onClick={() => setMode(mode === 'tree' ? 'list' : 'tree')} />
+        </div>
+      )}
+
+      {selfPrompt && (
+        <div
+          className="absolute z-[9] flex justify-center"
+          style={compact ? { left: edge, right: edgeR, bottom: 'calc(max(12px, env(safe-area-inset-bottom)) + 68px)' } : { top: 'calc(max(12px, env(safe-area-inset-top)) + 3.5rem + 12px)', left: edge, right: paneOpen ? `${paneWidth}px` : edgeR }}
+        >
+          {selfPrompt}
         </div>
       )}
 
@@ -320,7 +433,7 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
         </div>
       ) : mode === 'list' ? (
         <div className="min-h-0 flex-1 overflow-y-auto pt-[calc(max(12px,env(safe-area-inset-top))+72px)]">
-          <PersonList doc={doc} onOpen={(id) => (readOnly ? goTo(id) : setDialog({ kind: 'profile', personId: id }))} />
+          <PersonList doc={doc} terms={showTerms ? termLabels : undefined} onOpen={(id) => (readOnly ? goTo(id) : setDialog({ kind: 'profile', personId: id }))} />
         </div>
       ) : (
         <div className="relative flex min-h-0 flex-1" data-testid="tree-area">
@@ -338,6 +451,8 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
               onSelect={setSelectedId}
               onOpenProfile={(id) => (readOnly ? setSelectedId(id) : setDialog({ kind: 'profile', personId: id }))}
               onAction={onNodeAction}
+              terms={showTerms ? termLabels : undefined}
+              selfId={mineId}
             />
           </div>
           {segments ? (
@@ -407,6 +522,8 @@ function Loaded({ doc, role, cloud, sources, clanId, edit, saveError, onBack, re
       {sourceBox && selected && (
         <SourceBoxDialog store={sources} personName={selected.fullName} field={sourceBox} sources={personSources.filter((s) => s.field === sourceBox)} sourceList={src.sources} onClose={() => setSourceBox(null)} />
       )}
+      {kinDialog === 'self' && <SelfDialog doc={view} current={mineId} onPick={(id) => void chooseSelf(id)} onClear={() => void clearSelf()} onClose={() => setKinDialog(null)} />}
+      {kinDialog === 'lookup' && <LookupDialog doc={view} selfId={mineId} onClose={() => setKinDialog(null)} />}
       {dialog?.kind === 'addRoot' && <AddRootDialog edit={edit} onClose={closeDialog} />}
       {dialog?.kind === 'editTree' && (
         <EditTreeInfoDialog
